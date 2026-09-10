@@ -1,0 +1,236 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>HE-Arc - 1242.1 Langage C - Chapitre 1 - Introduction</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/hearc.css" id="theme">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="https://www.he-arc.ch/wp-content/uploads/2021/12/cropped-hearc-icon-192x192.png"
+    type="image/vnd.microsoft.icon" />
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/vs.css" id="highlight-theme">
+</head>
+
+<body>
+  <img id="logo-hearc" src="./medias/logo_he-arc.png" alt="Logo HE-ARC">
+  <img id="logo-hesso" src="./medias/logo_hes-so.png" alt="Logo HES-SO">
+  <p id="course-infos">1242.1 Langage C - 2026-2027</p>
+
+  <!----------          CONTENT          ---------->
+  <div class="reveal">
+    <div class="slides">
+
+      <!----------          TITLE          ---------->
+      <section>
+        <h1>
+          Chapitre 1
+        </h1>
+        <h2>
+          Introduction C
+        </h2>
+        <p>1. Pourquoi le C ?</p>
+        <p>2. Histoire du C</p>
+        <p>3. Avantages / désavantages</p>
+        <p>4. Exemples de programmes</p>
+        <p>5. La compilation</p>
+      </section>
+
+      <!----------          POPULARITE          ---------->
+      <section>
+
+        <section>
+          <h2>1.1 Pourquoi le C</h2>
+          <iframe src="https://www.tiobe.com/tiobe-index/" width="1600px" height="800px"></iframe>
+        </section>
+
+      </section>
+
+      <!----------          ORIGINE          ---------->
+      <section>
+
+        <section>
+          <h2>1.2 Histoire du C</h2>
+          <p><b>1960</b> - <b>Le langage CPL</b> - <em>Combined Programming Language</em></p>
+          <p><b>1967</b> - <b>Le langage BCPL</b> - <em>Basic Combined Programming Language</em> [Martin Richard]</p>
+          <p><b>1970</b> - <b>Le langage B</b> possédant des structures de contrôle indépendantes de la machine et
+            permettant d'écrire des compilateurs, récrit UNIX en langage B. [Ken Thompson]</p>
+          <br>
+          <p><highlight>1972 - Le langage C s'inspire fortement des langages B et BCPL des laboratoires Bell
+              [Dennis Ritchie]</highlight></p>
+        </section>
+
+        <section>
+          <h2>1.2 Histoire du C</h2>
+          <p><highlight>1973 - K&amp;R C :</highlight> UNIX est écrit à 90% en K&amp;R C. Cette première version du C
+            des auteurs Kernighan et Ritchie est définie dans le livre <em>The C Programming Language</em> (1978)</p>
+          <br>
+          <p><highlight>1983 - ANSI C :</highlight> <em><b>A</b>merican <b>N</b>ational <b>S</b>tandards
+              <b>I</b>nstitute</em>, résultat d'un effort de standardisation remplace le K&amp;R C, et évolue
+            jusqu'au standard connu comme <highlight>C ANSI</highlight>, <highlight>C89</highlight> ou
+            <highlight>C90</highlight></p>
+          <br>
+          <p><highlight>1985 - C++ :</highlight> évolution du C par Bjarne Stroustrup</p>
+          <p>Le principal "+" du C++ est la possibilité d'utiliser les concepts de la programmation orientée objet
+            avec l'efficacité du ANSI C</p>
+        </section>
+
+        <section>
+          <h2>1.2 Histoire du C</h2>
+          <p><highlight>1999 - C99 :</highlight> l'ISO standardise une extension de la norme du langage C, connue
+            sous le nom de <highlight>C99</highlight></p>
+          <br>
+          <p><highlight>2011 - C11 :</highlight> nouvelle norme du langage C depuis décembre 2011, avec la définition
+            du nouveau standard <highlight>C11</highlight></p>
+          <br>
+          <p><highlight>2018 - C17</highlight></p>
+          <br>
+          <p><highlight>2024 - C23</highlight></p>
+        </section>
+
+      </section>
+
+      <!----------          AVANTAGES / DESAVANTAGES          ---------->
+      <section>
+
+        <section>
+          <h2>1.3 Avantages du C</h2>
+          <p><highlight>Rapide</highlight> : proche du matériel, pas de machine virtuelle ni de ramasse-miettes</p>
+          <p><highlight>Compact</highlight> : code et empreinte mémoire réduits</p>
+          <p><highlight>Accès bas niveau</highlight> : mémoire, registres, périphériques</p>
+          <p><highlight>Portable</highlight> : le même code source se compile sur (presque) toutes les machines et tous
+            les OS</p>
+          <p><highlight>Omniprésent</highlight> : noyaux (Linux, Windows), embarqué, interpréteurs (Python, …),
+            bibliothèques système</p>
+        </section>
+
+        <section>
+          <h2>1.3 Désavantages du C</h2>
+          <div class="container">
+            <div class="col-left">
+              <p><highlight>Clarté non garantie</highlight> : rien n'empêche d'écrire du code illisible
+                (<a href="http://fr.wikipedia.org/wiki/International_Obfuscated_C_Code_Contest">concours du code
+                  obscur</a>)</p>
+              <br>
+              <p><highlight>Portable, mais…</highlight> : la bibliothèque standard est minimale, tout le reste
+                (interface graphique, réseau, système) dépend de la plateforme</p>
+              <br>
+              <p><highlight>Discipline de programmation</highlight> : pas de filet de sécurité, gestion manuelle de la
+                mémoire, pas de vérification des bornes</p>
+            </div>
+            <div class="col-right">
+              <img src="./medias/ioccc.png" alt="Exemple de code C obscur (IOCCC)" height="800px">
+            </div>
+          </div>
+        </section>
+
+      </section>
+
+      <!----------          EXEMPLES          ---------->
+      <section>
+
+        <section>
+          <h2>1.4 Exemples de code</h2>
+          <p>Fichier <inline-code>hello.c</inline-code></p>
+          <pre style="width: 1400px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 2em;"
+            data-line-numbers="">
+
+            #include &#60;stdio.h&#62;
+
+            // Main function
+            int main(void)
+            {
+              // Start of a block
+              printf("Hello World!\n");
+              
+              return 0;
+              // End of the block
+            }
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>1.4 Exemples de code</h2>
+          <p>Fichier <inline-code>add.c</inline-code></p>
+          <pre style="width: 1400px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 2em;"
+            data-line-numbers="">
+
+            #include &#60;stdio.h&#62;
+
+            int main(void)
+            {
+              int a = 10;
+              int b = 5;
+              printf("%d", a+b);
+
+              return 0;
+            }</code></pre>
+        </section>
+
+      </section>
+
+      <!----------          COMPILATION          ---------->
+      <section>
+
+        <section>
+          <h2>1.5 La compilation</h2>
+          <h3>Le C est un langage <highlight>compilé</highlight></h3>
+          <p>Un programme C est décrit par un fichier texte, appelé <highlight>fichier source</highlight>.</p>
+          <p>Il faut le <highlight>traduire</highlight>, le <highlight>compiler</highlight>, en langage machine car le
+            texte n'est pas exécutable par le microprocesseur</p>
+          <br>
+          <h3>La compilation</h3>
+          <p>La compilation est effectuée par un programme appelé <highlight>le compilateur</highlight>.</p>
+          <p>Elle se réalise en <highlight>4 phases</highlight> successives :</p>
+          <ol>
+            <li>Le prétraitement : <em>preprocessing</em></li>
+            <li>La compilation : <em>compilation</em></li>
+            <li>L'assemblage : <em>assembly</em></li>
+            <li>L'édition des liens : <em>linking</em></li>
+          </ol>
+        </section>
+
+      </section>
+
+    </div>
+  </div>
+
+  <!----------          CONTENT          ---------->
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/notes/notes.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      hash: true,
+      width: 1920,
+      height: 1080,
+      transition: "none",
+      center: false,
+      slideNumber: 'c/t',
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+    });
+  </script>
+</body>
+
+</html>
