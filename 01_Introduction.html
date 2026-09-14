@@ -59,8 +59,8 @@
           <h2>1.2 Histoire du C</h2>
           <p><b>1960</b> - <b>Le langage CPL</b> - <em>Combined Programming Language</em></p>
           <p><b>1967</b> - <b>Le langage BCPL</b> - <em>Basic Combined Programming Language</em> [Martin Richard]</p>
-          <p><b>1970</b> - <b>Le langage B</b> possédant des structures de contrôle indépendantes de la machine et
-            permettant d'écrire des compilateurs, récrit UNIX en langage B. [Ken Thompson]</p>
+          <p><b>1970</b> - <b>Le langage B</b> [Ken Thompson] : structures de contrôle indépendantes de la machine,
+            sert à écrire des compilateurs et des utilitaires d'UNIX, dont le noyau reste en assembleur</p>
           <br>
           <p><highlight>1972 - Le langage C s'inspire fortement des langages B et BCPL des laboratoires Bell
               [Dennis Ritchie]</highlight></p>
@@ -68,10 +68,12 @@
 
         <section>
           <h2>1.2 Histoire du C</h2>
-          <p><highlight>1973 - K&amp;R C :</highlight> UNIX est écrit à 90% en K&amp;R C. Cette première version du C
-            des auteurs Kernighan et Ritchie est définie dans le livre <em>The C Programming Language</em> (1978)</p>
+          <p><highlight>1973 -</highlight> UNIX est réécrit en C, à 90%</p>
           <br>
-          <p><highlight>1983 - ANSI C :</highlight> <em><b>A</b>merican <b>N</b>ational <b>S</b>tandards
+          <p><highlight>1978 - K&amp;R C :</highlight> première version de référence du langage, définie dans le livre
+            <em>The C Programming Language</em> de Kernighan et Ritchie</p>
+          <br>
+          <p><highlight>1983-1989 - ANSI C :</highlight> <em><b>A</b>merican <b>N</b>ational <b>S</b>tandards
               <b>I</b>nstitute</em>, résultat d'un effort de standardisation remplace le K&amp;R C, et évolue
             jusqu'au standard connu comme <highlight>C ANSI</highlight>, <highlight>C89</highlight> ou
             <highlight>C90</highlight></p>
@@ -151,7 +153,7 @@
             int main(void)
             {
               // Start of a block
-              printf("Hello World!\n");
+              printf("hello, world\n");
               
               return 0;
               // End of the block
@@ -175,7 +177,7 @@
             {
               int a = 10;
               int b = 5;
-              printf("%d", a+b);
+              printf("%d\n", a+b);
 
               return 0;
             }</code></pre>
@@ -189,19 +191,18 @@
         <section>
           <h2>1.5 La compilation</h2>
           <h3>Le C est un langage <highlight>compilé</highlight></h3>
-          <p>Un programme C est décrit par un fichier texte, appelé <highlight>fichier source</highlight>.</p>
-          <p>Il faut le <highlight>traduire</highlight>, le <highlight>compiler</highlight>, en langage machine car le
-            texte n'est pas exécutable par le microprocesseur</p>
+          <p>Fichier source <inline-code>.c</inline-code> : du texte</p>
+          <p>Le processeur n'exécute que du <highlight>langage machine</highlight></p>
+          <p><highlight>Compiler</highlight> = traduire le source en langage machine</p>
           <br>
-          <h3>La compilation</h3>
-          <p>La compilation est effectuée par un programme appelé <highlight>le compilateur</highlight>.</p>
-          <p>Elle se réalise en <highlight>4 phases</highlight> successives :</p>
+          <h3>La chaîne de compilation : <highlight>4 outils</highlight></h3>
           <ol>
-            <li>Le prétraitement : <em>preprocessing</em></li>
-            <li>La compilation : <em>compilation</em></li>
-            <li>L'assemblage : <em>assembly</em></li>
-            <li>L'édition des liens : <em>linking</em></li>
+            <li><b>Préprocesseur</b> : <inline-code>#include</inline-code>, <inline-code>#define</inline-code></li>
+            <li><b>Compilateur</b> : C → assembleur</li>
+            <li><b>Assembleur</b> : assembleur → code objet</li>
+            <li><b>Éditeur de liens</b> : objets + bibliothèques → exécutable</li>
           </ol>
+          <p><warning>⚠️ Attention :</warning> « Compilation » = étape 2 au sens strict, toute la chaîne au sens courant</p>
         </section>
 
       </section>
