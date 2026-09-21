@@ -1,0 +1,897 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>HE-Arc - 1242.1 Langage C - Chapitre 2 - Types et variables</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/hearc.css" id="theme">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="https://www.he-arc.ch/wp-content/uploads/2021/12/cropped-hearc-icon-192x192.png"
+    type="image/vnd.microsoft.icon" />
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/vs.css" id="highlight-theme">
+
+  <style>
+    .reveal .container p,
+    .reveal .container h3,
+    .reveal .container h4 { padding-left: 0; }
+    .reveal .container .col-left { text-align: left; }
+
+    .reveal .formula { text-align: center; padding-left: 0; font-size: 1.2em; }
+    .reveal .indent-1 { padding-left: 300px; }
+
+    .reveal table.memory {
+      font-size: 0.7em;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      margin: 0 auto;
+    }
+    .reveal table.memory th,
+    .reveal table.memory td {
+      border: 2px solid #222;
+      padding: 0.1em 0.6em;
+      text-align: center;
+    }
+    .reveal table.memory th { background-color: #dddddd; }
+    .reveal table.memory td.name { color: #FF0000; min-width: 3em; }
+    .reveal table.memory td.adr { color: #38a238; }
+    .reveal table.memory td.val { background-color: #dde6f4; color: #0000FF; min-width: 5em; }
+    .reveal table.memory td.note { border: none; font-family: "Roboto", Helvetica, sans-serif; font-weight: normal; text-align: left; }
+    .reveal table.memory tr.var-a td.name,
+    .reveal table.memory tr.var-a td.adr { background-color: #f0f0f0; }
+    .reveal table.memory tr.var-b td.name,
+    .reveal table.memory tr.var-b td.adr { background-color: #ffffcc; }
+    .reveal table.memory tr.var-a td.val.hl { background-color: #f9c6a0; }
+    .reveal table.memory tr.var-b td.val.hl { background-color: #9bd36a; }
+
+    .reveal table.types { font-size: 0.9em; margin: 0 auto; }
+    .reveal table.types th,
+    .reveal table.types td { border: 2px solid #222; padding: 0.2em 0.8em; }
+    .reveal table.types th { background-color: #dddddd; }
+    .reveal table.types td.code {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      color: #0000FF;
+    }
+    .reveal table.types td.center,
+    .reveal table.types th.center { text-align: center; }
+
+    .reveal table.keywords {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      font-size: 0.8em;
+      margin: 0 auto;
+    }
+    .reveal table.keywords td { border: none; padding: 0.1em 1.2em; }
+    .reveal table.keywords sup { font-family: "Roboto", Helvetica, sans-serif; font-weight: normal; font-size: 0.5em; }
+
+    .reveal table.ascii {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.55em;
+      margin: 0 auto;
+    }
+    .reveal table.ascii th,
+    .reveal table.ascii td { border: 1px solid #999; padding: 0.05em 0.5em; text-align: center; }
+    .reveal table.ascii th { background-color: #dddddd; }
+    .reveal table.ascii td.chr { color: #FF0000; font-weight: bold; }
+
+    .reveal .bits {
+      display: flex;
+      justify-content: center;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      font-size: 0.7em;
+      margin: 10px 0;
+    }
+    .reveal .bits span {
+      display: inline-block;
+      width: 1.5em;
+      line-height: 1.6em;
+      border: 2px solid #222;
+      margin-left: -2px;
+      text-align: center;
+    }
+    .reveal .bits .s { background-color: #f4b6b6; }
+    .reveal .bits .e { background-color: #ffe08a; }
+    .reveal .bits .m { background-color: #b6e8b6; }
+    .reveal .bits .label { border: none; background: none; font-family: "Roboto", Helvetica, sans-serif; font-weight: normal; }
+    .reveal .bits .label.s { width: 1.5em; }
+    .reveal .bits .label.e { width: 12em; }
+    .reveal .bits .label.m { width: 34.5em; }
+
+    .reveal pre.raw {
+      width: 1500px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.7em;
+      font-weight: bold;
+      line-height: 1.5em;
+      box-shadow: none;
+    }
+    .reveal pre.raw .s { color: #FF0000; }
+    .reveal pre.raw .e { color: #0000FF; }
+    .reveal pre.raw .m { color: #38a238; }
+  </style>
+</head>
+
+<body>
+  <img id="logo-hearc" src="./medias/logo_he-arc.png" alt="Logo HE-ARC">
+  <img id="logo-hesso" src="./medias/logo_hes-so.png" alt="Logo HES-SO">
+  <p id="course-infos">1242.1 Langage C - 2026-2027</p>
+
+  <!----------          CONTENT          ---------->
+  <div class="reveal">
+    <div class="slides">
+
+      <!----------          TITLE          ---------->
+      <section>
+        <h1>
+          Chapitre 2
+        </h1>
+        <h2>
+          Types et variables
+        </h2>
+        <p>1. Codage binaire</p>
+        <p>2. Mémoire</p>
+        <p>3. Définition d'une variable</p>
+        <p>4. Nommer une variable</p>
+        <p>5. Typer une variable</p>
+        <p>6. Les types de base</p>
+        <p>7. Déclaration et affectation d'une variable</p>
+        <p>8. Codage des types élémentaires</p>
+      </section>
+
+      <!----------          CODAGE BINAIRE          ---------->
+      <section>
+
+        <section>
+          <h2>2.1 Codage en binaire</h2>
+          <h3>Représenter les nombres en mémoire</h3>
+          <p>Toute information est codée en <highlight>base 2</highlight></p>
+          <p>Chaque symbole correspond physiquement à une tension électrique</p>
+          <br>
+          <h3>Pour une base <em>B</em>, il y a <em>B</em> symboles différents</h3>
+          <p>Décimal, <b>base 10</b> : 0, 1, 2, 3, 4, 5, 6, 7, 8, 9</p>
+          <p>Binaire, <b>base 2</b> : 0, 1 ⇒ un chiffre = un <highlight>bit</highlight> (<em><b>bi</b>nary digi<b>t</b></em>)</p>
+          <p>Octal, <b>base 8</b> : 0, 1, 2, 3, 4, 5, 6, 7</p>
+          <p class="indent-1">En C, préfixe <inline-code>0</inline-code> : <inline-code>0, 01, 02, 03, 07, 010, 011, …</inline-code></p>
+          <p>Hexadécimal, <b>base 16</b> : 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, <error>A, B, C, D, E, F</error></p>
+          <p class="indent-1">En C, préfixe <inline-code>0x</inline-code> : <inline-code>0x0, 0x1, …, 0xF, 0x10, …</inline-code></p>
+          <p class="indent-1">A<sub>16</sub> = 10<sub>10</sub>, B<sub>16</sub> = 11<sub>10</sub>, C<sub>16</sub> = 12<sub>10</sub>,
+            D<sub>16</sub> = 13<sub>10</sub>, E<sub>16</sub> = 14<sub>10</sub>, F<sub>16</sub> = 15<sub>10</sub></p>
+        </section>
+
+        <section>
+          <h2>2.1 Nombre en base B vers nombre décimal</h2>
+          <p>Valeur en base 10 d'un nombre (a<sub>n</sub> a<sub>n-1</sub> … a<sub>1</sub> a<sub>0</sub>)<sub>B</sub> codé en base B :</p>
+          <p class="formula">nb<sub>10</sub> = a<sub>n</sub> · B<sup>n</sup> + a<sub>n-1</sub> · B<sup>n-1</sup> + … + a<sub>1</sub> · B<sup>1</sup> + a<sub>0</sub> · B<sup>0</sup></p>
+          <br>
+          <h3>Exemples</h3>
+          <p>(<highlight>1234</highlight>)<sub>10</sub> = <highlight>1</highlight> · 10<sup>3</sup> + <highlight>2</highlight> · 10<sup>2</sup> + <highlight>3</highlight> · 10<sup>1</sup> + <highlight>4</highlight> · 10<sup>0</sup> = <error>1234<sub>10</sub></error></p>
+          <p>(<highlight>11001</highlight>)<sub>2</sub> = <highlight>1</highlight> · 2<sup>4</sup> + <highlight>1</highlight> · 2<sup>3</sup> + <highlight>0</highlight> · 2<sup>2</sup> + <highlight>0</highlight> · 2<sup>1</sup> + <highlight>1</highlight> · 2<sup>0</sup></p>
+          <p class="indent-1">= 16 + 8 + 0 + 0 + 1 = <error>25<sub>10</sub></error></p>
+          <p>(<highlight>1C04</highlight>)<sub>16</sub> = <highlight>1</highlight> · 16<sup>3</sup> + <highlight>12</highlight> · 16<sup>2</sup> + <highlight>0</highlight> · 16<sup>1</sup> + <highlight>4</highlight> · 16<sup>0</sup></p>
+          <p class="indent-1">= 4096 + 3072 + 0 + 4 = <error>7172<sub>10</sub></error></p>
+          <p class="indent-1"><em>avec A = 10, B = 11, C = 12, D = 13, E = 14, F = 15</em></p>
+        </section>
+
+      </section>
+
+      <!----------          MEMOIRE          ---------->
+      <section>
+
+        <section>
+          <h2>2.2 Qu'est-ce que la mémoire ?</h2>
+          <div class="container">
+            <div class="col-left">
+              <p>Un grand tableau de <highlight>cases</highlight> numérotées, dans lesquelles on mémorise des informations</p>
+              <br>
+              <p>Le numéro d'une case est son <highlight>adresse</highlight> (<inline-code>Adr</inline-code>)</p>
+              <br>
+              <p>Les <highlight>valeurs</highlight> sont stockées dans des cases de n bytes (1, 2, 4, 8, …)</p>
+              <br>
+              <p>Certaines valeurs tiennent sur :</p>
+              <p class="indent-1">une case, comme <b>27</b> à l'adresse <inline-code>0x2</inline-code></p>
+              <p class="indent-1">plusieurs cases, comme <b>"Hello"</b> aux adresses <inline-code>0x4…0x9</inline-code></p>
+            </div>
+            <div class="col-right">
+              <table class="memory">
+                <tr><th>Adr</th><th>Valeur</th><th></th></tr>
+                <tr><td class="adr">0x0</td><td class="val"></td><td class="note"></td></tr>
+                <tr><td class="adr">0x1</td><td class="val"></td><td class="note"></td></tr>
+                <tr><td class="adr">0x2</td><td class="val">0x1B</td><td class="note">= 27</td></tr>
+                <tr><td class="adr">0x3</td><td class="val"></td><td class="note"></td></tr>
+                <tr><td class="adr">0x4</td><td class="val">0x48</td><td class="note">'H' = 72</td></tr>
+                <tr><td class="adr">0x5</td><td class="val">0x65</td><td class="note">'e'</td></tr>
+                <tr><td class="adr">0x6</td><td class="val">0x6C</td><td class="note">'l'</td></tr>
+                <tr><td class="adr">0x7</td><td class="val">0x6C</td><td class="note">'l'</td></tr>
+                <tr><td class="adr">0x8</td><td class="val">0x6F</td><td class="note">'o'</td></tr>
+                <tr><td class="adr">0x9</td><td class="val">0x00</td><td class="note">'\0'</td></tr>
+                <tr><td class="adr">0xA</td><td class="val"></td><td class="note"></td></tr>
+                <tr><td class="adr">0xB</td><td class="val"></td><td class="note"></td></tr>
+                <tr><td class="adr">0xC</td><td class="val">01001001</td><td class="note"></td></tr>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </section>
+
+      <!----------          DEFINITION D'UNE VARIABLE          ---------->
+      <section>
+
+        <section>
+          <h2>2.3 Qu'est-ce qu'une variable ?</h2>
+          <div class="container">
+            <div class="col-left">
+              <p>Une <error>variable</error> <b>nomme un endroit de la mémoire</b> où on mémorise une <highlight>valeur</highlight> d'un certain <highlight>type</highlight></p>
+              <p>D'abord <highlight>déclarer</highlight> la variable : un nom et un type, et optionnellement une valeur : <highlight>initialisation</highlight></p>
+              <pre style="width: 700px; margin-left: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 2em;">
+
+                int x;
+                int y = 27;
+              </code></pre>
+              <p><inline-code>int</inline-code> : type pour un simple entier</p>
+              <p><inline-code>y</inline-code> : nom de la variable</p>
+              <p><inline-code>27</inline-code> : valeur initiale</p>
+              <br>
+              <p>Le compilateur décide quelles places mémoire il utilise</p>
+            </div>
+            <div class="col-right">
+              <table class="memory">
+                <tr><th>Nom</th><th>Adr</th><th>Valeur</th></tr>
+                <tr><td class="name"></td><td class="adr">0</td><td class="val"></td></tr>
+                <tr><td class="name"></td><td class="adr">…</td><td class="val"></td></tr>
+                <tr class="var-a"><td class="name">x</td><td class="adr">4</td><td class="val">??</td></tr>
+                <tr class="var-a"><td class="name"></td><td class="adr">5</td><td class="val">??</td></tr>
+                <tr class="var-a"><td class="name"></td><td class="adr">6</td><td class="val">??</td></tr>
+                <tr class="var-a"><td class="name"></td><td class="adr">7</td><td class="val">??</td></tr>
+                <tr class="var-b"><td class="name">y</td><td class="adr">8</td><td class="val">27</td></tr>
+                <tr class="var-b"><td class="name"></td><td class="adr">9</td><td class="val">00</td></tr>
+                <tr class="var-b"><td class="name"></td><td class="adr">A</td><td class="val">00</td></tr>
+                <tr class="var-b"><td class="name"></td><td class="adr">B</td><td class="val">00</td></tr>
+                <tr><td class="name"></td><td class="adr">C</td><td class="val"></td></tr>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>2.3 Variables « multi-byte »</h2>
+          <div class="container">
+            <div class="col-left">
+              <p>Les types prennent plus ou moins de place en mémoire</p>
+              <p>La plupart des ordinateurs mémorisent les valeurs sur des multiples d'un mot de base : 8, 16, 32, 64 bits</p>
+              <p>⇒ il peut y avoir du <highlight>remplissage</highlight> (<em>padding</em>)</p>
+              <pre style="width: 700px; margin-left: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 2em;">
+
+                char x;
+                int z = 0x01020304;
+              </code></pre>
+              <p><inline-code>0x</inline-code> : le nombre est en hexadécimal</p>
+              <br>
+              <p>Un <inline-code>char</inline-code> utilise <highlight>1 byte</highlight></p>
+              <p>Un <inline-code>int</inline-code> utilise <highlight>4 bytes</highlight></p>
+            </div>
+            <div class="col-right">
+              <table class="memory">
+                <tr><th>Nom</th><th>Adr</th><th>Valeur</th><th></th></tr>
+                <tr><td class="name"></td><td class="adr">0</td><td class="val"></td><td class="note"></td></tr>
+                <tr><td class="name"></td><td class="adr">…</td><td class="val"></td><td class="note"></td></tr>
+                <tr class="var-a"><td class="name">x</td><td class="adr">4</td><td class="val hl">??</td><td class="note">1 byte</td></tr>
+                <tr><td class="name"></td><td class="adr">5</td><td class="val"></td><td class="note">remplissage</td></tr>
+                <tr><td class="name"></td><td class="adr">6</td><td class="val"></td><td class="note">remplissage</td></tr>
+                <tr><td class="name"></td><td class="adr">7</td><td class="val"></td><td class="note">remplissage</td></tr>
+                <tr class="var-b"><td class="name">z</td><td class="adr">8</td><td class="val hl">04</td><td class="note">4 bytes</td></tr>
+                <tr class="var-b"><td class="name"></td><td class="adr">9</td><td class="val hl">03</td><td class="note"></td></tr>
+                <tr class="var-b"><td class="name"></td><td class="adr">A</td><td class="val hl">02</td><td class="note"></td></tr>
+                <tr class="var-b"><td class="name"></td><td class="adr">B</td><td class="val hl">01</td><td class="note"></td></tr>
+                <tr><td class="name"></td><td class="adr">C</td><td class="val"></td><td class="note"></td></tr>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>2.3 Caractéristiques d'une variable</h2>
+          <p><highlight>1. Son identificateur</highlight> : le nom par lequel la donnée est désignée</p>
+          <p class="indent-1">⇒ <b>fixe</b></p>
+          <br>
+          <p><highlight>2. Son type</highlight> : la nature de la donnée et les opérations permises</p>
+          <p class="indent-1">Détermine aussi la façon dont la variable est stockée en mémoire et son domaine d'utilisation</p>
+          <p class="indent-1">⇒ <b>fixe</b></p>
+          <br>
+          <p><highlight>3. Sa valeur</highlight> à un instant donné</p>
+          <p class="indent-1">Peut varier au cours de l'exécution du programme</p>
+          <p class="indent-1">⇒ <b>variable</b></p>
+        </section>
+
+        <section>
+          <h2>2.3 Cycle de vie des variables</h2>
+          <h3>On distingue <highlight>4 opérations</highlight> sur les variables</h3>
+          <br>
+          <p>La <highlight>déclaration</highlight> : déclarer un <b>nom</b> de variable en lui associant un <b>type</b></p>
+          <br>
+          <p>L'<highlight>affectation</highlight> : <b>attribuer</b> une <b>valeur</b> à une <b>variable</b></p>
+          <br>
+          <p>La <highlight>lecture</highlight> : <b>utiliser</b> la <b>valeur</b> associée à la variable</p>
+          <br>
+          <p>La <highlight>destruction</highlight> : <b>libérer</b> la <b>mémoire</b> utilisée</p>
+        </section>
+
+      </section>
+
+      <!----------          NOMMER UNE VARIABLE          ---------->
+      <section>
+
+        <section>
+          <h2>2.4 Noms de variables</h2>
+          <h3>Caractères autorisés par la norme</h3>
+          <p>1. les <b>lettres</b> majuscules et minuscules (<em>case sensitive</em>)</p>
+          <p>2. les <b>chiffres</b> 0..9</p>
+          <p>3. le caractère <inline-code>_</inline-code></p>
+          <br>
+          <p><warning>⚠️ Attention :</warning> les noms ne peuvent pas commencer par un chiffre !</p>
+          <br>
+          <p><error>⛔ Interdit :</error> utiliser un des <highlight>mots réservés</highlight> (<em>keywords</em>) du C comme nom de variable</p>
+        </section>
+
+        <section>
+          <h2>2.4 Mots réservés du langage C</h2>
+          <p>La norme C11 possède 44 mots-clés réservés <highlight>qui ne peuvent pas être utilisés comme identificateurs</highlight></p>
+          <table class="keywords">
+            <tr><td>_Alignas<sup>(C11)</sup></td><td>_Alignof<sup>(C11)</sup></td><td>_Atomic<sup>(C11)</sup></td><td>_Bool<sup>(C99)</sup></td><td>_Complex<sup>(C99)</sup></td></tr>
+            <tr><td>_Generic<sup>(C11)</sup></td><td>_Imaginary<sup>(C99)</sup></td><td>_Noreturn<sup>(C11)</sup></td><td>_Static_assert<sup>(C11)</sup></td><td>_Thread_local<sup>(C11)</sup></td></tr>
+            <tr><td>auto</td><td>break</td><td>case</td><td>char</td><td>const</td></tr>
+            <tr><td>continue</td><td>default</td><td>do</td><td>double</td><td>else</td></tr>
+            <tr><td>enum</td><td>extern</td><td>float</td><td>for</td><td>goto</td></tr>
+            <tr><td>if</td><td>inline<sup>(C99)</sup></td><td>int</td><td>long</td><td>register</td></tr>
+            <tr><td>restrict<sup>(C99)</sup></td><td>return</td><td>short</td><td>signed</td><td>sizeof</td></tr>
+            <tr><td>static</td><td>struct</td><td>switch</td><td>typedef</td><td>union</td></tr>
+            <tr><td>unsigned</td><td>void</td><td>volatile</td><td>while</td><td></td></tr>
+          </table>
+          <br>
+          <p>📌 C23 en ajoute (et en enlève) d'autres : <inline-code>bool</inline-code>, <inline-code>true</inline-code>, <inline-code>false</inline-code>,
+            <inline-code>nullptr</inline-code>, <inline-code>constexpr</inline-code>, <inline-code>typeof</inline-code>, …</p>
+          <p>📚 Référence : <a href="https://en.cppreference.com/w/c/keyword">en.cppreference.com/w/c/keyword</a></p>
+        </section>
+
+        <section>
+          <h2>2.4 Noms de variables</h2>
+          <p>Les <b>noms</b> de variables doivent être <b>explicites</b></p>
+          <p class="indent-1"><inline-code>quantity</inline-code>, <inline-code>unitPrice</inline-code>, <inline-code>xAxisSpeed</inline-code>, …</p>
+          <br>
+          <p>2 manières usuelles d'écrire des noms de variables :</p>
+          <p class="indent-1"><highlight>camelCase</highlight> (lowerCamelCase), exemple : <inline-code>exchangeRate</inline-code></p>
+          <p class="indent-1"><highlight>PascalCase</highlight> (UpperCamelCase), exemple : <inline-code>ExchangeRate</inline-code></p>
+          <br>
+          <p>Il existe des conventions de codage (par exemple : commentaires en anglais)</p>
+        </section>
+
+      </section>
+
+      <!----------          TYPER UNE VARIABLE          ---------->
+      <section>
+
+        <section>
+          <h2>2.5 Typer une variable</h2>
+          <p>Un programme gère des informations stockées dans des variables</p>
+          <p>En C, il faut « spécifier » la nature de chaque donnée en donnant son <highlight>type</highlight></p>
+          <br>
+          <h3>À chaque type sont associées 2 notions</h3>
+          <p><highlight>1. Taille de l'occupation en mémoire</highlight></p>
+          <p class="indent-1">⇒ définit un intervalle de valeurs possibles pour la variable</p>
+          <br>
+          <p><highlight>2. Ensemble d'opérations réalisables</highlight></p>
+        </section>
+
+        <section>
+          <h2>2.5 Typer une variable</h2>
+          <h3>Le C est un langage à typage <highlight>faible</highlight>, <highlight>explicite</highlight> et <highlight>statique</highlight></h3>
+          <br>
+          <h4><highlight>Typage faible</highlight></h4>
+          <p>La force du typage indique que les types de données correspondent aux données manipulées</p>
+          <p>Un langage est fortement typé si :</p>
+          <p class="indent-1">1. Les conversions implicites de types sont formellement interdites</p>
+          <p class="indent-1">2. Les erreurs de types sont détectées</p>
+          <h4><highlight>Typage explicite</highlight></h4>
+          <p>Le programmeur doit indiquer les types qu'il utilise</p>
+          <h4><highlight>Typage statique</highlight></h4>
+          <p>La vérification de type se fait <b>lors de la compilation</b>, et non lors de l'exécution (typage dynamique)</p>
+        </section>
+
+      </section>
+
+      <!----------          TYPES DE BASE          ---------->
+      <section>
+
+        <section>
+          <h2>2.6 Types de base en C</h2>
+          <p>Le C propose une vaste variété de types permettant de manipuler des valeurs</p>
+          <br>
+          <h3><highlight>Types de base</highlight></h3>
+          <p class="indent-1">Nombres entiers</p>
+          <p class="indent-1">Nombres à virgule flottante</p>
+          <p class="indent-1">Valeur booléenne</p>
+          <br>
+          <h3><highlight>Types dérivés</highlight></h3>
+          <p class="indent-1">Tableaux</p>
+          <p class="indent-1">Structures</p>
+          <p class="indent-1">Pointeurs</p>
+          <p class="indent-1">Fonctions</p>
+        </section>
+
+        <section>
+          <h2>2.6 Types de base en C</h2>
+          <h3>Nombres entiers</h3>
+          <table class="types">
+            <tr><th></th><th><highlight>signés</highlight> (anonymes)</th><th><highlight>non-signés</highlight> (anonymes)</th><th>nommés</th></tr>
+            <tr><td>Petite taille</td><td class="code">signed char</td><td class="code">unsigned char</td><td class="code">enum</td></tr>
+            <tr><td>Taille moyenne</td><td class="code">[signed] short</td><td class="code">unsigned short</td><td></td></tr>
+            <tr><td><b>Grande taille</b></td><td class="code">[signed] int</td><td class="code">unsigned int</td><td></td></tr>
+            <tr><td>Ultra grande taille</td><td class="code">[signed] long</td><td class="code">unsigned long</td><td></td></tr>
+          </table>
+          <br>
+          <h3>Nombres à virgule flottante</h3>
+          <p class="indent-1">Simple : <inline-code>float</inline-code></p>
+          <p class="indent-1"><b>Grande précision</b> : <inline-code>double</inline-code></p>
+          <p class="indent-1">Ultra grande précision : <inline-code>long double</inline-code></p>
+          <br>
+          <h3>Valeur booléenne</h3>
+          <p class="indent-1">Dépend de la version de la norme, voir « Type logique »</p>
+        </section>
+
+        <section>
+          <h2>2.6 Types des nombres entiers non signés</h2>
+          <table class="types">
+            <tr><th>Type</th><th class="center">Taille [bits]</th><th>Domaine de valeurs</th></tr>
+            <tr><td class="code">unsigned char</td><td class="center">8</td><td>0 à 255</td></tr>
+            <tr><td class="code">unsigned short</td><td class="center">16</td><td>0 à 65'535</td></tr>
+            <tr><td class="code">unsigned int</td><td class="center">32</td><td>0 à 4'294'967'295</td></tr>
+            <tr><td class="code">unsigned long</td><td class="center">32</td><td>0 à 4'294'967'295</td></tr>
+          </table>
+          <br>
+          <p><warning>⚠️ Attention :</warning> la taille des types <inline-code>int</inline-code> et <inline-code>long</inline-code> dépend de la plateforme</p>
+        </section>
+
+        <section>
+          <h2>2.6 Types des nombres entiers signés</h2>
+          <table class="types">
+            <tr><th>Type</th><th class="center">Taille [bits]</th><th>Domaine de valeurs</th></tr>
+            <tr><td class="code">char</td><td class="center">8</td><td>-128 à +127</td></tr>
+            <tr><td class="code">short</td><td class="center">16</td><td>-32'768 à +32'767</td></tr>
+            <tr><td class="code">int</td><td class="center">32</td><td>-2'147'483'648 à +2'147'483'647</td></tr>
+            <tr><td class="code">long</td><td class="center">32</td><td>-2'147'483'648 à +2'147'483'647</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>2.6 Types des nombres à virgule flottante (réels)</h2>
+          <table class="types">
+            <tr><th>Type</th><th class="center">Taille [bits]</th><th>Domaine de valeurs</th></tr>
+            <tr><td class="code">float</td><td class="center">32</td><td>3.4 · 10<sup>-38</sup> à 3.4 · 10<sup>38</sup></td></tr>
+            <tr><td class="code">double</td><td class="center">64</td><td>1.7 · 10<sup>-308</sup> à 1.7 · 10<sup>308</sup></td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>2.6 Type caractères</h2>
+          <table class="types">
+            <tr><th>Type</th><th class="center">Taille [bits]</th><th>Domaine de valeurs</th></tr>
+            <tr><td class="code">char</td><td class="center">8</td><td>-128 à +127</td></tr>
+            <tr><td class="code">unsigned char</td><td class="center">8</td><td>0 à 255</td></tr>
+          </table>
+          <br>
+          <p>Un caractère est un <highlight>nombre</highlight> : son code ASCII</p>
+          <table class="types">
+            <tr><th>Caractère</th><th class="center">Dec</th><th class="center">Hex</th><th></th><th>Caractère</th><th class="center">Dec</th><th class="center">Hex</th></tr>
+            <tr><td class="code">'@'</td><td class="center">64</td><td class="center">40</td><td></td><td class="code">'`'</td><td class="center">96</td><td class="center">60</td></tr>
+            <tr><td class="code">'A'</td><td class="center">65</td><td class="center">41</td><td></td><td class="code">'a'</td><td class="center">97</td><td class="center">61</td></tr>
+            <tr><td class="code">'B'</td><td class="center">66</td><td class="center">42</td><td></td><td class="code">'b'</td><td class="center">98</td><td class="center">62</td></tr>
+            <tr><td class="code">'C'</td><td class="center">67</td><td class="center">43</td><td></td><td class="code">'c'</td><td class="center">99</td><td class="center">63</td></tr>
+            <tr><td class="code">'D'</td><td class="center">68</td><td class="center">44</td><td></td><td class="code">'d'</td><td class="center">100</td><td class="center">64</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>2.6 Type logique</h2>
+          <table class="types">
+            <tr><th>Type</th><th class="center">Taille [bits]</th><th class="center">vrai</th><th class="center">faux</th><th>Version</th></tr>
+            <tr><td class="code">int</td><td class="center">32</td><td class="center">≠ 0</td><td class="center">= 0</td><td>&lt; C99</td></tr>
+            <tr><td class="code">_Bool</td><td class="center">8</td><td class="center">≠ 0</td><td class="center">= 0</td><td>C99</td></tr>
+            <tr><td class="code">bool</td><td class="center">8</td><td class="center code">true</td><td class="center code">false</td><td>C99 à C17 : <inline-code>#include &lt;stdbool.h&gt;</inline-code></td></tr>
+            <tr><td class="code">bool</td><td class="center">8</td><td class="center code">true</td><td class="center code">false</td><td>C23 : mots-clés du langage</td></tr>
+          </table>
+          <br>
+          <p>Depuis C99, <inline-code>bool</inline-code>, <inline-code>true</inline-code> et <inline-code>false</inline-code> sont des macros définies dans <inline-code>&lt;stdbool.h&gt;</inline-code></p>
+          <p>Depuis C23, ce sont des <highlight>mots-clés à part entière</highlight> : plus besoin de <inline-code>&lt;stdbool.h&gt;</inline-code></p>
+        </section>
+
+      </section>
+
+      <!----------          DECLARATION ET AFFECTATION          ---------->
+      <section>
+
+        <section>
+          <h2>2.7 Déclarer une variable</h2>
+          <p>Déclarer une variable <highlight>avant</highlight> de l'utiliser (typage explicite) :</p>
+          <pre style="width: 1400px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 2em;">
+
+            type nomDeLaVariable;
+            type nomDeLaVariable1, nomDeLaVariable2;
+          </code></pre>
+          <p>où <inline-code>type</inline-code> ∈ { <inline-code>char</inline-code>, <inline-code>short</inline-code>, <inline-code>int</inline-code>,
+            <inline-code>long</inline-code>, <inline-code>float</inline-code>, <inline-code>double</inline-code>, …, <inline-code>struct xx</inline-code>, … }</p>
+          <br>
+          <h3>Exemples</h3>
+          <pre style="width: 1400px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 2em;">
+
+            char         choice, tmp;
+            double       fuelPrice, total;
+            long         barCode;
+            unsigned int test, i, j, k;
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>2.7 Rôle et mécanisme de l'affectation</h2>
+          <p>L'affectation place une valeur dans un emplacement mémoire. Elle a pour forme :</p>
+          <pre style="width: 1400px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 2em;">
+
+            variable = expression;
+          </code></pre>
+          <h3>L'expression est soit</h3>
+          <p class="indent-1">une valeur littérale, par exemple <inline-code>10</inline-code> ou <inline-code>'a'</inline-code></p>
+          <p class="indent-1">le résultat d'une instruction, par exemple <inline-code>cos(5)</inline-code> ou <inline-code>a + 10 / c</inline-code></p>
+          <br>
+          <p><highlight>Le symbole = signifie que la variable de gauche prend la valeur de l'expression de droite</highlight></p>
+          <p><highlight>Le sens est « ← »</highlight></p>
+        </section>
+
+        <section>
+          <h2>2.7 Exemples d'affectation</h2>
+          <p>Pour des variables <inline-code>n</inline-code> et <inline-code>p</inline-code> déclarées de type entier :</p>
+          <p><inline-code>n = 4;</inline-code> ⇒ <inline-code>n</inline-code> prend la valeur 4</p>
+          <p><inline-code>p = 5 * n + 1;</inline-code> ⇒ évalue l'expression mathématique et mémorise le résultat (21) dans <inline-code>p</inline-code></p>
+          <br>
+          <h3><warning>⚠️ Attention</warning> à la signification du symbole <inline-code>=</inline-code></h3>
+          <p><inline-code>a = a + 1;</inline-code> a du <b>sens en informatique</b>, pas en mathématiques</p>
+          <p><s><inline-code>a + 5 = 3;</inline-code></s> a du <b>sens en mathématiques</b>, pas en informatique</p>
+          <p><inline-code>a = b;</inline-code> <b>en informatique</b> est différent de <inline-code>b = a;</inline-code></p>
+        </section>
+
+        <section>
+          <h2>2.7 Initialisation</h2>
+          <p>Toute variable d'un programme <highlight>doit être déclarée</highlight></p>
+          <p class="indent-1"><inline-code>type nomDeVariable;</inline-code></p>
+          <p>et peut recevoir une valeur par <error>affectation</error></p>
+          <p class="indent-1"><inline-code>nomDeVariable = valeur;</inline-code></p>
+          <br>
+          <h3><success>✅ Bonne habitude :</success> initialiser les variables à leur déclaration</h3>
+          <pre style="width: 1400px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 2em;">
+
+            float  fuelPrice = 1.63f, total = 0.0f;
+            double x = 1.63;
+            long   barCode = 123456789;
+            int    test, i = 0, j = 0, k = 0;
+            char   choice = 'Y', tmp = '\0';
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>2.7 Tableaux</h2>
+          <h3><highlight>Déclaration</highlight></h3>
+          <pre style="width: 1400px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            float tab[3];
+            int numbers[100];
+          </code></pre>
+          <h3><highlight>Initialisation</highlight></h3>
+          <pre style="width: 1400px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            float tab[3] = {1.2f, 3.4f, 5.6f};
+            int numbers[] = {5, 6, 7};
+          </code></pre>
+          <h3><highlight>Affectation</highlight></h3>
+          <pre style="width: 1400px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            tab[0] = 3.5f;
+            tab[2] = 6.2f;
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>2.7 Portée des variables</h2>
+          <pre style="width: 1400px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;"
+            data-line-numbers="">
+
+            #include &#60;stdio.h&#62;
+            #include &#60;stdlib.h&#62;
+
+            int a, b, z = 0;            // global variables
+
+            int main(void)
+            {
+                double x, y, z = 1;     // local variables
+                {
+                    int u, v, z = 2;    // local variables
+                }
+                return 0;
+            }
+          </code></pre>
+          <br>
+          <h3>Notions de <highlight>visibilité</highlight> (<em>scope</em>), <highlight>durée de vie</highlight>, <highlight>masquage</highlight></h3>
+        </section>
+
+        <section>
+          <h2>2.7 Échanger 2 variables</h2>
+          <div class="container">
+            <div class="col-left">
+              <p>Soit <inline-code>a</inline-code> et <inline-code>b</inline-code> deux variables de même type</p>
+              <p>On souhaite échanger les valeurs de <inline-code>a</inline-code> et <inline-code>b</inline-code></p>
+              <pre style="width: 700px; margin-left: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 2em;">
+
+                int a = 5;
+                int b = 7;
+
+                a = b;
+                b = a;
+              </code></pre>
+              <br>
+              <p>Que se passe-t-il ?</p>
+              <br>
+              <p>Comment faire ?</p>
+            </div>
+            <div class="col-right">
+              <table class="memory">
+                <tr><th>Nom</th><th>Adr</th><th>Valeur</th></tr>
+                <tr><td class="name"></td><td class="adr">0</td><td class="val"></td></tr>
+                <tr><td class="name"></td><td class="adr">…</td><td class="val"></td></tr>
+                <tr class="var-a"><td class="name">a</td><td class="adr">4</td><td class="val">05</td></tr>
+                <tr class="var-a"><td class="name"></td><td class="adr">5</td><td class="val">00</td></tr>
+                <tr class="var-a"><td class="name"></td><td class="adr">6</td><td class="val">00</td></tr>
+                <tr class="var-a"><td class="name"></td><td class="adr">7</td><td class="val">00</td></tr>
+                <tr class="var-b"><td class="name">b</td><td class="adr">8</td><td class="val">07</td></tr>
+                <tr class="var-b"><td class="name"></td><td class="adr">9</td><td class="val">00</td></tr>
+                <tr class="var-b"><td class="name"></td><td class="adr">A</td><td class="val">00</td></tr>
+                <tr class="var-b"><td class="name"></td><td class="adr">B</td><td class="val">00</td></tr>
+                <tr><td class="name"></td><td class="adr">C</td><td class="val"></td></tr>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>2.7 Déclaration de constantes symboliques</h2>
+          <p><highlight>1.</highlight> Le <b>mot réservé</b> <inline-code>const</inline-code> interdit toute modification de la valeur d'une variable après sa déclaration</p>
+          <pre style="width: 1400px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            const float PI = 3.1416f;
+            PI = 3.14f;                 // compilation error
+          </code></pre>
+          <p class="indent-1">⇒ toute constante doit être initialisée lors de sa déclaration</p>
+          <br>
+          <p><highlight>2.</highlight> La <b>directive de précompilation</b> <inline-code>#define</inline-code></p>
+          <pre style="width: 1400px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            #define PI 3.1416f
+          </code></pre>
+          <br>
+          <p><error>⛔ Éviter les constantes littérales</error>, appelées « <em>magic numbers</em> »</p>
+        </section>
+
+      </section>
+
+      <!----------          CODAGE DES TYPES ELEMENTAIRES          ---------->
+      <section>
+
+        <section>
+          <h2>2.8 Codage des types élémentaires</h2>
+          <h3>Caractères</h3>
+          <p><inline-code>char</inline-code></p>
+          <p class="indent-1"><inline-code>'A'</inline-code>, <inline-code>'n'</inline-code></p>
+          <br>
+          <h3>Entiers</h3>
+          <p><inline-code>int</inline-code> → <inline-code>short</inline-code>, <inline-code>int</inline-code>, <inline-code>long</inline-code></p>
+          <p class="indent-1"><inline-code>10</inline-code>, <inline-code>-100</inline-code></p>
+          <br>
+          <h3>Réels</h3>
+          <p><inline-code>double</inline-code> → <inline-code>float</inline-code>, <inline-code>double</inline-code>, <inline-code>long double</inline-code></p>
+          <p class="indent-1"><inline-code>-1.0007</inline-code>, <inline-code>887.82E-003</inline-code></p>
+        </section>
+
+        <section>
+          <h2>2.8 Code ASCII pour les caractères</h2>
+          <!-- ASCII_TABLE -->
+          <br>
+          <p>Codes 0 à 31 : caractères de contrôle, par exemple <inline-code>'\0'</inline-code> (0, NUL), <inline-code>'\a'</inline-code> (7, BEL),
+            <inline-code>'\t'</inline-code> (9, TAB), <inline-code>'\n'</inline-code> (10, LF)</p>
+              <p><highlight>0 à 127</highlight> : ASCII standard, 7 bits</p>
+              <br>
+              <p><error>128 à 255</error> : ASCII étendu, dépend de la page de code (ici CP437, IBM PC)</p>
+        </section>
+
+        <section>
+          <h2>2.8 Nombres entiers non signés</h2>
+          <p>Un byte (1 octet) = ensemble de 8 bits</p>
+          <br>
+          <p>Un byte peut prendre 2<sup>8</sup> = 256 valeurs différentes,</p>
+          <p class="indent-1">entre 0 (<inline-code>00000000</inline-code>) et 255 (<inline-code>11111111</inline-code>)</p>
+          <br>
+          <h3>Exemple de byte non-signé</h3>
+          <p class="indent-1"><inline-code>11000100</inline-code> = 128 + 64 + 4 = 196</p>
+        </section>
+
+        <section>
+          <h2>2.8 Nombres entiers signés</h2>
+          <p><b>Byte signé</b> : de -128 jusqu'à 127</p>
+          <p class="indent-1">Valeurs négatives : <inline-code>11111111</inline-code> = -1 à <inline-code>10000000</inline-code> = -128</p>
+          <p class="indent-1">Valeurs positives : <inline-code>00000000</inline-code> = 0 à <inline-code>01111111</inline-code> = 127</p>
+          <br>
+          <h3>Passer de positif à négatif et réciproquement : <highlight>complément à 2<sup>n</sup></highlight></h3>
+          <p class="indent-1">1. Inverser tous les bits</p>
+          <p class="indent-1">2. Ajouter 1</p>
+          <h3>Exemple : passer de 65 à -65 et réciproquement</h3>
+          <table class="types">
+            <tr><td><highlight>65</highlight></td><td class="code">01000001</td><td></td><td><error>-65</error></td><td class="code">10111111</td></tr>
+            <tr><td>Inverser tous les bits</td><td class="code">10111110</td><td></td><td>Inverser tous les bits</td><td class="code">01000000</td></tr>
+            <tr><td>Ajouter 1</td><td class="code">10111111</td><td>= <error>-65</error></td><td>Ajouter 1</td><td class="code">01000001</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>2.8 Nombres à virgule flottante</h2>
+          <p>Norme informatique <highlight>IEEE 754</highlight></p>
+          <p>Un nombre à virgule flottante (<inline-code>float</inline-code>, <inline-code>double</inline-code>, <inline-code>long double</inline-code>) est composé de :</p>
+          <p class="indent-1">un <highlight>signe</highlight> S, une <highlight>mantisse entière</highlight> M, un <highlight>exposant</highlight> E</p>
+          <p>Simple précision (32 bits) : valeur = (-1)<sup>S</sup> · (1 + M) · 2<sup>(E - 127)</sup></p>
+          <p>Double précision (64 bits) : valeur = (-1)<sup>S</sup> · (1 + M) · 2<sup>(E - 1023)</sup></p>
+          <!-- BITS_LAYOUT -->
+          <div class="bits"><span class="label s">S</span><span class="label e">Exposant</span><span class="label m">Mantisse</span></div>
+          <table class="types">
+            <tr><th></th><th class="center">signe</th><th class="center">exposant</th><th class="center">mantisse</th><th class="center">chiffres significatifs</th></tr>
+            <tr><td>Simple précision (<inline-code>float</inline-code>, 32 bits)</td><td class="center">1 bit</td><td class="center">8 bits</td><td class="center">23 bits</td><td class="center">≈ 7</td></tr>
+            <tr><td>Double précision (<inline-code>double</inline-code>, 64 bits)</td><td class="center">1 bit</td><td class="center">11 bits</td><td class="center">52 bits</td><td class="center">≈ 16</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>2.8 Nombres à virgule flottante</h2>
+          <h3>Exemple : -3141.5 = -1.5339 · 2<sup>11</sup></h3>
+          <p class="indent-1">-3141.5 = -1.<b>100010001011</b><sub>2</sub> · 2<sup>11</sup> (nombre normalisé, bit implicite 1)</p>
+          <p class="indent-1">exposant : 11 + 127 = 138 = <inline-code>10001010</inline-code></p>
+          <!-- BITS_NEG3141 -->
+          <div class="bits"><span class="label s">S</span><span class="label e">Exposant</span><span class="label m">Mantisse</span></div>
+          <br>
+          <h3>Exemple : 1.0101905 · 10<sup>-39</sup> = 0.0859375 · 2<sup>-126</sup></h3>
+          <p class="indent-1">≈ 0.<b>0001011</b><sub>2</sub> · 2<sup>-126</sup> (nombre dénormalisé, bit implicite 0)</p>
+          <p class="indent-1">exposant : <inline-code>00000000</inline-code></p>
+          <!-- BITS_DENORMAL -->
+          <div class="bits"><span class="label s">S</span><span class="label e">Exposant</span><span class="label m">Mantisse</span></div>
+        </section>
+
+        <section>
+          <h2>2.8 Différents codages des valeurs 1 et -1</h2>
+          <pre class="raw">
+char   c = 1;    00000001
+int    i = 1;    00000000 00000000 00000000 00000001
+float  f = 1.f;  <span class="s">0</span> <span class="e">01111111</span> <span class="m">00000000000000000000000</span>
+double d = 1.;   <span class="s">0</span> <span class="e">01111111111</span> <span class="m">0000000000000000000000000000000000000000000000000000</span>
+
+char   c = -1;   11111111
+int    i = -1;   11111111 11111111 11111111 11111111
+float  f = -1.f; <span class="s">1</span> <span class="e">01111111</span> <span class="m">00000000000000000000000</span>
+double d = -1.;  <span class="s">1</span> <span class="e">01111111111</span> <span class="m">0000000000000000000000000000000000000000000000000000</span>
+
+char   c = '1';  00110001
+          </pre>
+          <p><span class="s" style="color: #FF0000;"><b>signe</b></span>, <span style="color: #0000FF;"><b>exposant</b></span>, <span style="color: #38a238;"><b>mantisse</b></span></p>
+        </section>
+
+        <section>
+          <h2>2.8 Visualisation : entiers et flottants en mémoire</h2>
+          <a href="https://he-arc.github.io/1242.1-Langage_C-VIZ/ints-floats/" target="_blank">
+            Visualiser en mémoire
+          </a>
+        </section>
+
+      </section>
+
+      <!----------          EXERCICES          ---------->
+      <section>
+        <h2>Exercices</h2>
+        <div style="text-align: center;">
+          <a href="https://he-arc.github.io/1242.1-Langage_C/docs/cours/chapitre02cours/">
+            <img src="./medias/exercices.png" alt="Exercices" height="500px">
+          </a>
+        </div>
+        <p style="text-align: center; padding-left: 0;">
+          <a href="https://he-arc.github.io/1242.1-Langage_C/docs/cours/chapitre02cours/">Exercices du chapitre 2</a>
+        </p>
+      </section>
+
+    </div>
+  </div>
+
+  <!----------          CONTENT          ---------->
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/notes/notes.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      hash: true,
+      width: 1920,
+      height: 1080,
+      transition: "none",
+      center: false,
+      slideNumber: 'c/t',
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+    });
+  </script>
+</body>
+
+</html>
