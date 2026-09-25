@@ -1,0 +1,1313 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>HE-Arc - 1242.1 Langage C - Chapitre 3 - Les opérateurs</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/hearc.css" id="theme">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="https://www.he-arc.ch/wp-content/uploads/2021/12/cropped-hearc-icon-192x192.png"
+    type="image/vnd.microsoft.icon" />
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/vs.css" id="highlight-theme">
+
+  <style>
+    .reveal .container p,
+    .reveal .container h3,
+    .reveal .container h4 { padding-left: 0; }
+    .reveal .container .col-left { text-align: left; }
+
+    .reveal .indent-1 { padding-left: 300px; }
+    .reveal .indent-2 { padding-left: 400px; }
+    .reveal .centered { text-align: center; padding-left: 0; }
+    .reveal h2.long-title { font-size: 1.4em; }
+
+    .reveal table.ops { font-size: 0.8em; margin: 0 auto; }
+    .reveal table.ops th,
+    .reveal table.ops td { border: 2px solid #222; padding: 0.2em 0.8em; }
+    .reveal table.ops th { background-color: #dddddd; }
+    .reveal table.ops td.code {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      color: #0000FF;
+    }
+    .reveal table.ops td.center,
+    .reveal table.ops th.center { text-align: center; }
+    .reveal table.ops td.muted { color: #aaaaaa; }
+    .reveal table.ops td.plain { color: #000000; font-weight: normal; }
+
+    .reveal table.ops tr:last-child td,
+    .reveal table.ops tr:last-child th,
+    .reveal table.priority tr:last-child td { border-bottom: 2px solid #222; }
+
+    .reveal table.priority { font-size: 1em; width: 1500px; margin: 0 auto; }
+    .reveal table.priority th,
+    .reveal table.priority td { border: 2px solid #222; padding: 0.1em 0.8em; height: 1.4em; text-align: center; }
+    .reveal table.priority th { background-color: #dddddd; text-align: center; }
+    .reveal table.priority td.op {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      text-align: center;
+    }
+    .reveal table.priority td.op.new { color: #0000FF; }
+    .reveal table.priority td.op i { font-weight: normal; }
+    .reveal table.priority td.dir { text-align: center; }
+    .reveal table.priority td.dir.rtl { color: #FF0000; }
+    .reveal table.priority.full { font-size: 0.8em; margin-top: 40px; }
+    .reveal table.priority .red { color: #FF0000; }
+    .reveal table.priority .blue { color: #0000FF; }
+
+    .reveal table.bitreg {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9em;
+      margin: 0 auto;
+    }
+    .reveal table.bitreg td { border: none; padding: 0 0.2em; text-align: center; min-width: 1.2em; }
+    .reveal table.bitreg td.b { border: 2px solid #222; }
+    .reveal table.bitreg td.b.hl { color: #0000FF; font-weight: bold; }
+    .reveal table.bitreg td.b.new { color: #0000FF; font-weight: bold; background-color: #c6d9f1; }
+    .reveal table.bitreg td.idx { font-size: 0.7em; }
+    .reveal table.bitreg td.nib { font-weight: bold; }
+    .reveal table.bitreg td.in { color: #0000FF; font-weight: bold; }
+    .reveal table.bitreg td.label { font-family: "Roboto", Helvetica, sans-serif; padding: 0 0.6em; }
+
+    .reveal pre.terminal code.hljs,
+    .reveal pre.terminal code {
+      background-color: #000000;
+      color: #FFFFFF;
+    }
+
+    .reveal .code-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 520px);
+      gap: 20px 30px;
+      justify-content: center;
+    }
+    .reveal .code-grid pre { width: 520px; margin: 0; }
+  </style>
+</head>
+
+<body>
+  <img id="logo-hearc" src="./medias/logo_he-arc.png" alt="Logo HE-ARC">
+  <img id="logo-hesso" src="./medias/logo_hes-so.png" alt="Logo HES-SO">
+  <p id="course-infos">1242.1 Langage C - 2026-2027</p>
+
+  <!----------          CONTENT          ---------->
+  <div class="reveal">
+    <div class="slides">
+
+      <!----------          TITLE          ---------->
+      <section>
+        <h1>
+          Chapitre 3
+        </h1>
+        <h2>
+          Les opérateurs
+        </h2>
+        <p>1. Les opérateurs arithmétiques</p>
+        <p>2. Les opérateurs d’affectation / assignation</p>
+        <p>3. Les opérateurs d'incrémentation</p>
+        <p>4. L’opérateur virgule</p>
+        <p>5. Les opérateurs de comparaison</p>
+        <p>6. Les opérateurs logiques</p>
+        <p>7. Les opérateurs bit-à-bit</p>
+        <p>8. Les opérateurs de décalage de bit</p>
+      </section>
+
+      <!----------          OPERATEURS ARITHMETIQUES          ---------->
+      <section>
+
+        <section>
+          <h2>3.1 Les opérateurs arithmétiques</h2>
+          <table class="ops">
+            <tr><th class="center">Opérateur</th><th>Signification</th><th class="center">Exemple</th></tr>
+            <tr><td class="code center">+</td><td>Addition</td><td class="code center">a + b</td></tr>
+            <tr><td class="code center">-</td><td>Soustraction</td><td class="code center">a – b</td></tr>
+            <tr><td class="code center">*</td><td>Multiplication</td><td class="code center">a * b</td></tr>
+            <tr><td class="code center">/</td><td>Division</td><td class="code center">a / b</td></tr>
+            <tr><td class="code center">%</td><td>Modulo : reste de la division d’entiers</td><td class="code center">a % b</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>📝 3.1 Les opérateurs arithmétiques</h2>
+          <h3><highlight>Quelle valeur prend <inline-code>a</inline-code> dans ces expressions ?</highlight></h3>
+          <pre style="width: 700px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            int a;
+            a = 10 %  2;
+            a = 10 %  3;
+            a = 10 % 10;
+            a =  5 % 10;
+            a = 10 %  0;
+            a =  0 % 10;
+          </code></pre>
+          <h3>Remarques</h3>
+          <p>L'opérateur <inline-code>%</inline-code> ne s’applique qu’à des opérandes de type entier et retourne un entier.</p>
+          <p>La fonction <inline-code>fmod()</inline-code> dans la librairie <inline-code>&lt;math.h&gt;</inline-code> travaille avec des valeurs de type double.</p>
+        </section>
+
+        <section>
+          <h2>3.1 Priorité des opérateurs</h2>
+          <table class="priority">
+            <tr><th>Opérateur</th><th>Sens d’évaluation</th><th>Priorité</th></tr>
+            <tr><td class="op new">()</td><td class="dir">→</td><td>haute</td></tr>
+            <tr><td class="op"></td><td class="dir"></td><td></td></tr>
+            <tr><td class="op new">* / %</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op new">+ -</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op"></td><td class="dir"></td><td></td></tr>
+            <tr><td class="op"></td><td class="dir"></td><td></td></tr>
+            <tr><td class="op"></td><td class="dir"></td><td></td></tr>
+            <tr><td class="op"></td><td class="dir"></td><td></td></tr>
+            <tr><td class="op new">=</td><td class="dir rtl">←</td><td>basse</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>3.1 Priorité des opérateurs</h2>
+          <p>Dans chaque classe de priorité, les opérateurs ont la même priorité. S'il y a une suite d'opérateurs binaires de même classe, l'évaluation se fait de la <highlight>gauche vers la droite</highlight> dans l'expression.</p>
+          <br>
+          <p><b>Exemple</b> <inline-code>6/3*2 → 4</inline-code></p>
+          <br>
+          <p>Pour les opérateurs unaires (<inline-code>!,++,--</inline-code>) et pour les opérateurs d’affectation (<inline-code>=,+=,-=,*=,/=,%=</inline-code>), l'évaluation se fait de <highlight>droite à gauche</highlight>.</p>
+        </section>
+
+        <section>
+          <h2>📝 3.1 Les opérateurs arithmétiques</h2>
+          <h3><highlight>Quelle valeur prend <inline-code>a</inline-code> dans ces expressions ?</highlight></h3>
+          <pre style="width: 900px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            int a = 0;
+            a = (10 + 6) / (3 - 1);
+            a = (10 + 6) / 3 - 1;
+            a =  10 + 6  / (3 - 1);
+            a =  10 + 6  / 3 - 1;
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>3.1 Types et domaines de définition</h2>
+          <p>Le <highlight>type</highlight> d'une variable définit le <highlight>domaine des valeurs possibles</highlight></p>
+          <br>
+          <p>Il faut être attentif à <highlight>ne pas dépasser les limites de validité des variables</highlight>.</p>
+          <br>
+          <p><warning>⚠</warning> lorsqu’on combine des variables de types différents à l'aide des opérateurs mathématiques.</p>
+          <br>
+          <p>Le tableau suivant rappelle les <highlight>domaines de validité</highlight> de quelques types du langage C.</p>
+        </section>
+
+        <section>
+          <h2>3.1 Domaines de validité</h2>
+          <table class="ops">
+            <tr><th>Type</th><th class="center">Min</th><th class="center">Max</th></tr>
+            <tr><td class="code">signed char</td><td class="code plain center">-128</td><td class="code plain center">+127</td></tr>
+            <tr><td class="code">unsigned char</td><td class="code plain center">0</td><td class="code plain center">+255</td></tr>
+            <tr><td class="code">short</td><td class="code plain center">-32768</td><td class="code plain center">+32767</td></tr>
+            <tr><td class="code">unsigned short</td><td class="code plain center">0</td><td class="code plain center">+65535</td></tr>
+            <tr><td class="code">int</td><td class="code plain center">-2147483648</td><td class="code plain center">+2147483647</td></tr>
+            <tr><td class="code">unsigned int</td><td class="code plain center">0</td><td class="code plain center">+4294967295</td></tr>
+            <tr><td class="code">long</td><td class="code plain center">-2147483648</td><td class="code plain center">+2147483647</td></tr>
+            <tr><td class="code">unsigned long</td><td class="code plain center">0</td><td class="code plain center">+4294967295</td></tr>
+            <tr><td class="code">float</td><td class="code plain center">1.1E-38</td><td class="code plain center">3.4E+38</td></tr>
+            <tr><td class="code">double</td><td class="code plain center">2.2E-308</td><td class="code plain center">1.7E+308</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>3.1 Domaines de validité</h2>
+          <p>Le fichier <inline-code>&lt;limits.h&gt;</inline-code> définit des macros pour les nombres entiers. Les valeurs dépendent de l’implémentation et de la machine.</p>
+          <br>
+          <table class="ops" style="font-size: 0.75em; width: 1600px;">
+            <tr><th>Valeur</th><th>Remarques</th></tr>
+            <tr><td class="code plain">CHAR_BIT</td><td>Taille d'un <inline-code>char</inline-code> en bits (minimum 8 bits)</td></tr>
+            <tr><td class="code plain">SCHAR_MIN, SHRT_MIN, INT_MIN, LONG_MIN, LLONG_MIN(C99)</td><td>Valeur <error>minimum possible</error> des types entiers signés : <inline-code>char, short, int, long, long long</inline-code></td></tr>
+            <tr><td class="code plain">SCHAR_MAX, SHRT_MAX, INT_MAX, LONG_MAX, LLONG_MAX(C99)</td><td>Valeur <error>maximum possible</error> des types entiers signés : <inline-code>signed char, signed short, signed int,...</inline-code></td></tr>
+            <tr><td class="code plain">UCHAR_MAX, USHRT_MAX, UINT_MAX, ULONG_MAX, ULLONG_MAX(C99)</td><td>Valeur <error>maximum possible</error> des types entiers non-signés : <inline-code>unsigned char, unsigned short,...</inline-code></td></tr>
+            <tr><td class="code plain">CHAR_MIN</td><td>Valeur <error>minimum possible</error> pour un <inline-code>char</inline-code></td></tr>
+            <tr><td class="code plain">CHAR_MAX</td><td>Valeur <error>maximum possible</error> pour un <inline-code>char</inline-code></td></tr>
+            <tr><td>…</td><td>…</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>3.1 Domaines de validité</h2>
+          <p>Le fichier <inline-code>&lt;float.h&gt;</inline-code> définit des macros pour les nombres en virgule flottante. Les valeurs dépendent de l’implémentation et de la machine.</p>
+          <br>
+          <table class="ops" style="font-size: 0.75em; width: 1600px;">
+            <tr><th>Valeur</th><th>Remarques</th></tr>
+            <tr><td class="code plain">FLT_MIN, DBL_MIN</td><td>Valeur <error>minimum possible</error> d’un <inline-code>float, double</inline-code></td></tr>
+            <tr><td class="code plain">FLT_MAX, DBL_MAX</td><td>Valeur <error>maximum possible</error> d’un <inline-code>float</inline-code> ou <inline-code>double</inline-code></td></tr>
+            <tr><td class="code plain">FLT_EPSILON, DBL_EPSILON</td><td>Le <error>plus petit nombre</error> tel que 1.0 + x != 1.0 pour <inline-code>float</inline-code> ou <inline-code>double</inline-code></td></tr>
+            <tr><td class="code plain">FLT_DIG, DBL_DIG</td><td>Nombre de décimales qui peuvent être représentées sans perte de précision pour <inline-code>float</inline-code> ou <inline-code>double</inline-code></td></tr>
+            <tr><td>….</td><td>….</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>3.1 «Overflow» – dépassement de capacité</h2>
+          <p>Lorsqu'on sort des domaines de définition</p>
+          <p>a) Avec les types <b>réels</b> tels que <inline-code>float</inline-code> ou <inline-code>double</inline-code>, la variable prend une valeur spéciale</p>
+          <br>
+          <table class="ops">
+            <tr><th></th><th class="center">Valeurs</th><th class="center">math.h</th></tr>
+            <tr><td>Valeur infinie</td><td class="code center">1.#INF</td><td class="code center">HUGE_VAL<br>INFINITY</td></tr>
+            <tr><td>Valeur indéterminée</td><td class="code center">1.#IND</td><td class="code center">NAN</td></tr>
+          </table>
+          <br>
+          <p>b) Avec les types <b>entiers,</b> signés ou non, <error>aucun message d’erreur</error>, mais un certain nombre de bits sont pris en compte, les autres sont ignorés. Généralement, la valeur "boucle sur le codage", sans garanti à 100% hélas.</p>
+        </section>
+
+        <!-- Hidden in the original PPTX
+        <section>
+          <h2>3.1 Exemples de débordement</h2>
+          <div class="container">
+            <div class="col-left">
+              <pre style="width: 700px; margin-left: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                unsigned char resultat;
+                resultat = 255 + 1;
+              </code></pre>
+            </div>
+            <div class="col-right">
+              <pre style="width: 700px; margin-left: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                char resultat;
+                resultat = 127 + 1;
+              </code></pre>
+            </div>
+          </div>
+          <pre style="width: 1400px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            #include &#60;math.h&#62; /* HUGE_VAL: valeur infinie */
+            …
+            double x = 1/0.;
+            printf("%lf %lf\n", x, -HUGE_VAL);
+            double y = x/x;
+            printf("%lf %lf\n", y,  -HUGE_VAL/HUGE_VAL);
+            double z = 1/HUGE_VAL;
+            printf("%lf\n", z);
+          </code></pre>
+        </section>
+        -->
+
+        <section>
+          <h2>📝 3.1 Les opérateurs arithmétiques</h2>
+          <h3><error>Que valent <inline-code>i3</inline-code> et <inline-code>f3</inline-code>?</error></h3>
+          <pre style="width: 900px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            int   i1 = 5,  i2 = 2,  i3;
+            float f1 = 5., f2 = 2., f3;
+
+            f3 = f1 / f2;
+
+            i3 = i1 / i2;
+
+            f3 = i1 / i2;
+
+            i3 = f1 / f2;
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>3.1 Règles de conversions implicites</h2>
+          <div class="container">
+            <div class="col-left" style="flex: 3; padding-left: 150px;">
+              <p>Une <highlight>conversion implicite</highlight> est une modification du type prise en charge par le compilateur.</p>
+              <br>
+              <p><b>1. Dans une affectation :</b> le résultat de l'expression à droite du signe = est converti de façon à <highlight>réduire au minimum les pertes de données</highlight>.</p>
+              <br>
+              <p><b>2. Dans une opération :</b> si les opérandes sont de types différents, il y a conversion <highlight>du type le plus FAIBLE vers le type le plus FORT</highlight><b>.</b></p>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <table class="ops">
+                <tr><th class="center">FAIBLE</th></tr>
+                <tr><td class="code center">char</td></tr>
+                <tr><td class="code center">short</td></tr>
+                <tr><td class="code center">int</td></tr>
+                <tr><td class="code center">unsigned int</td></tr>
+                <tr><td class="code center">long</td></tr>
+                <tr><td class="code center">unsigned long</td></tr>
+                <tr><td class="code center">float</td></tr>
+                <tr><td class="code center">double</td></tr>
+                <tr><td class="code center">long double</td></tr>
+                <tr><th class="center">FORT</th></tr>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="long-title">Conversion explicite (transtypage ou <em>casting</em>)</h2>
+          <p>Une <highlight>conversion explicite</highlight> est <b>une modification du type</b>, réalisée par le programmeur grâce à la syntaxe suivante :</p>
+          <p class="centered"><inline-code><highlight>(&lt;Type&gt;)</highlight> &lt;valeur&gt;</inline-code></p>
+          <br>
+          <h3>Exemples</h3>
+          <pre style="width: 1000px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            (int) 132.45
+            (double) 2/3   //   2.0/3
+          </code></pre>
+          <h3>Remarque</h3>
+          <p>On peut aussi forcer un transtypage de valeurs littérales avec des suffixes :
+            <highlight>.</highlight> pour <inline-code>double</inline-code>, <highlight>f</highlight> pour <inline-code>float</inline-code>,
+            <highlight>u</highlight> pour <inline-code>unsigned</inline-code>, <highlight>l</highlight> pour <inline-code>long</inline-code>.</p>
+          <p>Par exemple <inline-code>x = 17f</inline-code></p>
+        </section>
+
+        <section>
+          <h2>📝 Exercice – Conversions</h2>
+          <div class="code-grid">
+            <pre><code class="c" data-trim data-noescape style="font-size: 1.8em;">
+              int x = 5;
+              int y = 2;
+              int r;
+              r = x / y;
+            </code></pre>
+            <pre><code class="c" data-trim data-noescape style="font-size: 1.8em;">
+              int x = 5;
+              int y = 2;
+              float r;
+              r = x / y;
+            </code></pre>
+            <pre><code class="c" data-trim data-noescape style="font-size: 1.8em;">
+              int x = 5;
+              int y = 2;
+              float r;
+              r = (float)x / y;
+            </code></pre>
+            <pre><code class="c" data-trim data-noescape style="font-size: 1.8em;">
+              float x = 5;
+              int y = 2;
+              int r;
+              r = x / y;
+            </code></pre>
+            <pre><code class="c" data-trim data-noescape style="font-size: 1.8em;">
+              float x = 5;
+              int y = 2;
+              float r;
+              r = x / y;
+            </code></pre>
+            <pre><code class="c" data-trim data-noescape style="font-size: 1.8em;">
+              int x = 5;
+              int y = 2;
+              float r;
+              r = (float)(x / y);
+            </code></pre>
+          </div>
+        </section>
+
+        <!-- Hidden in the original PPTX
+        <section>
+          <h2>Exemple</h2>
+          <pre style="width: 1600px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            // This programs uses various operations using variables and mixing types
+            #include &#60;stdio.h&#62;
+            #include &#60;stdlib.h&#62;
+            int main(void)
+            {
+                double result1, result2;
+                long result3;
+                unsigned int result4;
+                result1 = 4. / 3;    // Division: double -> double
+                result2 = 4 / 3;     // Division: int -> double
+                result3 = result1;   // double -> long
+                result4 = -result1;  // double -> unsigned int
+                printf("double:         4. / 3  = %lg\n", result1);
+                printf("double:         4  / 3  = %lg\n", result2);
+                printf("long:           4. / 3  = %ld\n", result3);
+                printf("unsigned int: -(4. / 3) = %u\n", result4);    // (2^32) - 1
+                return 0;
+            }
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>Affichage des résultats</h2>
+          <pre class="terminal" style="width: 1400px;"><code
+            class="nohighlight"
+            data-trim
+            style="font-size: 1.8em;">
+
+            double:         4. / 3  = 1.33333
+            double:         4  / 3  = 1
+            long:           4. / 3  = 1
+            unsigned int:   - (4./ 3) = 4294967295
+          </code></pre>
+          <br>
+          <p><b>Note : de nouvelles spécifications de format sont employées ici. Voir chapitre sur les entrées-sorties.</b></p>
+          <p class="indent-1"><inline-code><highlight><em>long</em></highlight> <em>%ld</em></inline-code></p>
+          <p class="indent-1"><inline-code><highlight><em>unsigned long</em></highlight> <em>%lu</em></inline-code></p>
+          <p class="indent-1"><inline-code><highlight><em>double</em></highlight> <em>%lg, %lf</em></inline-code></p>
+        </section>
+        -->
+
+      </section>
+
+      <!----------          OPERATEURS D'AFFECTATION          ---------->
+      <section>
+
+        <section>
+          <h2>3.2 L’opérateur d’affectation</h2>
+          <p>En C, <highlight>l'affectation peut jouer le rôle d'un opérateur en fournissant un résultat</highlight> pouvant être réutilisé dans le programme.</p>
+          <br>
+          <p>La partie à gauche de l’opérateur <inline-code>=</inline-code> s’appelle une <highlight><em>lvalue</em></highlight>.</p>
+          <br>
+          <p>L'affectation retourne un résultat qui peut aussi être affecté à une variable :</p>
+          <p class="indent-1"><inline-code>b = (a = 4);</inline-code> ou <inline-code>b = a = 4;</inline-code></p>
+          <p class="indent-1">est équivalent à:</p>
+          <pre style="width: 700px; margin-left: 300px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            a = 4;
+            b = a;
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>3.2 L’opérateur d’affectation</h2>
+          <p class="centered"><inline-code>&lt;Var&gt; <error>=</error> &lt;Var&gt; <error>&lt;Opérateur&gt;</error> &lt;Expression&gt;;</inline-code></p>
+          <br>
+          <p class="centered">devient</p>
+          <br>
+          <p class="centered"><inline-code>&lt;Var&gt; <highlight>&lt;Opérateur composé&gt;</highlight> &lt;Expression&gt;;</inline-code></p>
+          <br>
+          <br>
+          <h3>Exemple</h3>
+          <div class="container">
+            <div class="col-left" style="flex: 2;">
+              <pre style="width: 800px; margin-left: 200px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                compteur = compteur + 2;
+                compteur += 2;
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <p>} équivalents</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>3.2 L’opérateur d’affectation</h2>
+          <table class="ops">
+            <tr><th class="center">Opérateur</th><th>Signification</th><th class="center">Exemple</th></tr>
+            <tr><td class="code center">=</td><td>Affectation</td><td class="code center">a = b</td></tr>
+            <tr><td class="code center">+=</td><td>addition et assignation</td><td class="code center">a += b</td></tr>
+            <tr><td class="code center">-=</td><td>soustraction et assignation</td><td class="code center">a –= b</td></tr>
+            <tr><td class="code center">*=</td><td>multiplication et assignation</td><td class="code center">a *= b</td></tr>
+            <tr><td class="code center">/=</td><td>division et assignation</td><td class="code center">a /= b</td></tr>
+            <tr><td class="code center">%=</td><td>modulo et assignation</td><td class="code center">a %= b</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>3.2 Priorité des opérateurs</h2>
+          <table class="priority">
+            <tr><th>Opérateur</th><th>Sens d’évaluation</th><th>Priorité</th></tr>
+            <tr><td class="op">()</td><td class="dir">→</td><td>haute</td></tr>
+            <tr><td class="op"></td><td class="dir"></td><td></td></tr>
+            <tr><td class="op">* / %</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">+ -</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op"></td><td class="dir"></td><td></td></tr>
+            <tr><td class="op"></td><td class="dir"></td><td></td></tr>
+            <tr><td class="op"></td><td class="dir"></td><td></td></tr>
+            <tr><td class="op"></td><td class="dir"></td><td></td></tr>
+            <tr><td class="op new">= += -= *= /= %=</td><td class="dir rtl">←</td><td>basse</td></tr>
+          </table>
+        </section>
+
+      </section>
+
+      <!----------          OPERATEURS D'INCREMENTATION          ---------->
+      <section>
+
+        <section>
+          <h2>3.3 Les opérateurs d’incrémentation</h2>
+          <p>Opérateur qui <highlight>augmente</highlight>, ou <highlight>diminue</highlight>, <highlight>de 1</highlight> la valeur d’une variable entière.</p>
+          <br>
+          <table class="ops">
+            <tr><th class="center">Opérateur</th><th>Signification</th><th class="center">Exemple</th></tr>
+            <tr><td class="code center">++</td><td>incrémentation</td><td class="code center">a++<br>++a</td></tr>
+            <tr><td class="code center">--</td><td>décrémentation</td><td class="code center">a--<br>--a</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>3.3 Les opérateurs d’incrémentation</h2>
+          <p>Les opérateurs <inline-code>++</inline-code> et <inline-code>--</inline-code> peuvent être</p>
+          <br>
+          <p class="indent-1"><highlight>(a) préfixés</highlight>, à gauche de l’opérande</p>
+          <p class="indent-2">On <b>pré-incrémente</b>, puis on affecte</p>
+          <br>
+          <p class="indent-1"><highlight>(b) postfixés</highlight>, à droite de l’opérande</p>
+          <p class="indent-2">On affecte, puis on <b>post-incrémente</b></p>
+        </section>
+
+        <section>
+          <h2>3.3 Les opérateurs d’incrémentation</h2>
+          <table class="ops" style="font-size: 1em;">
+            <tr><td class="code" style="border: none;">y = x++;</td><td style="border: none;">est équivalent à</td><td class="code" style="border: none;">y = x;<br>x = x + 1;</td></tr>
+            <tr><td class="code" style="border: none;">y = ++x;</td><td style="border: none;">est équivalent à</td><td class="code" style="border: none;">x = x + 1;<br>y = x;</td></tr>
+            <tr><td class="code" style="border: none;">y = x--;</td><td style="border: none;">est équivalent à</td><td class="code" style="border: none;">y = x;<br>x = x - 1 ;</td></tr>
+            <tr><td class="code" style="border: none;">y = --x;</td><td style="border: none;">est équivalent à</td><td class="code" style="border: none;">x = x - 1 ;<br>y = x ;</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>📝 3.3 Opérateurs d'incrémentation</h2>
+          <h3 class="centered"><highlight>Que valent <inline-code>x</inline-code> et <inline-code>y</inline-code> ?</highlight></h3>
+          <pre style="width: 700px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            int x = 6, y;
+            y = --x;
+          </code></pre>
+          <br>
+          <pre style="width: 700px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            int x = 6, y;
+            y = x--;
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>3.3 Priorité des opérateurs</h2>
+          <table class="priority">
+            <tr><th>Opérateur</th><th>Sens d’évaluation</th><th>Priorité</th></tr>
+            <tr><td class="op">()</td><td class="dir">→</td><td>haute</td></tr>
+            <tr><td class="op new">++ --</td><td class="dir rtl">←</td><td></td></tr>
+            <tr><td class="op">* / %</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">+ -</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op"></td><td class="dir"></td><td></td></tr>
+            <tr><td class="op"></td><td class="dir"></td><td></td></tr>
+            <tr><td class="op"></td><td class="dir"></td><td></td></tr>
+            <tr><td class="op"></td><td class="dir"></td><td></td></tr>
+            <tr><td class="op">= += -= *= /= %=</td><td class="dir rtl">←</td><td>basse</td></tr>
+          </table>
+        </section>
+
+        <!-- Hidden in the original PPTX
+        <section>
+          <h2>📝 Exercices</h2>
+          <p>Série  3.1 : exercices #1 à #3</p>
+          <br>
+          <p>Les exemples se trouvent dans le dossier :</p>
+          <p><b>\Exemples\1240.1.03 Operateurs</b></p>
+        </section>
+        -->
+
+      </section>
+
+      <!----------          OPERATEUR VIRGULE          ---------->
+      <section>
+
+        <section>
+          <h2>3.4 L'opérateur virgule  :  « , »</h2>
+          <p class="centered"><inline-code>&lt;expression1&gt; <highlight>,</highlight> … <highlight>,</highlight> &lt;expressionN&gt;</inline-code></p>
+          <br>
+          <p><inline-code>expression1</inline-code> est évaluée, puis … , puis finalement <inline-code>expressionN</inline-code>. La valeur de <inline-code>expressionN</inline-code>, la plus à droite, est conservée, c’est la valeur de l’opération virgule.</p>
+          <br>
+          <p>Utilisation courante dans les boucles :</p>
+          <pre style="width: 1100px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            for(i=1,j=0; j<15; i++, j=j+2){...}
+          </code></pre>
+        </section>
+
+      </section>
+
+      <!----------          OPERATEURS DE COMPARAISON          ---------->
+      <section>
+
+        <section>
+          <h2>3.5 Opérateurs de comparaison</h2>
+          <p><highlight>Comparaison</highlight> de variables ou expressions dont le résultat est <highlight>0</highlight> ou <highlight>1</highlight> :</p>
+          <br>
+          <p class="centered"><box><inline-code>{type simple} x {type simple}  -> {0, 1}</inline-code></box></p>
+          <br>
+          <h3>Exemples</h3>
+          <pre style="width: 900px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            _Bool b = 5 < (3 + 4);
+                  b = 'A' > 'Z';
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>3.5 Exemple de valeurs booléennes</h2>
+          <h3>Les valeurs booléennes peuvent avoir diverses représentations</h3>
+          <table class="ops" style="font-size: 0.7em;">
+            <tr><th class="center">Version</th><th class="center">Type</th><th class="center">vrai</th><th class="center">faux</th><th class="center">#include</th></tr>
+            <tr><td class="muted center">K&amp;R</td><td class="code muted center">int</td><td class="muted center">1 (≠0)</td><td class="muted center">0</td><td></td></tr>
+            <tr><td class="center"><a href="http://en.wikipedia.org/wiki/ANSI_C">C99</a></td><td class="code center">bool</td><td class="center"><b>true</b></td><td class="center"><b>false</b></td><td class="center"><b>&lt;stdbool.h&gt;</b></td></tr>
+            <tr><td class="center"><a href="http://en.wikipedia.org/wiki/ANSI_C">C99</a></td><td class="code center">_Bool</td><td class="center"><b>≠0</b></td><td class="center"><b>0</b></td><td></td></tr>
+          </table>
+          <div style="text-align: center;">
+            <img src="./medias/codeblocks_std_cpp0x.png" width="900px" alt="Have g++ follow the coming C++0x (aka c++11) ISO C++ language standard [-std=c++0x]">
+          </div>
+          <div class="container">
+            <div class="col-left">
+              <pre style="width: 850px; margin-left: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.5em;">
+
+                #include &#60;stdbool.h&#62;
+                bool test = true;
+                test = (2*3) < 7;
+                printf("%d", test);
+                printf("%s", test ? "true" : "false");
+              </code></pre>
+            </div>
+            <div class="col-right">
+              <pre style="width: 850px; margin-left: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.5em;">
+
+                _Bool test = 3; //!=0 => true
+                test = (2*3) < 7;
+                printf("%d", test);
+                printf("%s", test ? "true" : "false");
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>3.5 Opérateurs de comparaison</h2>
+          <table class="ops">
+            <tr><th class="center">Opérateur</th><th>Signification</th><th class="center">Exemple</th></tr>
+            <tr><td class="code center">==</td><td>égal à</td><td class="code center">a == b</td></tr>
+            <tr><td class="code center">!=</td><td>différent de</td><td class="code center">a != b</td></tr>
+            <tr><td class="code center">&gt;</td><td>supérieur à</td><td class="code center">a &gt; b</td></tr>
+            <tr><td class="code center">&lt;</td><td>inférieur à</td><td class="code center">a &lt; b</td></tr>
+            <tr><td class="code center">&gt;=</td><td>supérieur ou égal à</td><td class="code center">a &gt;= b</td></tr>
+            <tr><td class="code center">&lt;=</td><td>inférieur ou égal à</td><td class="code center">a &lt;= b</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>3.3 Priorité des opérateurs</h2>
+          <table class="priority">
+            <tr><th>Opérateur</th><th>Sens d’évaluation</th><th>Priorité</th></tr>
+            <tr><td class="op">()</td><td class="dir">→</td><td>haute</td></tr>
+            <tr><td class="op">++ --</td><td class="dir rtl">←</td><td></td></tr>
+            <tr><td class="op">* / %</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">+ -</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op new">&lt; &gt; &lt;= &lt;=</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op new">== !=</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op"></td><td class="dir"></td><td></td></tr>
+            <tr><td class="op"></td><td class="dir"></td><td></td></tr>
+            <tr><td class="op">= += -= *= /= %=</td><td class="dir rtl">←</td><td>basse</td></tr>
+          </table>
+        </section>
+
+      </section>
+
+      <!----------          OPERATEURS LOGIQUES          ---------->
+      <section>
+
+        <section>
+          <h2>3.6 Opérateurs logiques</h2>
+          <p><b>Opérateur qui agit sur des booléens et qui donne un booléen :</b></p>
+          <p class="indent-1"><inline-code>{ _Bool } <highlight>x</highlight> { _Bool }  -> { _Bool }</inline-code></p>
+          <br>
+          <p><b>Exemple :</b></p>
+          <pre style="width: 900px; margin-left: 300px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            bool a = true, b = false, c;
+            c = a || b;
+          </code></pre>
+          <table class="ops">
+            <tr><th class="center">Opérateur</th><th>Signification</th><th class="center">Exemple</th></tr>
+            <tr><td class="code center">&amp;&amp;</td><td>et (AND)</td><td class="code center">a &amp;&amp; b</td></tr>
+            <tr><td class="code center">||</td><td>ou (OR)</td><td class="code center">a || b</td></tr>
+            <tr><td class="code center">!</td><td>négation (NOT)</td><td class="code center">!a</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>3.6 Opérateurs logiques</h2>
+          <table class="ops" style="font-family: 'Courier New', Courier, monospace;">
+            <tr><th></th><th></th><th class="center">NOT</th><th class="center">AND</th><th class="center">OR</th><th class="center"><em>XOR</em></th></tr>
+            <tr><th class="center">p</th><th class="center">q</th>
+              <th class="center"><highlight>!</highlight>q</th>
+              <th class="center">p<highlight>&amp;&amp;</highlight>q</th>
+              <th class="center">p<highlight>||</highlight>q</th>
+              <th class="center"><highlight>(!</highlight><em>p</em> <highlight>&amp;&amp;</highlight> <em>q</em><highlight>)</highlight><br><highlight>||</highlight><br><highlight>(</highlight><em>p</em> <highlight>&amp;&amp;</highlight> <highlight>!</highlight><em>q</em><highlight>)</highlight></th></tr>
+            <tr><td class="center"><b>false</b></td><td class="center"><b>false</b></td><td class="center">true</td><td class="center">false</td><td class="center">false</td><td class="center"><em>false</em></td></tr>
+            <tr><td class="center"><b>false</b></td><td class="center"><b>true</b></td><td class="center">false</td><td class="center">false</td><td class="center">true</td><td class="center"><em>true</em></td></tr>
+            <tr><td class="center"><b>true</b></td><td class="center"><b>false</b></td><td class="center">true</td><td class="center">false</td><td class="center">true</td><td class="center"><em>true</em></td></tr>
+            <tr><td class="center"><b>true</b></td><td class="center"><b>true</b></td><td class="center">false</td><td class="center">true</td><td class="center">true</td><td class="center"><em>false</em></td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>3.6 Priorité des opérateurs</h2>
+          <table class="priority">
+            <tr><th>Opérateur</th><th>Sens d’évaluation</th><th>Priorité</th></tr>
+            <tr><td class="op">()</td><td class="dir">→</td><td>haute</td></tr>
+            <tr><td class="op">++ -- <span class="blue">!</span></td><td class="dir rtl">←</td><td></td></tr>
+            <tr><td class="op">* / %</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">+ -</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">&lt; &gt; &lt;= &lt;=</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">== !=</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op new">&amp;&amp;</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op new">||</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">= += -= *= /= %=</td><td class="dir rtl">←</td><td>basse</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>3.6 Exemples</h2>
+          <pre style="width: 800px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            (true && false)
+
+            !true
+
+            false || !(32 > 12)
+          </code></pre>
+          <br>
+          <p><b>Remarque :</b> les opérateurs <inline-code>&amp;&amp;</inline-code> et <inline-code>||</inline-code> ont un point d’arrêt entre l’évaluation du membre de gauche et du membre de droite : « <em>short-circuit evaluation</em> ». <highlight>Le membre de droite n’est évalué que si c’est nécessaire.</highlight></p>
+        </section>
+
+        <!-- Hidden in the original PPTX
+        <section>
+          <h2>3.6 Lois de De Morgan</h2>
+          <br>
+          <p class="centered"><inline-code><highlight>!(p &amp;&amp; q) == (!p) || (!q)</highlight></inline-code></p>
+          <br>
+          <p class="centered"><inline-code><highlight>!(p || q) == (!p) &amp;&amp; (!q)</highlight></inline-code></p>
+        </section>
+
+        <section>
+          <h2>📝 Exercices</h2>
+          <p>Série  3.1 : exercices #4 et #5</p>
+          <br>
+          <p>Les exemples se trouvent dans le dossier:</p>
+          <p><b>\Exemples\1240.1.03 Operateurs</b></p>
+        </section>
+        -->
+
+      </section>
+
+      <!----------          OPERATEURS BIT-A-BIT          ---------->
+      <section>
+
+        <section>
+          <h2>3.7 Opérateurs bit-à-bit</h2>
+          <p>Opérateurs qui agissent directement au niveau des bits des mots. La valeur de <highlight>chaque bit</highlight> dépend <highlight>seulement</highlight> des valeurs des bit(s) à cette <highlight>position</highlight></p>
+          <br>
+          <table class="ops">
+            <tr><th class="center">Opérateur</th><th>Signification</th><th class="center">Exemple</th></tr>
+            <tr><td class="code center">&amp;</td><td>et : « AND »</td><td class="code center">a &amp; b</td></tr>
+            <tr><td class="code center">|</td><td>ou : « OR »</td><td class="code center">a | b</td></tr>
+            <tr><td class="code center">^</td><td>ou exclusif : « XOR »</td><td class="code center">a ^ b</td></tr>
+            <tr><td class="code center">~</td><td>complément à 1</td><td class="code center">~a</td></tr>
+          </table>
+          <br>
+          <p>Les opérateurs composés sont également autorisés : <inline-code>&amp;=</inline-code>, <inline-code>|=</inline-code> et <inline-code>^=</inline-code></p>
+        </section>
+
+        <section>
+          <h2>3.7 Opérateurs bit à bit – entiers</h2>
+          <table class="ops" style="font-size: 1em;">
+            <tr><td></td><td class="code">a</td><td class="code plain center"><b>0</b></td><td class="code plain center"><b>0</b></td><td class="code plain center"><b>1</b></td><td class="code plain center"><b>1</b></td></tr>
+            <tr><td></td><td class="code">b</td><td class="code plain center"><b>0</b></td><td class="code plain center"><b>1</b></td><td class="code plain center"><b>0</b></td><td class="code plain center"><b>1</b></td></tr>
+            <tr><td><b>Et</b></td><td class="code">a &amp; b</td><td class="code plain center">0</td><td class="code plain center">0</td><td class="code plain center">0</td><td class="code plain center">1</td></tr>
+            <tr><td><b>Ou</b></td><td class="code">a | b</td><td class="code plain center">0</td><td class="code plain center">1</td><td class="code plain center">1</td><td class="code plain center">1</td></tr>
+            <tr><td><b>Ou exclusif</b></td><td class="code">a ^ b</td><td class="code plain center">0</td><td class="code plain center">1</td><td class="code plain center">1</td><td class="code plain center">0</td></tr>
+            <tr><td><b>Complément à 1</b></td><td class="code">~a</td><td class="code plain center">1</td><td class="code plain center">1</td><td class="code plain center">0</td><td class="code plain center">0</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>3.7 Opérateurs bit à bit – entiers</h2>
+          <p><b>Exemples</b> :  <inline-code>int a = 33333, b = -77777;</inline-code></p>
+          <br>
+          <table class="ops">
+            <tr><th>Expression</th><th>Représentation</th></tr>
+            <tr><td class="code">a</td><td class="code">00000000 00000000 10000010 00110101</td></tr>
+            <tr><td class="code">b</td><td class="code">11111111 11111110 11010000 00101111</td></tr>
+            <tr><td class="code">a &amp; b</td><td class="code plain">00000000 00000000 10000000 00100101</td></tr>
+            <tr><td class="code">a ^ b</td><td class="code plain">11111111 11111110 01010010 00011010</td></tr>
+            <tr><td class="code">a | b</td><td class="code plain">11111111 11111110 11010010 00111111</td></tr>
+            <tr><td class="code">~ ( a | b )</td><td class="code plain">00000000 00000001 00101101 11000000</td></tr>
+            <tr><td class="code">~ a &amp; ~ b</td><td class="code plain">00000000 00000001 00101101 11000000</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>📝 3.7 Opérateurs bit à bit – entiers</h2>
+          <h3>Qu’affiche ce programme</h3>
+          <pre style="width: 1100px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            unsigned char x=0xAA; // 1010 1010
+            printf("%X\n", x);
+            printf("%X\n", x & 0xFF);
+            printf("%X\n", x & 0x01);
+            printf("%X\n", x & 0x03);
+          </code></pre>
+        </section>
+
+      </section>
+
+      <!----------          OPERATEURS DE DECALAGE          ---------->
+      <section>
+
+        <section>
+          <h2>3.8 Opérateurs de décalage</h2>
+          <p>Les opérateurs de décalage vont décaler les bits soit vers la droite, soit vers la gauche.</p>
+          <br>
+          <table class="ops">
+            <tr><th class="center">Opérateur</th><th>Signification</th><th class="center">Exemple</th></tr>
+            <tr><td class="code center">&lt;&lt;</td><td>Décalage des bits de <inline-code>a</inline-code> vers la gauche de <inline-code>b</inline-code> bits</td><td class="code center">a &lt;&lt; b</td></tr>
+            <tr><td class="code center">&gt;&gt;</td><td>Décalage des bits de <inline-code>a</inline-code> vers la droite de <inline-code>b</inline-code> bits</td><td class="code center">a &gt;&gt; b</td></tr>
+            <tr><td class="code center">&lt;&lt;=</td><td>Décalage à gauche et affectation</td><td class="code center">a &lt;&lt;= b</td></tr>
+            <tr><td class="code center">&gt;&gt;=</td><td>Décalage à droite et affectation</td><td class="code center">a &gt;&gt;= b</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>3.8 Opérateur de décalage à gauche</h2>
+          <pre style="width: 1000px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            short a = 0x68ab;
+            a = a << 3; /* shift left 3 bits  */
+          </code></pre>
+          <table class="bitreg">
+            <tr><td></td>
+              <td class="nib" colspan="4">6</td><td class="nib" colspan="4">8</td><td class="nib" colspan="4">a</td><td class="nib" colspan="4">b</td>
+              <td></td></tr>
+            <tr><td></td>
+              <td class="idx">15</td><td class="idx">14</td><td class="idx">13</td><td class="idx">12</td><td class="idx">11</td><td class="idx">10</td><td class="idx">9</td><td class="idx">8</td>
+              <td class="idx">7</td><td class="idx">6</td><td class="idx">5</td><td class="idx">4</td><td class="idx">3</td><td class="idx">2</td><td class="idx">1</td><td class="idx">0</td>
+              <td></td></tr>
+            <tr><td></td>
+              <td class="b">0</td><td class="b">1</td><td class="b">1</td><td class="b">0</td><td class="b">1</td><td class="b">0</td><td class="b">0</td><td class="b">0</td>
+              <td class="b">1</td><td class="b">0</td><td class="b">1</td><td class="b">0</td><td class="b">1</td><td class="b">0</td><td class="b">1</td><td class="b">1</td>
+              <td></td></tr>
+            <tr><td>&nbsp;</td></tr>
+            <tr><td>0 1 1 ←</td>
+              <td class="b">0</td><td class="b">1</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">1</td><td class="b">0</td><td class="b">1</td>
+              <td class="b">0</td><td class="b">1</td><td class="b">0</td><td class="b">1</td><td class="b">1</td><td class="b new">0</td><td class="b new">0</td><td class="b new">0</td>
+              <td class="in">← 0</td></tr>
+            <tr><td></td>
+              <td class="nib" colspan="4">4</td><td class="nib" colspan="4">5</td><td class="nib" colspan="4">5</td><td class="nib" colspan="4">8</td>
+              <td></td></tr>
+          </table>
+          <br>
+          <div class="container">
+            <div class="col-left">
+              <p>Les <highlight>"Most Significant Bits"</highlight> sont perdus</p>
+            </div>
+            <div class="col-right">
+              <p>Les positions vides en entrée sont <highlight>remplies de zéros</highlight></p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="long-title">3.8 Opérateur de décalage à droite – non signé</h2>
+          <pre style="width: 1000px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            unsigned short a = 0x98ab;
+            . . .
+            a >>= 5; /* shift right 5 bits */
+          </code></pre>
+          <table class="bitreg">
+            <tr><td></td>
+              <td class="nib" colspan="4">9</td><td class="nib" colspan="4">8</td><td class="nib" colspan="4">a</td><td class="nib" colspan="4">b</td>
+              <td></td></tr>
+            <tr><td></td>
+              <td class="idx">15</td><td class="idx">14</td><td class="idx">13</td><td class="idx">12</td><td class="idx">11</td><td class="idx">10</td><td class="idx">9</td><td class="idx">8</td>
+              <td class="idx">7</td><td class="idx">6</td><td class="idx">5</td><td class="idx">4</td><td class="idx">3</td><td class="idx">2</td><td class="idx">1</td><td class="idx">0</td>
+              <td></td></tr>
+            <tr><td></td>
+              <td class="b">1</td><td class="b">0</td><td class="b">0</td><td class="b">1</td><td class="b">1</td><td class="b">0</td><td class="b">0</td><td class="b">0</td>
+              <td class="b">1</td><td class="b">0</td><td class="b">1</td><td class="b">0</td><td class="b">1</td><td class="b">0</td><td class="b">1</td><td class="b">1</td>
+              <td></td></tr>
+            <tr><td>&nbsp;</td></tr>
+            <tr><td class="in">0 →</td>
+              <td class="b new">0</td><td class="b new">0</td><td class="b new">0</td><td class="b new">0</td><td class="b new">0</td><td class="b">1</td><td class="b">0</td><td class="b">0</td>
+              <td class="b">1</td><td class="b">1</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">1</td><td class="b">0</td><td class="b">1</td>
+              <td>→</td></tr>
+            <tr><td></td>
+              <td class="nib" colspan="4">0</td><td class="nib" colspan="4">4</td><td class="nib" colspan="4">c</td><td class="nib" colspan="4">5</td>
+              <td></td></tr>
+          </table>
+          <br>
+          <p>Pour les types <highlight>non signés</highlight>, les positions libérées sont <highlight>remplies avec des zéros</highlight></p>
+        </section>
+
+        <section>
+          <h2>3.8 Opérateur de décalage à droite – signé</h2>
+          <div class="container">
+            <div class="col-left">
+              <pre style="width: 700px; margin-left: auto; margin-right: auto;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                char a = 0x98; //-104
+                . . .
+                a >>= 5;
+              </code></pre>
+              <table class="bitreg">
+                <tr><td></td><td class="nib" colspan="4">9</td><td class="nib" colspan="4">8</td><td></td></tr>
+                <tr><td></td>
+                  <td class="idx">7</td><td class="idx">6</td><td class="idx">5</td><td class="idx">4</td><td class="idx">3</td><td class="idx">2</td><td class="idx">1</td><td class="idx">0</td>
+                  <td></td></tr>
+                <tr><td></td>
+                  <td class="b hl">1</td><td class="b">0</td><td class="b">0</td><td class="b">1</td><td class="b">1</td><td class="b">0</td><td class="b">0</td><td class="b">0</td>
+                  <td></td></tr>
+                <tr><td>&nbsp;</td></tr>
+                <tr><td class="in">1 →</td>
+                  <td class="b new">1</td><td class="b new">1</td><td class="b new">1</td><td class="b new">1</td><td class="b new">1</td><td class="b">1</td><td class="b">0</td><td class="b">0</td>
+                  <td>→</td></tr>
+                <tr><td></td><td class="nib" colspan="4">f</td><td class="nib" colspan="4">c</td><td></td></tr>
+              </table>
+            </div>
+            <div class="col-right">
+              <pre style="width: 700px; margin-left: auto; margin-right: auto;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                char a = 0x78; //+120
+                . . .
+                a >>= 5;
+              </code></pre>
+              <table class="bitreg">
+                <tr><td></td><td class="nib" colspan="4">7</td><td class="nib" colspan="4">8</td><td></td></tr>
+                <tr><td></td>
+                  <td class="idx">7</td><td class="idx">6</td><td class="idx">5</td><td class="idx">4</td><td class="idx">3</td><td class="idx">2</td><td class="idx">1</td><td class="idx">0</td>
+                  <td></td></tr>
+                <tr><td></td>
+                  <td class="b hl">0</td><td class="b">1</td><td class="b">1</td><td class="b">1</td><td class="b">1</td><td class="b">0</td><td class="b">0</td><td class="b">0</td>
+                  <td></td></tr>
+                <tr><td>&nbsp;</td></tr>
+                <tr><td class="in">0 →</td>
+                  <td class="b new">0</td><td class="b new">0</td><td class="b new">0</td><td class="b new">0</td><td class="b new">0</td><td class="b">0</td><td class="b">1</td><td class="b">1</td>
+                  <td>→</td></tr>
+                <tr><td></td><td class="nib" colspan="4">0</td><td class="nib" colspan="4">3</td><td></td></tr>
+              </table>
+            </div>
+          </div>
+          <br>
+          <p>Les positions libérées sont remplies avec <highlight>une copie du bit de poids fort : bit de signe</highlight></p>
+        </section>
+
+        <section>
+          <h2>3.8 Remarques</h2>
+          <div class="container">
+            <div class="col-left">
+              <br>
+              <p><inline-code>x &lt;&lt; n</inline-code> est équivalent à <highlight>multiplier par 2<sup>n</sup></highlight></p>
+              <br>
+              <br>
+              <p><inline-code>x &gt;&gt; n</inline-code> est équivalent à <highlight>diviser par 2<sup>n</sup></highlight></p>
+            </div>
+            <div class="col-right">
+              <table class="bitreg" style="font-size: 0.85em;">
+                <tr><td class="label">n</td>
+                  <td class="idx">7</td><td class="idx">6</td><td class="idx">5</td><td class="idx">4</td><td class="idx">3</td><td class="idx">2</td><td class="idx">1</td><td class="idx">0</td>
+                  <td></td><td></td></tr>
+                <tr><td></td>
+                  <td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b hl">1</td>
+                  <td class="label">0x01</td><td class="label">1</td></tr>
+                <tr><td>&lt;&lt;1</td>
+                  <td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b hl">1</td><td class="b">0</td>
+                  <td class="label">0x02</td><td class="label">2</td></tr>
+                <tr><td>&lt;&lt;2</td>
+                  <td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b hl">1</td><td class="b">0</td><td class="b">0</td>
+                  <td class="label">0x04</td><td class="label">4</td></tr>
+                <tr><td>&lt;&lt;3</td>
+                  <td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b hl">1</td><td class="b">0</td><td class="b">0</td><td class="b">0</td>
+                  <td class="label">0x08</td><td class="label">8</td></tr>
+                <tr><td>&lt;&lt;4</td>
+                  <td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b hl">1</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td>
+                  <td class="label">0x10</td><td class="label">16</td></tr>
+                <tr><td>&lt;&lt;5</td>
+                  <td class="b">0</td><td class="b">0</td><td class="b hl">1</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td>
+                  <td class="label">0x20</td><td class="label">32</td></tr>
+                <tr><td>&lt;&lt;6</td>
+                  <td class="b">0</td><td class="b hl">1</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td>
+                  <td class="label">0x40</td><td class="label">64</td></tr>
+                <tr><td>&lt;&lt;7</td>
+                  <td class="b hl">1</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td>
+                  <td class="label">0x80</td><td class="label">128</td></tr>
+              </table>
+            </div>
+          </div>
+          <br>
+          <p>Les multiplications et divisions de puissance de 2 peuvent être implémentées avec des <highlight>décalages</highlight> (et être plus rapides)</p>
+          <p>→ Inutile de le faire en pratique car les compilateurs récents le feront  pour nous si possible.</p>
+        </section>
+
+        <section>
+          <h2>3.8 Exemples</h2>
+          <br>
+          <div class="container">
+            <div class="col-left">
+              <pre style="width: 700px; margin-left: auto; margin-right: auto;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                char a = 0x05; //+5
+                a <<= 3;
+              </code></pre>
+            </div>
+            <div class="col-right">
+              <table class="bitreg">
+                <tr><td class="label">n</td>
+                  <td class="idx">7</td><td class="idx">6</td><td class="idx">5</td><td class="idx">4</td><td class="idx">3</td><td class="idx">2</td><td class="idx">1</td><td class="idx">0</td>
+                  <td></td></tr>
+                <tr><td></td>
+                  <td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b hl">1</td><td class="b hl">0</td><td class="b hl">1</td>
+                  <td class="label">0x05</td></tr>
+                <tr><td>&lt;&lt;3</td>
+                  <td class="b">0</td><td class="b">0</td><td class="b hl">1</td><td class="b hl">0</td><td class="b hl">1</td><td class="b">0</td><td class="b">0</td><td class="b">0</td>
+                  <td></td></tr>
+              </table>
+            </div>
+          </div>
+          <br>
+          <br>
+          <div class="container">
+            <div class="col-left">
+              <pre style="width: 700px; margin-left: auto; margin-right: auto;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                char a = 0xd0; //-48
+                a >>= 4;
+              </code></pre>
+            </div>
+            <div class="col-right">
+              <table class="bitreg">
+                <tr><td></td>
+                  <td class="idx">7</td><td class="idx">6</td><td class="idx">5</td><td class="idx">4</td><td class="idx">3</td><td class="idx">2</td><td class="idx">1</td><td class="idx">0</td>
+                  <td></td></tr>
+                <tr><td></td>
+                  <td class="b hl">1</td><td class="b hl">1</td><td class="b hl">0</td><td class="b hl">1</td><td class="b">0</td><td class="b">0</td><td class="b">0</td><td class="b">0</td>
+                  <td class="label">0xd0</td></tr>
+                <tr><td>&gt;&gt;4</td>
+                  <td class="b hl">1</td><td class="b hl">1</td><td class="b hl">1</td><td class="b hl">1</td><td class="b hl">1</td><td class="b hl">1</td><td class="b hl">0</td><td class="b hl">1</td>
+                  <td>//-3</td></tr>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Hidden in the original PPTX
+        <section>
+          <h2>3.8 Groupement de 4 <inline-code>char</inline-code> en un <inline-code>int</inline-code></h2>
+          <div class="container">
+            <div class="col-left">
+              <pre style="width: 700px; margin-left: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                char b3, b2, b1, b0;
+                int   p = b3;
+                p = (p << 8) | b2;
+                p = (p << 8) | b1;
+                p = (p << 8) | b0;
+              </code></pre>
+            </div>
+            <div class="col-right">
+              <pre style="width: 700px; margin-left: 0;"><code
+                class="nohighlight"
+                data-trim
+                style="font-size: 1.5em;">
+
+                 p = 0  0  0  b3
+
+                 p = 0  0  b3  0
+                     0  0  0  b2
+                     0  0  b3 b2
+
+                 p = 0  b3 b2 0
+                     0  0  0  b1
+                     0  b3 b2 b1
+
+                 p = b3 b2 b1 0
+                     0  0  0  b0
+                     b3 b2 b1 b0
+              </code></pre>
+            </div>
+          </div>
+        </section>
+        -->
+
+        <section>
+          <h2>3.8 Extraction d’un byte d’un <inline-code>int</inline-code></h2>
+          <pre style="width: 1000px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            int i; char b;
+            int noByte;  // de 0 à 3
+
+            unsigned int mask = 0xFF;
+            int n = noByte * 8;
+
+            mask <<= n;
+            b =  ( ( i & mask ) >> n );
+          </code></pre>
+        </section>
+
+        <section>
+          <table class="priority full">
+            <tr><th>Opérateur</th><th>Sens d’évaluation</th><th>Priorité</th></tr>
+            <tr><td class="op">++ -- <i>(postfixé)</i> ()</td><td class="dir">→</td><td>haute</td></tr>
+            <tr><td class="op">+ -<i>(unaire)</i> ++ -- <i>(préfixé)</i> <span class="red">(&lt;Type&gt;)</span> ! <span class="blue">~</span></td><td class="dir rtl">←</td><td></td></tr>
+            <tr><td class="op">* / %</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">+ -</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op new">&lt;&lt; &gt;&gt;</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">&lt; &gt; &lt;= &lt;=</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">== !=</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op new">&amp;</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op new">^</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op new">|</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op new">&amp;&amp;</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op new">||</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">?:</td><td class="dir rtl">←</td><td></td></tr>
+            <tr><td class="op">= += -= *= /= %= &gt;&gt;= <i>etc</i></td><td class="dir rtl">←</td><td>basse</td></tr>
+          </table>
+        </section>
+
+      </section>
+
+      <!----------          EXERCICES          ---------->
+      <section>
+        <h2>📝 Exercices</h2>
+        <p style="text-align: center; padding-left: 0;">
+          <a href="https://he-arc.github.io/1242.1-Langage_C/docs/cours/chapitre03cours/">Exercices du chapitre 03</a>
+        </p>
+      </section>
+
+    </div>
+  </div>
+
+  <!----------          CONTENT          ---------->
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/notes/notes.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      hash: true,
+      width: 1920,
+      height: 1080,
+      transition: "none",
+      center: false,
+      slideNumber: 'c/t',
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+    });
+  </script>
+</body>
+
+</html>
