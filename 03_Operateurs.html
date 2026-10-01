@@ -59,7 +59,7 @@
     .reveal table.priority td.op i { font-weight: normal; }
     .reveal table.priority td.dir { text-align: center; }
     .reveal table.priority td.dir.rtl { color: #FF0000; }
-    .reveal table.priority.full { font-size: 0.8em; margin-top: 40px; }
+    .reveal table.priority.full { font-size: 0.75em; }
     .reveal table.priority .red { color: #FF0000; }
     .reveal table.priority .blue { color: #0000FF; }
 
@@ -128,7 +128,7 @@
           <table class="ops">
             <tr><th class="center">Opérateur</th><th>Signification</th><th class="center">Exemple</th></tr>
             <tr><td class="code center">+</td><td>Addition</td><td class="code center">a + b</td></tr>
-            <tr><td class="code center">-</td><td>Soustraction</td><td class="code center">a – b</td></tr>
+            <tr><td class="code center">-</td><td>Soustraction</td><td class="code center">a - b</td></tr>
             <tr><td class="code center">*</td><td>Multiplication</td><td class="code center">a * b</td></tr>
             <tr><td class="code center">/</td><td>Division</td><td class="code center">a / b</td></tr>
             <tr><td class="code center">%</td><td>Modulo : reste de la division d’entiers</td><td class="code center">a % b</td></tr>
@@ -151,16 +151,19 @@
             a =  5 % 10;
             a = 10 %  0;
             a =  0 % 10;
+            a = -7 %  3;
+            a =  7 % -3;
           </code></pre>
           <h3>Remarques</h3>
           <p>L'opérateur <inline-code>%</inline-code> ne s’applique qu’à des opérandes de type entier et retourne un entier.</p>
+          <p>Avec un négatif, le reste a le signe du <highlight>premier opérande</highlight> : <inline-code style="white-space: nowrap;">(a/b)*b + a%b == a</inline-code></p>
           <p>La fonction <inline-code>fmod()</inline-code> dans la librairie <inline-code>&lt;math.h&gt;</inline-code> travaille avec des valeurs de type double.</p>
         </section>
 
         <section>
           <h2>3.1 Priorité des opérateurs</h2>
           <table class="priority">
-            <tr><th>Opérateur</th><th>Sens d’évaluation</th><th>Priorité</th></tr>
+            <tr><th>Opérateur</th><th>Associativité</th><th>Priorité</th></tr>
             <tr><td class="op new">()</td><td class="dir">→</td><td>haute</td></tr>
             <tr><td class="op"></td><td class="dir"></td><td></td></tr>
             <tr><td class="op new">* / %</td><td class="dir">→</td><td></td></tr>
@@ -175,11 +178,14 @@
 
         <section>
           <h2>3.1 Priorité des opérateurs</h2>
-          <p>Dans chaque classe de priorité, les opérateurs ont la même priorité. S'il y a une suite d'opérateurs binaires de même classe, l'évaluation se fait de la <highlight>gauche vers la droite</highlight> dans l'expression.</p>
+          <p>Dans chaque classe de priorité, les opérateurs ont la même priorité. S'il y a une suite d'opérateurs binaires de même classe, ils sont regroupés de la <highlight>gauche vers la droite</highlight> : c'est l'<highlight>associativité</highlight>.</p>
           <br>
-          <p><b>Exemple</b> <inline-code>6/3*2 → 4</inline-code></p>
+          <p><b>Exemple</b> <inline-code>6/3*2</inline-code> se lit <inline-code>(6/3)*2 → 4</inline-code></p>
           <br>
-          <p>Pour les opérateurs unaires (<inline-code>!,++,--</inline-code>) et pour les opérateurs d’affectation (<inline-code>=,+=,-=,*=,/=,%=</inline-code>), l'évaluation se fait de <highlight>droite à gauche</highlight>.</p>
+          <p>Les opérateurs unaires préfixés (<inline-code>!x, ++x, --x</inline-code>) et les opérateurs d’affectation (<inline-code style="white-space: nowrap;">= += -= *= /= %=</inline-code>) sont associatifs de <highlight>droite à gauche</highlight>.</p>
+          <p><b>Exemple</b> <inline-code>a = b = c</inline-code> se lit <inline-code>a = (b = c)</inline-code></p>
+          <br>
+          <p><warning>⚠</warning> Priorité et associativité disent comment l'expression est <b>parenthésée</b>, pas dans quel <b>ordre</b> les opérandes sont évalués : dans <inline-code>f() + g()</inline-code>, <inline-code>g()</inline-code> peut être appelée avant <inline-code>f()</inline-code>.</p>
         </section>
 
         <section>
@@ -200,75 +206,27 @@
         </section>
 
         <section>
-          <h2>3.1 Types et domaines de définition</h2>
-          <p>Le <highlight>type</highlight> d'une variable définit le <highlight>domaine des valeurs possibles</highlight></p>
-          <br>
-          <p>Il faut être attentif à <highlight>ne pas dépasser les limites de validité des variables</highlight>.</p>
-          <br>
-          <p><warning>⚠</warning> lorsqu’on combine des variables de types différents à l'aide des opérateurs mathématiques.</p>
-          <br>
-          <p>Le tableau suivant rappelle les <highlight>domaines de validité</highlight> de quelques types du langage C.</p>
-        </section>
-
-        <section>
-          <h2>3.1 Domaines de validité</h2>
-          <table class="ops">
-            <tr><th>Type</th><th class="center">Min</th><th class="center">Max</th></tr>
-            <tr><td class="code">signed char</td><td class="code plain center">-128</td><td class="code plain center">+127</td></tr>
-            <tr><td class="code">unsigned char</td><td class="code plain center">0</td><td class="code plain center">+255</td></tr>
-            <tr><td class="code">short</td><td class="code plain center">-32768</td><td class="code plain center">+32767</td></tr>
-            <tr><td class="code">unsigned short</td><td class="code plain center">0</td><td class="code plain center">+65535</td></tr>
-            <tr><td class="code">int</td><td class="code plain center">-2147483648</td><td class="code plain center">+2147483647</td></tr>
-            <tr><td class="code">unsigned int</td><td class="code plain center">0</td><td class="code plain center">+4294967295</td></tr>
-            <tr><td class="code">long</td><td class="code plain center">-2147483648</td><td class="code plain center">+2147483647</td></tr>
-            <tr><td class="code">unsigned long</td><td class="code plain center">0</td><td class="code plain center">+4294967295</td></tr>
-            <tr><td class="code">float</td><td class="code plain center">1.1E-38</td><td class="code plain center">3.4E+38</td></tr>
-            <tr><td class="code">double</td><td class="code plain center">2.2E-308</td><td class="code plain center">1.7E+308</td></tr>
+          <h2>3.1 «Overflow» - dépassement de capacité</h2>
+          <p>Rappel (chapitre 2) : le <highlight>type</highlight> d'une variable définit le <highlight>domaine des valeurs possibles</highlight>
+            (<inline-code>&lt;limits.h&gt;</inline-code>, <inline-code>&lt;float.h&gt;</inline-code>). Que se passe-t-il lorsqu'on en sort ?</p>
+          <p>a) Avec les types <b>réels</b> (<inline-code>float</inline-code>, <inline-code>double</inline-code>), la variable prend une valeur spéciale :
+            infinie, affichée <inline-code>inf</inline-code> (<inline-code>HUGE_VAL</inline-code>, <inline-code>INFINITY</inline-code>),
+            ou indéterminée, affichée <inline-code>-nan(ind)</inline-code> (<inline-code>NAN</inline-code>). Macros de <inline-code>&lt;math.h&gt;</inline-code>.</p>
+          <p>b) Avec les types <b>entiers</b>, les bits en trop sont perdus. Le résultat dépend du cas :</p>
+          <table class="ops" style="font-size: 0.65em;">
+            <tr><th></th><th class="center">Type non signé</th><th class="center">Type signé</th></tr>
+            <tr><td>Calcul qui dépasse</td>
+              <td class="center">modulo 2<sup>N</sup> (défini)<br><inline-code>UINT_MAX + 1</inline-code> → <inline-code>0</inline-code></td>
+              <td class="center"><error>indéfini (UB)</error><br><inline-code>INT_MAX + 1</inline-code></td></tr>
+            <tr><td>Conversion d'un entier trop grand</td>
+              <td class="center">modulo 2<sup>N</sup> (défini)<br><inline-code>(unsigned char)300</inline-code> → <inline-code>44</inline-code></td>
+              <td class="center">défini par l'implémentation<br>gcc : <inline-code>(signed char)200</inline-code> → <inline-code>-56</inline-code></td></tr>
+            <tr><td>Conversion d'un flottant hors limites</td>
+              <td class="center"><error>indéfini (UB)</error></td>
+              <td class="center"><error>indéfini (UB)</error></td></tr>
           </table>
-        </section>
-
-        <section>
-          <h2>3.1 Domaines de validité</h2>
-          <p>Le fichier <inline-code>&lt;limits.h&gt;</inline-code> définit des macros pour les nombres entiers. Les valeurs dépendent de l’implémentation et de la machine.</p>
-          <br>
-          <table class="ops" style="font-size: 0.75em; width: 1600px;">
-            <tr><th>Valeur</th><th>Remarques</th></tr>
-            <tr><td class="code plain">CHAR_BIT</td><td>Taille d'un <inline-code>char</inline-code> en bits (minimum 8 bits)</td></tr>
-            <tr><td class="code plain">SCHAR_MIN, SHRT_MIN, INT_MIN, LONG_MIN, LLONG_MIN(C99)</td><td>Valeur <error>minimum possible</error> des types entiers signés : <inline-code>char, short, int, long, long long</inline-code></td></tr>
-            <tr><td class="code plain">SCHAR_MAX, SHRT_MAX, INT_MAX, LONG_MAX, LLONG_MAX(C99)</td><td>Valeur <error>maximum possible</error> des types entiers signés : <inline-code>signed char, signed short, signed int,...</inline-code></td></tr>
-            <tr><td class="code plain">UCHAR_MAX, USHRT_MAX, UINT_MAX, ULONG_MAX, ULLONG_MAX(C99)</td><td>Valeur <error>maximum possible</error> des types entiers non-signés : <inline-code>unsigned char, unsigned short,...</inline-code></td></tr>
-            <tr><td class="code plain">CHAR_MIN</td><td>Valeur <error>minimum possible</error> pour un <inline-code>char</inline-code></td></tr>
-            <tr><td class="code plain">CHAR_MAX</td><td>Valeur <error>maximum possible</error> pour un <inline-code>char</inline-code></td></tr>
-            <tr><td>…</td><td>…</td></tr>
-          </table>
-        </section>
-
-        <section>
-          <h2>3.1 Domaines de validité</h2>
-          <p>Le fichier <inline-code>&lt;float.h&gt;</inline-code> définit des macros pour les nombres en virgule flottante. Les valeurs dépendent de l’implémentation et de la machine.</p>
-          <br>
-          <table class="ops" style="font-size: 0.75em; width: 1600px;">
-            <tr><th>Valeur</th><th>Remarques</th></tr>
-            <tr><td class="code plain">FLT_MIN, DBL_MIN</td><td>Valeur <error>minimum possible</error> d’un <inline-code>float, double</inline-code></td></tr>
-            <tr><td class="code plain">FLT_MAX, DBL_MAX</td><td>Valeur <error>maximum possible</error> d’un <inline-code>float</inline-code> ou <inline-code>double</inline-code></td></tr>
-            <tr><td class="code plain">FLT_EPSILON, DBL_EPSILON</td><td>Le <error>plus petit nombre</error> tel que 1.0 + x != 1.0 pour <inline-code>float</inline-code> ou <inline-code>double</inline-code></td></tr>
-            <tr><td class="code plain">FLT_DIG, DBL_DIG</td><td>Nombre de décimales qui peuvent être représentées sans perte de précision pour <inline-code>float</inline-code> ou <inline-code>double</inline-code></td></tr>
-            <tr><td>….</td><td>….</td></tr>
-          </table>
-        </section>
-
-        <section>
-          <h2>3.1 «Overflow» – dépassement de capacité</h2>
-          <p>Lorsqu'on sort des domaines de définition</p>
-          <p>a) Avec les types <b>réels</b> tels que <inline-code>float</inline-code> ou <inline-code>double</inline-code>, la variable prend une valeur spéciale</p>
-          <br>
-          <table class="ops">
-            <tr><th></th><th class="center">Valeurs</th><th class="center">math.h</th></tr>
-            <tr><td>Valeur infinie</td><td class="code center">1.#INF</td><td class="code center">HUGE_VAL<br>INFINITY</td></tr>
-            <tr><td>Valeur indéterminée</td><td class="code center">1.#IND</td><td class="code center">NAN</td></tr>
-          </table>
-          <br>
-          <p>b) Avec les types <b>entiers,</b> signés ou non, <error>aucun message d’erreur</error>, mais un certain nombre de bits sont pris en compte, les autres sont ignorés. Généralement, la valeur "boucle sur le codage", sans garanti à 100% hélas.</p>
+          <p style="font-size: 0.8em;">Exception : vers <inline-code>bool</inline-code>, toute valeur non nulle donne <inline-code>1</inline-code>.
+            gcc ne signale que certains dépassements sur des constantes (<inline-code>-Woverflow</inline-code>), jamais ceux qui ont lieu à l'exécution.</p>
         </section>
 
         <!-- Hidden in the original PPTX
@@ -344,9 +302,12 @@
             <div class="col-left" style="flex: 3; padding-left: 150px;">
               <p>Une <highlight>conversion implicite</highlight> est une modification du type prise en charge par le compilateur.</p>
               <br>
-              <p><b>1. Dans une affectation :</b> le résultat de l'expression à droite du signe = est converti de façon à <highlight>réduire au minimum les pertes de données</highlight>.</p>
+              <p><b>1. Dans une affectation :</b> le résultat de l'expression à droite du signe = est converti <highlight>dans le type de la variable de gauche</highlight>, peu importe la perte.</p>
               <br>
               <p><b>2. Dans une opération :</b> si les opérandes sont de types différents, il y a conversion <highlight>du type le plus FAIBLE vers le type le plus FORT</highlight><b>.</b></p>
+              <p style="font-size: 0.8em;">Avant tout calcul, <inline-code>char</inline-code> et <inline-code>short</inline-code> sont <highlight>promus en <inline-code>int</inline-code></highlight>, même entre deux <inline-code>char</inline-code>.</p>
+              <p style="font-size: 0.8em;"><warning>⚠</warning> Signé et non signé : <inline-code>-1 &lt; 1u</inline-code> est <error>faux</error>, car <inline-code>-1</inline-code> est converti en <inline-code>UINT_MAX</inline-code> (gcc le signale : <inline-code>-Wsign-compare</inline-code>).
+                Le résultat dépend aussi des tailles : sous Windows, <inline-code>unsigned int + long</inline-code> donne un <inline-code>unsigned long</inline-code>.</p>
             </div>
             <div class="col-right" style="flex: 1;">
               <table class="ops">
@@ -357,6 +318,8 @@
                 <tr><td class="code center">unsigned int</td></tr>
                 <tr><td class="code center">long</td></tr>
                 <tr><td class="code center">unsigned long</td></tr>
+                <tr><td class="code center">long long</td></tr>
+                <tr><td class="code center">unsigned long long</td></tr>
                 <tr><td class="code center">float</td></tr>
                 <tr><td class="code center">double</td></tr>
                 <tr><td class="code center">long double</td></tr>
@@ -370,7 +333,6 @@
           <h2 class="long-title">Conversion explicite (transtypage ou <em>casting</em>)</h2>
           <p>Une <highlight>conversion explicite</highlight> est <b>une modification du type</b>, réalisée par le programmeur grâce à la syntaxe suivante :</p>
           <p class="centered"><inline-code><highlight>(&lt;Type&gt;)</highlight> &lt;valeur&gt;</inline-code></p>
-          <br>
           <h3>Exemples</h3>
           <pre style="width: 1000px;"><code
             class="c"
@@ -382,10 +344,13 @@
             (double) 2/3   //   2.0/3
           </code></pre>
           <h3>Remarque</h3>
-          <p>On peut aussi forcer un transtypage de valeurs littérales avec des suffixes :
-            <highlight>.</highlight> pour <inline-code>double</inline-code>, <highlight>f</highlight> pour <inline-code>float</inline-code>,
-            <highlight>u</highlight> pour <inline-code>unsigned</inline-code>, <highlight>l</highlight> pour <inline-code>long</inline-code>.</p>
-          <p>Par exemple <inline-code>x = 17f</inline-code></p>
+          <p>Sans transtypage, on peut aussi fixer le type d'une valeur littérale avec le <highlight>point décimal</highlight> et des <highlight>suffixes</highlight> :</p>
+          <table class="ops">
+            <tr><th>Littéral</th><td class="code center">17</td><td class="code center">17.0</td><td class="code center">17.0F</td><td class="code center">17U</td><td class="code center">17L</td><td class="code center">17LL</td><td class="code center">17UL</td></tr>
+            <tr><th>Type</th><td class="center">int</td><td class="center">double</td><td class="center">float</td><td class="center">unsigned int</td><td class="center">long</td><td class="center">long long</td><td class="center">unsigned long</td></tr>
+          </table>
+          <p style="font-size: 0.8em;"><warning>⚠</warning> <inline-code>17F</inline-code> est invalide (il faut <inline-code>17.0F</inline-code>).
+            Préférer les majuscules : <inline-code>17l</inline-code> ressemble à <inline-code>171</inline-code>.</p>
         </section>
 
         <section>
@@ -539,7 +504,7 @@
             <tr><th class="center">Opérateur</th><th>Signification</th><th class="center">Exemple</th></tr>
             <tr><td class="code center">=</td><td>Affectation</td><td class="code center">a = b</td></tr>
             <tr><td class="code center">+=</td><td>addition et assignation</td><td class="code center">a += b</td></tr>
-            <tr><td class="code center">-=</td><td>soustraction et assignation</td><td class="code center">a –= b</td></tr>
+            <tr><td class="code center">-=</td><td>soustraction et assignation</td><td class="code center">a -= b</td></tr>
             <tr><td class="code center">*=</td><td>multiplication et assignation</td><td class="code center">a *= b</td></tr>
             <tr><td class="code center">/=</td><td>division et assignation</td><td class="code center">a /= b</td></tr>
             <tr><td class="code center">%=</td><td>modulo et assignation</td><td class="code center">a %= b</td></tr>
@@ -549,9 +514,9 @@
         <section>
           <h2>3.2 Priorité des opérateurs</h2>
           <table class="priority">
-            <tr><th>Opérateur</th><th>Sens d’évaluation</th><th>Priorité</th></tr>
+            <tr><th>Opérateur</th><th>Associativité</th><th>Priorité</th></tr>
             <tr><td class="op">()</td><td class="dir">→</td><td>haute</td></tr>
-            <tr><td class="op"></td><td class="dir"></td><td></td></tr>
+            <tr><td class="op"><span class="red">(&lt;Type&gt;)</span></td><td class="dir rtl">←</td><td></td></tr>
             <tr><td class="op">* / %</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op">+ -</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op"></td><td class="dir"></td><td></td></tr>
@@ -569,7 +534,8 @@
 
         <section>
           <h2>3.3 Les opérateurs d’incrémentation</h2>
-          <p>Opérateur qui <highlight>augmente</highlight>, ou <highlight>diminue</highlight>, <highlight>de 1</highlight> la valeur d’une variable entière.</p>
+          <p>Opérateur qui <highlight>augmente</highlight>, ou <highlight>diminue</highlight>, <highlight>de 1</highlight> la valeur d’une variable, entière ou flottante.</p>
+          <p style="font-size: 0.8em;">S'applique aussi aux pointeurs : l'adresse avance d'un élément (chapitre 9).</p>
           <br>
           <table class="ops">
             <tr><th class="center">Opérateur</th><th>Signification</th><th class="center">Exemple</th></tr>
@@ -583,10 +549,12 @@
           <p>Les opérateurs <inline-code>++</inline-code> et <inline-code>--</inline-code> peuvent être</p>
           <br>
           <p class="indent-1"><highlight>(a) préfixés</highlight>, à gauche de l’opérande</p>
-          <p class="indent-2">On <b>pré-incrémente</b>, puis on affecte</p>
+          <p class="indent-2"><inline-code>++x</inline-code> vaut la <b>nouvelle</b> valeur de <inline-code>x</inline-code></p>
           <br>
           <p class="indent-1"><highlight>(b) postfixés</highlight>, à droite de l’opérande</p>
-          <p class="indent-2">On affecte, puis on <b>post-incrémente</b></p>
+          <p class="indent-2"><inline-code>x++</inline-code> vaut l'<b>ancienne</b> valeur de <inline-code>x</inline-code></p>
+          <br>
+          <p>Dans les deux cas, <inline-code>x</inline-code> est modifié au plus tard au prochain <highlight>point de séquence</highlight> : ne pas lire ni modifier <inline-code>x</inline-code> ailleurs dans la même expression (voir le défi <inline-code>i = i++</inline-code>).</p>
         </section>
 
         <section>
@@ -626,9 +594,9 @@
         <section>
           <h2>3.3 Priorité des opérateurs</h2>
           <table class="priority">
-            <tr><th>Opérateur</th><th>Sens d’évaluation</th><th>Priorité</th></tr>
+            <tr><th>Opérateur</th><th>Associativité</th><th>Priorité</th></tr>
             <tr><td class="op">()</td><td class="dir">→</td><td>haute</td></tr>
-            <tr><td class="op new">++ --</td><td class="dir rtl">←</td><td></td></tr>
+            <tr><td class="op new">++ -- <span class="red">(&lt;Type&gt;)</span></td><td class="dir rtl">←</td><td></td></tr>
             <tr><td class="op">* / %</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op">+ -</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op"></td><td class="dir"></td><td></td></tr>
@@ -669,6 +637,7 @@
 
             for(i=1,j=0; j<15; i++, j=j+2){...}
           </code></pre>
+          <p style="font-size: 0.8em;"><warning>⚠</warning> Les virgules qui séparent les arguments d'une fonction (<inline-code>printf("%d %d", a, b)</inline-code>) ou les variables d'une déclaration (<inline-code>int a, b;</inline-code>) ne sont <b>pas</b> l'opérateur virgule. En particulier, l'ordre d'évaluation des arguments n'est pas fixé.</p>
         </section>
 
       </section>
@@ -680,7 +649,8 @@
           <h2>3.5 Opérateurs de comparaison</h2>
           <p><highlight>Comparaison</highlight> de variables ou expressions dont le résultat est <highlight>0</highlight> ou <highlight>1</highlight> :</p>
           <br>
-          <p class="centered"><box><inline-code>{type simple} x {type simple}  -> {0, 1}</inline-code></box></p>
+          <p class="centered"><box><inline-code>{type simple} x {type simple}  -> int {0, 1}</inline-code></box></p>
+          <p class="centered" style="font-size: 0.8em;">Le résultat est un <inline-code>int</inline-code>, pas un <inline-code>bool</inline-code>, même en C23.</p>
           <br>
           <h3>Exemples</h3>
           <pre style="width: 900px;"><code
@@ -689,23 +659,17 @@
             data-noescape
             style="font-size: 1.8em;">
 
-            _Bool b = 5 < (3 + 4);
-                  b = 'A' > 'Z';
+            bool b = 5 < (3 + 4);
+                 b = 'A' > 'Z';
           </code></pre>
         </section>
 
         <section>
           <h2>3.5 Exemple de valeurs booléennes</h2>
-          <h3>Les valeurs booléennes peuvent avoir diverses représentations</h3>
-          <table class="ops" style="font-size: 0.7em;">
-            <tr><th class="center">Version</th><th class="center">Type</th><th class="center">vrai</th><th class="center">faux</th><th class="center">#include</th></tr>
-            <tr><td class="muted center">K&amp;R</td><td class="code muted center">int</td><td class="muted center">1 (≠0)</td><td class="muted center">0</td><td></td></tr>
-            <tr><td class="center"><a href="http://en.wikipedia.org/wiki/ANSI_C">C99</a></td><td class="code center">bool</td><td class="center"><b>true</b></td><td class="center"><b>false</b></td><td class="center"><b>&lt;stdbool.h&gt;</b></td></tr>
-            <tr><td class="center"><a href="http://en.wikipedia.org/wiki/ANSI_C">C99</a></td><td class="code center">_Bool</td><td class="center"><b>≠0</b></td><td class="center"><b>0</b></td><td></td></tr>
-          </table>
-          <div style="text-align: center;">
-            <img src="./medias/codeblocks_std_cpp0x.png" width="900px" alt="Have g++ follow the coming C++0x (aka c++11) ISO C++ language standard [-std=c++0x]">
-          </div>
+          <p>Rappel (chapitre 2) : en C23, <inline-code>bool</inline-code>, <inline-code>true</inline-code> et <inline-code>false</inline-code> sont des <highlight>mots-clés</highlight>, sans <inline-code>&lt;stdbool.h&gt;</inline-code>.
+            Un <inline-code>bool</inline-code> ne vaut que <highlight>0 ou 1</highlight> : toute valeur non nulle convertie en <inline-code>bool</inline-code> donne <inline-code>1</inline-code>.</p>
+          <p style="font-size: 0.8em;">Avant C99 : un <inline-code>int</inline-code> (0 = faux, ≠ 0 = vrai). De C99 à C17 : <inline-code>_Bool</inline-code>, ou <inline-code>bool</inline-code> avec <inline-code>&lt;stdbool.h&gt;</inline-code>.</p>
+          <br>
           <div class="container">
             <div class="col-left">
               <pre style="width: 850px; margin-left: 0;"><code
@@ -714,11 +678,9 @@
                 data-noescape
                 style="font-size: 1.5em;">
 
-                #include &#60;stdbool.h&#62;
                 bool test = true;
                 test = (2*3) < 7;
-                printf("%d", test);
-                printf("%s", test ? "true" : "false");
+                printf("%d\n", test); // 1
               </code></pre>
             </div>
             <div class="col-right">
@@ -728,10 +690,10 @@
                 data-noescape
                 style="font-size: 1.5em;">
 
-                _Bool test = 3; //!=0 => true
-                test = (2*3) < 7;
-                printf("%d", test);
-                printf("%s", test ? "true" : "false");
+                bool test = 3;  // stocke 1
+                printf("%d\n", test); // 1
+                test = 0.5;     // stocke 1
+                printf("%d\n", test); // 1
               </code></pre>
             </div>
           </div>
@@ -751,14 +713,14 @@
         </section>
 
         <section>
-          <h2>3.3 Priorité des opérateurs</h2>
+          <h2>3.5 Priorité des opérateurs</h2>
           <table class="priority">
-            <tr><th>Opérateur</th><th>Sens d’évaluation</th><th>Priorité</th></tr>
+            <tr><th>Opérateur</th><th>Associativité</th><th>Priorité</th></tr>
             <tr><td class="op">()</td><td class="dir">→</td><td>haute</td></tr>
-            <tr><td class="op">++ --</td><td class="dir rtl">←</td><td></td></tr>
+            <tr><td class="op">++ -- <span class="red">(&lt;Type&gt;)</span></td><td class="dir rtl">←</td><td></td></tr>
             <tr><td class="op">* / %</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op">+ -</td><td class="dir">→</td><td></td></tr>
-            <tr><td class="op new">&lt; &gt; &lt;= &lt;=</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op new">&lt; &gt; &lt;= &gt;=</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op new">== !=</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op"></td><td class="dir"></td><td></td></tr>
             <tr><td class="op"></td><td class="dir"></td><td></td></tr>
@@ -773,8 +735,9 @@
 
         <section>
           <h2>3.6 Opérateurs logiques</h2>
-          <p><b>Opérateur qui agit sur des booléens et qui donne un booléen :</b></p>
-          <p class="indent-1"><inline-code>{ _Bool } <highlight>x</highlight> { _Bool }  -> { _Bool }</inline-code></p>
+          <p><b>Opérateur qui combine des conditions et qui donne 0 ou 1 :</b></p>
+          <p class="indent-1"><inline-code>{type simple} <highlight>x</highlight> {type simple}  -> int {0, 1}</inline-code></p>
+          <p class="indent-1" style="font-size: 0.8em;">Un opérande vaut faux s'il est nul, vrai sinon. Le résultat est un <inline-code>int</inline-code>, même avec des opérandes <inline-code>bool</inline-code>.</p>
           <br>
           <p><b>Exemple :</b></p>
           <pre style="width: 900px; margin-left: 300px;"><code
@@ -799,26 +762,28 @@
           <table class="ops" style="font-family: 'Courier New', Courier, monospace;">
             <tr><th></th><th></th><th class="center">NOT</th><th class="center">AND</th><th class="center">OR</th><th class="center"><em>XOR</em></th></tr>
             <tr><th class="center">p</th><th class="center">q</th>
-              <th class="center"><highlight>!</highlight>q</th>
+              <th class="center"><highlight>!</highlight>p</th>
               <th class="center">p<highlight>&amp;&amp;</highlight>q</th>
               <th class="center">p<highlight>||</highlight>q</th>
               <th class="center"><highlight>(!</highlight><em>p</em> <highlight>&amp;&amp;</highlight> <em>q</em><highlight>)</highlight><br><highlight>||</highlight><br><highlight>(</highlight><em>p</em> <highlight>&amp;&amp;</highlight> <highlight>!</highlight><em>q</em><highlight>)</highlight></th></tr>
             <tr><td class="center"><b>false</b></td><td class="center"><b>false</b></td><td class="center">true</td><td class="center">false</td><td class="center">false</td><td class="center"><em>false</em></td></tr>
-            <tr><td class="center"><b>false</b></td><td class="center"><b>true</b></td><td class="center">false</td><td class="center">false</td><td class="center">true</td><td class="center"><em>true</em></td></tr>
-            <tr><td class="center"><b>true</b></td><td class="center"><b>false</b></td><td class="center">true</td><td class="center">false</td><td class="center">true</td><td class="center"><em>true</em></td></tr>
+            <tr><td class="center"><b>false</b></td><td class="center"><b>true</b></td><td class="center">true</td><td class="center">false</td><td class="center">true</td><td class="center"><em>true</em></td></tr>
+            <tr><td class="center"><b>true</b></td><td class="center"><b>false</b></td><td class="center">false</td><td class="center">false</td><td class="center">true</td><td class="center"><em>true</em></td></tr>
             <tr><td class="center"><b>true</b></td><td class="center"><b>true</b></td><td class="center">false</td><td class="center">true</td><td class="center">true</td><td class="center"><em>false</em></td></tr>
           </table>
+          <br>
+          <p style="font-size: 0.8em;">C n'a pas d'opérateur XOR logique : pour deux <inline-code>bool</inline-code>, <inline-code>p != q</inline-code> donne le même résultat.</p>
         </section>
 
         <section>
           <h2>3.6 Priorité des opérateurs</h2>
           <table class="priority">
-            <tr><th>Opérateur</th><th>Sens d’évaluation</th><th>Priorité</th></tr>
+            <tr><th>Opérateur</th><th>Associativité</th><th>Priorité</th></tr>
             <tr><td class="op">()</td><td class="dir">→</td><td>haute</td></tr>
-            <tr><td class="op">++ -- <span class="blue">!</span></td><td class="dir rtl">←</td><td></td></tr>
+            <tr><td class="op">++ -- <span class="red">(&lt;Type&gt;)</span> <span class="blue">!</span></td><td class="dir rtl">←</td><td></td></tr>
             <tr><td class="op">* / %</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op">+ -</td><td class="dir">→</td><td></td></tr>
-            <tr><td class="op">&lt; &gt; &lt;= &lt;=</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">&lt; &gt; &lt;= &gt;=</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op">== !=</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op new">&amp;&amp;</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op new">||</td><td class="dir">→</td><td></td></tr>
@@ -841,7 +806,7 @@
             false || !(32 > 12)
           </code></pre>
           <br>
-          <p><b>Remarque :</b> les opérateurs <inline-code>&amp;&amp;</inline-code> et <inline-code>||</inline-code> ont un point d’arrêt entre l’évaluation du membre de gauche et du membre de droite : « <em>short-circuit evaluation</em> ». <highlight>Le membre de droite n’est évalué que si c’est nécessaire.</highlight></p>
+          <p><b>Remarque :</b> les opérateurs <inline-code>&amp;&amp;</inline-code> et <inline-code>||</inline-code> ont un <a href="https://he-arc.github.io/1242.1-Langage_C/docs/cours/faq/#quest-ce-quun-point-de-s%C3%A9quence-en-c-">point de séquence</a> entre l’évaluation du membre de gauche et du membre de droite : « <em>short-circuit evaluation</em> ». <highlight>Le membre de droite n’est évalué que si c’est nécessaire.</highlight></p>
         </section>
 
         <!-- Hidden in the original PPTX
@@ -880,6 +845,8 @@
           </table>
           <br>
           <p>Les opérateurs composés sont également autorisés : <inline-code>&amp;=</inline-code>, <inline-code>|=</inline-code> et <inline-code>^=</inline-code></p>
+          <p style="font-size: 0.8em;"><warning>⚠</warning> Ne pas confondre <inline-code>&amp;</inline-code> / <inline-code>&amp;&amp;</inline-code> et <inline-code>|</inline-code> / <inline-code>||</inline-code> : <inline-code>2 &amp; 1</inline-code> vaut <inline-code>0</inline-code>, <inline-code>2 &amp;&amp; 1</inline-code> vaut <inline-code>1</inline-code>.</p>
+          <p style="font-size: 0.8em;"><warning>⚠</warning> <inline-code>x &amp; 1 == 0</inline-code> se lit <inline-code>x &amp; (1 == 0)</inline-code> : écrire <inline-code>(x &amp; 1) == 0</inline-code> (gcc le signale : <inline-code>-Wparentheses</inline-code>).</p>
         </section>
 
         <section>
@@ -986,6 +953,8 @@
               <p>Les positions vides en entrée sont <highlight>remplies de zéros</highlight></p>
             </div>
           </div>
+          <p style="font-size: 0.8em;">En réalité, <inline-code>a</inline-code> est d'abord promu en <inline-code>int</inline-code> : <inline-code>a &lt;&lt; 3</inline-code> vaut <inline-code>0x34558</inline-code>.
+            Ce sont les 16 bits de poids faible, gardés par l'affectation à un <inline-code>short</inline-code> (avec gcc), qui donnent <inline-code>0x4558</inline-code>.</p>
         </section>
 
         <section>
@@ -1035,7 +1004,7 @@
                 data-noescape
                 style="font-size: 1.8em;">
 
-                char a = 0x98; //-104
+                signed char a = -104; // 0x98
                 . . .
                 a >>= 5;
               </code></pre>
@@ -1061,7 +1030,7 @@
                 data-noescape
                 style="font-size: 1.8em;">
 
-                char a = 0x78; //+120
+                signed char a = 120; // 0x78
                 . . .
                 a >>= 5;
               </code></pre>
@@ -1083,6 +1052,7 @@
           </div>
           <br>
           <p>Les positions libérées sont remplies avec <highlight>une copie du bit de poids fort : bit de signe</highlight></p>
+          <p style="font-size: 0.8em;"><warning>⚠</warning> Pour une valeur négative, ce comportement est <b>défini par l'implémentation</b> : c'est celui de gcc, pas une garantie de la norme.</p>
         </section>
 
         <section>
@@ -1091,9 +1061,10 @@
             <div class="col-left">
               <br>
               <p><inline-code>x &lt;&lt; n</inline-code> est équivalent à <highlight>multiplier par 2<sup>n</sup></highlight></p>
-              <br>
+              <p style="font-size: 0.75em;"><warning>⚠</warning> Pour un type signé, <error>UB</error> si <inline-code>x</inline-code> est négatif ou si le résultat déborde.</p>
               <br>
               <p><inline-code>x &gt;&gt; n</inline-code> est équivalent à <highlight>diviser par 2<sup>n</sup></highlight></p>
+              <p style="font-size: 0.75em;"><warning>⚠</warning> Seulement si <inline-code>x ≥ 0</inline-code> : <inline-code>-3 &gt;&gt; 1</inline-code> donne <inline-code>-2</inline-code>, <inline-code>-3 / 2</inline-code> donne <inline-code>-1</inline-code>.</p>
             </div>
             <div class="col-right">
               <table class="bitreg" style="font-size: 0.85em;">
@@ -1143,7 +1114,7 @@
                 data-noescape
                 style="font-size: 1.8em;">
 
-                char a = 0x05; //+5
+                signed char a = 5; // 0x05
                 a <<= 3;
               </code></pre>
             </div>
@@ -1171,7 +1142,7 @@
                 data-noescape
                 style="font-size: 1.8em;">
 
-                char a = 0xd0; //-48
+                signed char a = -48; // 0xd0
                 a >>= 4;
               </code></pre>
             </div>
@@ -1235,33 +1206,35 @@
         -->
 
         <section>
-          <h2>3.8 Extraction d’un byte d’un <inline-code>int</inline-code></h2>
+          <h2>3.8 Extraction d’un octet d’un <inline-code>int</inline-code></h2>
           <pre style="width: 1000px;"><code
             class="c"
             data-trim
             data-noescape
             style="font-size: 1.8em;">
 
-            int i; char b;
-            int noByte;  // de 0 à 3
+            unsigned int i = 0x12345678;
+            unsigned char b;
+            int noByte = 1;  // de 0 à 3
 
             unsigned int mask = 0xFF;
             int n = noByte * 8;
 
             mask <<= n;
-            b =  ( ( i & mask ) >> n );
+            b =  ( ( i & mask ) >> n );  // 0x56
           </code></pre>
         </section>
 
         <section>
+          <h2>3.8 Priorité des opérateurs : tableau complet</h2>
           <table class="priority full">
-            <tr><th>Opérateur</th><th>Sens d’évaluation</th><th>Priorité</th></tr>
+            <tr><th>Opérateur</th><th>Associativité</th><th>Priorité</th></tr>
             <tr><td class="op">++ -- <i>(postfixé)</i> ()</td><td class="dir">→</td><td>haute</td></tr>
             <tr><td class="op">+ -<i>(unaire)</i> ++ -- <i>(préfixé)</i> <span class="red">(&lt;Type&gt;)</span> ! <span class="blue">~</span></td><td class="dir rtl">←</td><td></td></tr>
             <tr><td class="op">* / %</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op">+ -</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op new">&lt;&lt; &gt;&gt;</td><td class="dir">→</td><td></td></tr>
-            <tr><td class="op">&lt; &gt; &lt;= &lt;=</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">&lt; &gt; &lt;= &gt;=</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op">== !=</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op new">&amp;</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op new">^</td><td class="dir">→</td><td></td></tr>
@@ -1269,7 +1242,8 @@
             <tr><td class="op new">&amp;&amp;</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op new">||</td><td class="dir">→</td><td></td></tr>
             <tr><td class="op">?:</td><td class="dir rtl">←</td><td></td></tr>
-            <tr><td class="op">= += -= *= /= %= &gt;&gt;= <i>etc</i></td><td class="dir rtl">←</td><td>basse</td></tr>
+            <tr><td class="op">= += -= *= /= %= &gt;&gt;= <i>etc</i></td><td class="dir rtl">←</td><td></td></tr>
+            <tr><td class="op">,</td><td class="dir">→</td><td>basse</td></tr>
           </table>
         </section>
 

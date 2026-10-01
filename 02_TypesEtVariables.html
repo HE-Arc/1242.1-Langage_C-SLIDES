@@ -61,6 +61,7 @@
     }
     .reveal table.types td.center,
     .reveal table.types th.center { text-align: center; }
+    .reveal table.types td.plain { color: #000000; font-weight: normal; }
 
     .reveal table.keywords {
       font-family: 'Courier New', Courier, monospace;
@@ -461,10 +462,12 @@
             <tr><td class="code">unsigned char</td><td class="center">8</td><td>0 à 255</td></tr>
             <tr><td class="code">unsigned short</td><td class="center">16</td><td>0 à 65'535</td></tr>
             <tr><td class="code">unsigned int</td><td class="center">32</td><td>0 à 4'294'967'295</td></tr>
-            <tr><td class="code">unsigned long</td><td class="center">32</td><td>0 à 4'294'967'295</td></tr>
+            <tr><td class="code">unsigned long</td><td class="center">32 ou 64</td><td>Windows : comme <inline-code>unsigned int</inline-code><br>Linux, macOS : comme <inline-code>unsigned long long</inline-code></td></tr>
+            <tr><td class="code">unsigned long long</td><td class="center">64</td><td>0 à 18'446'744'073'709'551'615</td></tr>
           </table>
           <br>
-          <p><warning>⚠️ Attention :</warning> la taille des types <inline-code>int</inline-code> et <inline-code>long</inline-code> dépend de la plateforme</p>
+          <p><warning>⚠️ Attention :</warning> la taille des types <inline-code>int</inline-code> et <inline-code>long</inline-code> dépend de la plateforme.
+            Sur un système 64 bits, <inline-code>long</inline-code> fait 32 bits sous Windows, 64 bits sous Linux et macOS.</p>
         </section>
 
         <section>
@@ -474,16 +477,47 @@
             <tr><td class="code">char</td><td class="center">8</td><td>-128 à +127</td></tr>
             <tr><td class="code">short</td><td class="center">16</td><td>-32'768 à +32'767</td></tr>
             <tr><td class="code">int</td><td class="center">32</td><td>-2'147'483'648 à +2'147'483'647</td></tr>
-            <tr><td class="code">long</td><td class="center">32</td><td>-2'147'483'648 à +2'147'483'647</td></tr>
+            <tr><td class="code">long</td><td class="center">32 ou 64</td><td>Windows : comme <inline-code>int</inline-code><br>Linux, macOS : comme <inline-code>long long</inline-code></td></tr>
+            <tr><td class="code">long long</td><td class="center">64</td><td>-9'223'372'036'854'775'808 à +9'223'372'036'854'775'807</td></tr>
           </table>
         </section>
 
         <section>
           <h2>2.6 Types des nombres à virgule flottante (réels)</h2>
           <table class="types">
-            <tr><th>Type</th><th class="center">Taille [bits]</th><th>Domaine de valeurs</th></tr>
-            <tr><td class="code">float</td><td class="center">32</td><td>3.4 · 10<sup>-38</sup> à 3.4 · 10<sup>38</sup></td></tr>
-            <tr><td class="code">double</td><td class="center">64</td><td>1.7 · 10<sup>-308</sup> à 1.7 · 10<sup>308</sup></td></tr>
+            <tr><th>Type</th><th class="center">Taille [bits]</th><th>Domaine de valeurs</th><th>Plus petite valeur positive normalisée</th></tr>
+            <tr><td class="code">float</td><td class="center">32</td><td>-3.4 · 10<sup>38</sup> à +3.4 · 10<sup>38</sup></td><td class="center">1.2 · 10<sup>-38</sup></td></tr>
+            <tr><td class="code">double</td><td class="center">64</td><td>-1.8 · 10<sup>308</sup> à +1.8 · 10<sup>308</sup></td><td class="center">2.2 · 10<sup>-308</sup></td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>2.6 Domaines de validité</h2>
+          <p>Le fichier <inline-code>&lt;limits.h&gt;</inline-code> définit des macros pour les nombres entiers. Les valeurs dépendent de l’implémentation et de la machine.</p>
+          <br>
+          <table class="types" style="font-size: 0.75em; width: 1600px;">
+            <tr><th>Valeur</th><th>Remarques</th></tr>
+            <tr><td class="code plain">CHAR_BIT</td><td>Taille d'un <inline-code>char</inline-code> en bits (minimum 8 bits)</td></tr>
+            <tr><td class="code plain">SCHAR_MIN, SHRT_MIN, INT_MIN, LONG_MIN, LLONG_MIN(C99)</td><td>Valeur <error>minimum possible</error> des types entiers signés : <inline-code>char, short, int, long, long long</inline-code></td></tr>
+            <tr><td class="code plain">SCHAR_MAX, SHRT_MAX, INT_MAX, LONG_MAX, LLONG_MAX(C99)</td><td>Valeur <error>maximum possible</error> des types entiers signés : <inline-code>signed char, signed short, signed int,...</inline-code></td></tr>
+            <tr><td class="code plain">UCHAR_MAX, USHRT_MAX, UINT_MAX, ULONG_MAX, ULLONG_MAX(C99)</td><td>Valeur <error>maximum possible</error> des types entiers non-signés : <inline-code>unsigned char, unsigned short,...</inline-code></td></tr>
+            <tr><td class="code plain">CHAR_MIN</td><td>Valeur <error>minimum possible</error> pour un <inline-code>char</inline-code></td></tr>
+            <tr><td class="code plain">CHAR_MAX</td><td>Valeur <error>maximum possible</error> pour un <inline-code>char</inline-code></td></tr>
+            <tr><td>…</td><td>…</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>2.6 Domaines de validité</h2>
+          <p>Le fichier <inline-code>&lt;float.h&gt;</inline-code> définit des macros pour les nombres en virgule flottante. Les valeurs dépendent de l’implémentation et de la machine.</p>
+          <br>
+          <table class="types" style="font-size: 0.75em; width: 1600px;">
+            <tr><th>Valeur</th><th>Remarques</th></tr>
+            <tr><td class="code plain">FLT_MIN, DBL_MIN</td><td>Plus petite valeur <error>positive normalisée</error> d’un <inline-code>float</inline-code> ou <inline-code>double</inline-code> (la valeur minimum est <inline-code>-FLT_MAX</inline-code>, <inline-code>-DBL_MAX</inline-code>)</td></tr>
+            <tr><td class="code plain">FLT_MAX, DBL_MAX</td><td>Valeur <error>maximum possible</error> d’un <inline-code>float</inline-code> ou <inline-code>double</inline-code></td></tr>
+            <tr><td class="code plain">FLT_EPSILON, DBL_EPSILON</td><td><error>Écart</error> entre 1.0 et le plus petit nombre représentable supérieur à 1.0 pour <inline-code>float</inline-code> ou <inline-code>double</inline-code></td></tr>
+            <tr><td class="code plain">FLT_DIG, DBL_DIG</td><td>Nombre de décimales qui peuvent être représentées sans perte de précision pour <inline-code>float</inline-code> ou <inline-code>double</inline-code></td></tr>
+            <tr><td>….</td><td>….</td></tr>
           </table>
         </section>
 
