@@ -229,51 +229,6 @@
             gcc ne signale que certains dépassements sur des constantes (<inline-code>-Woverflow</inline-code>), jamais ceux qui ont lieu à l'exécution.</p>
         </section>
 
-        <!-- Hidden in the original PPTX
-        <section>
-          <h2>3.1 Exemples de débordement</h2>
-          <div class="container">
-            <div class="col-left">
-              <pre style="width: 700px; margin-left: 0;"><code
-                class="c"
-                data-trim
-                data-noescape
-                style="font-size: 1.8em;">
-
-                unsigned char resultat;
-                resultat = 255 + 1;
-              </code></pre>
-            </div>
-            <div class="col-right">
-              <pre style="width: 700px; margin-left: 0;"><code
-                class="c"
-                data-trim
-                data-noescape
-                style="font-size: 1.8em;">
-
-                char resultat;
-                resultat = 127 + 1;
-              </code></pre>
-            </div>
-          </div>
-          <pre style="width: 1400px;"><code
-            class="c"
-            data-trim
-            data-noescape
-            style="font-size: 1.8em;">
-
-            #include &#60;math.h&#62; /* HUGE_VAL: valeur infinie */
-            …
-            double x = 1/0.;
-            printf("%lf %lf\n", x, -HUGE_VAL);
-            double y = x/x;
-            printf("%lf %lf\n", y,  -HUGE_VAL/HUGE_VAL);
-            double z = 1/HUGE_VAL;
-            printf("%lf\n", z);
-          </code></pre>
-        </section>
-        -->
-
         <section>
           <h2>📝 3.1 Les opérateurs arithmétiques</h2>
           <h3><error>Que valent <inline-code>i3</inline-code> et <inline-code>f3</inline-code>?</error></h3>
@@ -394,56 +349,6 @@
             </code></pre>
           </div>
         </section>
-
-        <!-- Hidden in the original PPTX
-        <section>
-          <h2>Exemple</h2>
-          <pre style="width: 1600px;"><code
-            class="c"
-            data-trim
-            data-noescape
-            style="font-size: 1.5em;">
-
-            // This programs uses various operations using variables and mixing types
-            #include &#60;stdio.h&#62;
-            #include &#60;stdlib.h&#62;
-            int main(void)
-            {
-                double result1, result2;
-                long result3;
-                unsigned int result4;
-                result1 = 4. / 3;    // Division: double -> double
-                result2 = 4 / 3;     // Division: int -> double
-                result3 = result1;   // double -> long
-                result4 = -result1;  // double -> unsigned int
-                printf("double:         4. / 3  = %lg\n", result1);
-                printf("double:         4  / 3  = %lg\n", result2);
-                printf("long:           4. / 3  = %ld\n", result3);
-                printf("unsigned int: -(4. / 3) = %u\n", result4);    // (2^32) - 1
-                return 0;
-            }
-          </code></pre>
-        </section>
-
-        <section>
-          <h2>Affichage des résultats</h2>
-          <pre class="terminal" style="width: 1400px;"><code
-            class="nohighlight"
-            data-trim
-            style="font-size: 1.8em;">
-
-            double:         4. / 3  = 1.33333
-            double:         4  / 3  = 1
-            long:           4. / 3  = 1
-            unsigned int:   - (4./ 3) = 4294967295
-          </code></pre>
-          <br>
-          <p><b>Note : de nouvelles spécifications de format sont employées ici. Voir chapitre sur les entrées-sorties.</b></p>
-          <p class="indent-1"><inline-code><highlight><em>long</em></highlight> <em>%ld</em></inline-code></p>
-          <p class="indent-1"><inline-code><highlight><em>unsigned long</em></highlight> <em>%lu</em></inline-code></p>
-          <p class="indent-1"><inline-code><highlight><em>double</em></highlight> <em>%lg, %lf</em></inline-code></p>
-        </section>
-        -->
 
       </section>
 
@@ -606,16 +511,6 @@
             <tr><td class="op">= += -= *= /= %=</td><td class="dir rtl">←</td><td>basse</td></tr>
           </table>
         </section>
-
-        <!-- Hidden in the original PPTX
-        <section>
-          <h2>📝 Exercices</h2>
-          <p>Série  3.1 : exercices #1 à #3</p>
-          <br>
-          <p>Les exemples se trouvent dans le dossier :</p>
-          <p><b>\Exemples\1240.1.03 Operateurs</b></p>
-        </section>
-        -->
 
       </section>
 
@@ -808,24 +703,6 @@
           <br>
           <p><b>Remarque :</b> les opérateurs <inline-code>&amp;&amp;</inline-code> et <inline-code>||</inline-code> ont un <a href="https://he-arc.github.io/1242.1-Langage_C/docs/cours/faq/#quest-ce-quun-point-de-s%C3%A9quence-en-c-">point de séquence</a> entre l’évaluation du membre de gauche et du membre de droite : « <em>short-circuit evaluation</em> ». <highlight>Le membre de droite n’est évalué que si c’est nécessaire.</highlight></p>
         </section>
-
-        <!-- Hidden in the original PPTX
-        <section>
-          <h2>3.6 Lois de De Morgan</h2>
-          <br>
-          <p class="centered"><inline-code><highlight>!(p &amp;&amp; q) == (!p) || (!q)</highlight></inline-code></p>
-          <br>
-          <p class="centered"><inline-code><highlight>!(p || q) == (!p) &amp;&amp; (!q)</highlight></inline-code></p>
-        </section>
-
-        <section>
-          <h2>📝 Exercices</h2>
-          <p>Série  3.1 : exercices #4 et #5</p>
-          <br>
-          <p>Les exemples se trouvent dans le dossier:</p>
-          <p><b>\Exemples\1240.1.03 Operateurs</b></p>
-        </section>
-        -->
 
       </section>
 
@@ -1161,49 +1038,6 @@
             </div>
           </div>
         </section>
-
-        <!-- Hidden in the original PPTX
-        <section>
-          <h2>3.8 Groupement de 4 <inline-code>char</inline-code> en un <inline-code>int</inline-code></h2>
-          <div class="container">
-            <div class="col-left">
-              <pre style="width: 700px; margin-left: 0;"><code
-                class="c"
-                data-trim
-                data-noescape
-                style="font-size: 1.8em;">
-
-                char b3, b2, b1, b0;
-                int   p = b3;
-                p = (p << 8) | b2;
-                p = (p << 8) | b1;
-                p = (p << 8) | b0;
-              </code></pre>
-            </div>
-            <div class="col-right">
-              <pre style="width: 700px; margin-left: 0;"><code
-                class="nohighlight"
-                data-trim
-                style="font-size: 1.5em;">
-
-                 p = 0  0  0  b3
-
-                 p = 0  0  b3  0
-                     0  0  0  b2
-                     0  0  b3 b2
-
-                 p = 0  b3 b2 0
-                     0  0  0  b1
-                     0  b3 b2 b1
-
-                 p = b3 b2 b1 0
-                     0  0  0  b0
-                     b3 b2 b1 b0
-              </code></pre>
-            </div>
-          </div>
-        </section>
-        -->
 
         <section>
           <h2>3.8 Extraction d’un octet d’un <inline-code>int</inline-code></h2>
