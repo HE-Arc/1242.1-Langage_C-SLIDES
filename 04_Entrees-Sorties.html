@@ -107,10 +107,10 @@
         <h2>
           Entrées / Sorties
         </h2>
-        <p>1. Syntaxe de printf()</p>
+        <p>1. Syntaxe de <inline-code>printf()</inline-code></p>
         <p>2. Spécifications de format</p>
         <p>3. Séquences d'échappement '\'</p>
-        <p>4. Syntaxe de scanf()</p>
+        <p>4. Syntaxe de <inline-code>scanf()</inline-code></p>
         <p>5. Précautions avec scanf()</p>
         <p>6. Autres fonctions d'entrée/sortie</p>
       </section>
@@ -120,25 +120,27 @@
 
         <section>
           <h2>4.1 Affichage &amp; saisie</h2>
-          <p><highlight>Affichage d’informations à l'écran</highlight> <span class="indent-1"><inline-code>printf()</inline-code></span></p>
+          <p><highlight>Affichage d'informations à l'écran</highlight> <span class="indent-1"><inline-code>printf()</inline-code></span></p>
           <p class="indent-1">Texte, contenu de variables</p>
           <br>
           <p><highlight>Saisie de valeurs à partir du clavier</highlight> <span class="indent-1"><inline-code>scanf()</inline-code></span></p>
           <p class="indent-1">Les valeurs saisies sont toujours stockées dans des variables.</p>
           <br>
-          <p>Ces fonctions nécessitent d’inclure le fichier</p>
+          <p>Ces fonctions nécessitent d'inclure le fichier</p>
           <p class="indent-2"><inline-code>#include &lt;stdio.h&gt;</inline-code></p>
+          <br>
+          <p><warning>⚠</warning> <inline-code>scanf()</inline-code> sert ici à <highlight>comprendre</highlight> les entrées-sorties, mais il est <error>déconseillé</error> en pratique (voir 4.4)</p>
         </section>
 
         <section>
           <h2>4.1 printf()</h2>
-          <p class="centered"><inline-code>printf("<highlight>&lt;Chaîne de commandes&gt;</highlight>", <highlight>&lt;Liste d’expressions&gt;</highlight>);</inline-code></p>
+          <p class="centered"><inline-code>printf("<highlight>&lt;Chaîne de commandes&gt;</highlight>", <highlight>&lt;Liste d'expressions&gt;</highlight>);</inline-code></p>
           <h3>&lt;Chaîne de commandes&gt;</h3>
           <p>1. Un <highlight>texte</highlight> (<inline-code>"hello, world"</inline-code>)</p>
-          <p>2. La <highlight>spécification du format d’affichage</highlight> des variables → <inline-code>‘%d’</inline-code></p>
-          <p>3. Les <highlight>caractères d'échappement</highlight> pour la mise en page → <inline-code>‘\n’</inline-code></p>
-          <h3>&lt;Liste d’expressions&gt;</h3>
-          <p>Liste des variables ou d’expressions à afficher</p>
+          <p>2. La <highlight>spécification du format d'affichage</highlight> des variables → <inline-code>'%d'</inline-code></p>
+          <p>3. Les <highlight>séquences d'échappement</highlight> pour la mise en page → <inline-code>'\n'</inline-code></p>
+          <h3>&lt;Liste d'expressions&gt;</h3>
+          <p>Liste des expressions à afficher (variables, constantes, calculs, appels de fonction, etc.)</p>
           <h3>Exemple</h3>
           <div class="container">
             <div class="col-left" style="flex: 3;">
@@ -148,7 +150,7 @@
                 data-noescape
                 style="font-size: 1.8em;">
 
-                nb=20;
+                int nb = 20;
                 printf("nb %d x %d\n", nb, 5+2);
               </code></pre>
             </div>
@@ -170,67 +172,64 @@
       <section>
 
         <section>
-          <h2>4.2 printf() – formats d’affichage</h2>
+          <h2>4.2 printf() – formats d'affichage</h2>
           <h3>Caractères</h3>
           <table class="ops">
             <tr><th class="center">Format</th><th>Type</th><th>Représentation</th></tr>
             <tr><td class="code center">%c</td><td class="code">char</td><td>caractère simple</td></tr>
-            <tr><td class="code center">%s</td><td class="code">char *</td><td>chaîne de caractères (via un pointeur sur char)</td></tr>
           </table>
+          <br>
+          <p>📚 Référence : <a href="https://en.cppreference.com/w/c/io/fprintf#Non-numeric">cppreference → fprintf, formats non numériques</a></p>
         </section>
 
         <section>
-          <h2>4.2 printf() – formats d’affichage</h2>
+          <h2>4.2 printf() – formats d'affichage</h2>
+          <h3>Chaînes de caractères</h3>
+          <table class="ops">
+            <tr><th class="center">Format</th><th>Type</th><th>Représentation</th></tr>
+            <tr><td class="code center">%s</td><td class="code">char *</td><td>chaîne de caractères (via un pointeur sur char)</td></tr>
+          </table>
+          <br>
+          <p>📚 Référence : <a href="https://en.cppreference.com/w/c/io/fprintf#Non-numeric">cppreference → fprintf, formats non numériques</a></p>
+        </section>
+
+        <section>
+          <h2>4.2 printf() – formats d'affichage</h2>
           <h3>Entiers</h3>
           <table class="ops">
             <tr><th class="center">Format</th><th>Type</th><th>Représentation</th></tr>
             <tr><td class="code center">%d</td><td class="code">int</td><td><b>entier décimal signé</b></td></tr>
-            <tr><td class="code center">%i</td><td class="code">int</td><td>entier décimal signé (comme <inline-code>%d</inline-code> ; le préfixe ne compte qu’avec <inline-code>scanf</inline-code>)</td></tr>
             <tr><td class="code center">%u</td><td class="code">unsigned int</td><td>entier décimal non-signé</td></tr>
-            <tr><td class="code center">%x %X</td><td class="code">unsigned int</td><td>entier hexadécimal non-signé [a…f] ou [A…F]</td></tr>
-            <tr><td class="code center">%o</td><td class="code">unsigned int</td><td>entier octal non-signé</td></tr>
-            <tr><td class="code center">%p</td><td class="code">void *</td><td><b>pointeur pur</b></td></tr>
+            <tr><td class="code center">%x</td><td class="code">int</td><td>entier hexadécimal</td></tr>
+            <tr><td class="code center">%zu</td><td class="code">size_t</td><td>taille (résultat de <inline-code>sizeof</inline-code>)</td></tr>
           </table>
-          <aside class="notes">http://www.gnu.org/software/libc/manual/html_node/Table-of-Output-Conversions.html</aside>
+          <br>
+          <p style="font-size: 0.8em;">Précisions sur <inline-code>%x</inline-code> : <a href="https://he-arc.github.io/1242.1-Langage_C/docs/cours/chapitre04cours/">support de cours, chapitre 4</a></p>
+          <p>📚 Référence : <a href="https://en.cppreference.com/w/c/io/fprintf#Integer">cppreference → fprintf, formats entiers</a></p>
         </section>
 
         <section>
-          <h2>4.2 printf() – formats d’affichage</h2>
-          <h3>Nombre à virgule flottante</h3>
+          <h2>4.2 printf() – formats d'affichage</h2>
+          <h3>Nombres à virgule flottante</h3>
           <table class="ops">
             <tr><th class="center">Format</th><th>Type</th><th>Représentation</th></tr>
-            <tr><td class="code center">%f<br>%lf</td><td class="code">float<br>double</td><td>valeur signée <inline-code>[-]zzz.fff</inline-code></td></tr>
-            <tr><td class="code center">%e<br>%E</td><td class="code">float<br>double</td><td>valeur signée <inline-code>[-]z.ffffffe±nn</inline-code><br><span style="padding-left: 5.5em;"></span><inline-code>[-]z.ffffffE±nn</inline-code></td></tr>
-            <tr><td class="code center">%g<br>%G</td><td class="code">float<br>double</td><td>Utilise automatiquement le format <inline-code>%e</inline-code> ou <inline-code>%f</inline-code> suivant la valeur et la précision données.</td></tr>
+            <tr><td class="code center">%lf</td><td class="code">double</td><td>valeur signée <inline-code>[-]zzz.fff</inline-code></td></tr>
           </table>
+          <br>
+          <p>📚 Référence : <a href="https://en.cppreference.com/w/c/io/fprintf#Floating-point">cppreference → fprintf, formats flottants</a></p>
         </section>
 
         <section>
-          <h2>4.2 printf() – formats d’affichage</h2>
-          <p>D'autres spécifications de formats peuvent être utilisées par l'instruction <inline-code>printf()</inline-code></p>
+          <h2>4.2 printf() – formats d'affichage</h2>
+          <h3>Adresses (pointeurs)</h3>
+          <table class="ops">
+            <tr><th class="center">Format</th><th>Type</th><th>Représentation</th></tr>
+            <tr><td class="code center">%p</td><td class="code">void *</td><td>adresse mémoire</td></tr>
+          </table>
           <br>
-          <div class="container">
-            <div class="col-left">
-              <table class="ops">
-                <tr><th>Type</th><th class="center">Format</th></tr>
-                <tr><td class="code">short</td><td class="code center">%hd</td></tr>
-                <tr><td class="code">long</td><td class="code center">%ld</td></tr>
-                <tr><td class="code">long long</td><td class="code center">%lld</td></tr>
-                <tr><td class="code">long double</td><td class="code center">%Lf</td></tr>
-                <tr><td class="code">size_t</td><td class="code center">%zu</td></tr>
-              </table>
-            </div>
-            <div class="col-right">
-              <table class="ops">
-                <tr><th>Type</th><th class="center">Format</th></tr>
-                <tr><td class="code">unsigned char</td><td class="code center">%hhu</td></tr>
-                <tr><td class="code">unsigned short</td><td class="code center">%hu</td></tr>
-                <tr><td class="code">unsigned int</td><td class="code center">%u</td></tr>
-                <tr><td class="code">unsigned long</td><td class="code center">%lu</td></tr>
-              </table>
-            </div>
-          </div>
-          <p style="font-size: 0.8em;"><inline-code>size_t</inline-code> : type du résultat de <inline-code>sizeof</inline-code> (chapitre 2) → <inline-code>printf("%zu\n", sizeof(int));</inline-code></p>
+          <p class="centered"><inline-code>printf("%p\n", (void *)&amp;x);</inline-code></p>
+          <p>Le cast <inline-code>(void *)</inline-code> est nécessaire : sans lui, gcc refuse de compiler. Les pointeurs sont vus en détail plus tard.</p>
+          <p>📚 Référence : <a href="https://en.cppreference.com/w/c/io/fprintf#Non-numeric">cppreference → fprintf, formats non numériques</a></p>
         </section>
 
         <section>
@@ -347,11 +346,10 @@
         <section>
           <h2>4.2 printf() – types réels</h2>
           <p>Avec les <highlight>types réels</highlight>, le format peut contenir des indications pour la <highlight>largeur et la précision</highlight>.</p>
-          <p class="centered"><inline-code>%[drapeaux][L][.P]f</inline-code></p>
           <p class="centered"><inline-code>%[drapeaux][L][.P]lf</inline-code></p>
           <br>
           <p>La spécification de <highlight>largeur L</highlight> fixe la largeur minimale de la valeur à afficher.</p>
-          <p>La spécification de <highlight>précision P</highlight> commence toujours par un point et indique que <highlight>P</highlight> décimales sont affichées (avec <inline-code>%g</inline-code> : P chiffres significatifs).</p>
+          <p>La spécification de <highlight>précision P</highlight> commence toujours par un point et indique que <highlight>P</highlight> décimales sont affichées.</p>
           <p>Les <highlight>drapeaux</highlight> : <inline-code>+</inline-code> affiche toujours le signe, <inline-code>0</inline-code> complète à gauche avec des zéros, <inline-code>-</inline-code> aligne à gauche.</p>
           <p>Largeur et précision existent aussi pour les entiers et les chaînes : <inline-code>%5d</inline-code>, <inline-code>%.3s</inline-code>.</p>
         </section>
@@ -360,15 +358,15 @@
           <h2>4.2 printf() – formats d’affichage</h2>
           <div class="container">
             <div class="col-left" style="flex: 3; padding-left: 150px;">
-              <p><inline-code>printf("%f", 157.892600<error>32</error>);</inline-code></p>
+              <p><inline-code>printf("%lf", 157.892600<error>32</error>);</inline-code></p>
               <table class="cells"><tr><td>1</td><td>5</td><td>7</td><td>.</td><td>8</td><td>9</td><td>2</td><td>6</td><td>0</td><td>0</td></tr></table>
-              <p><inline-code>printf("%6.1f", 157.89260032);</inline-code></p>
+              <p><inline-code>printf("%6.1lf", 157.89260032);</inline-code></p>
               <table class="cells"><tr><td class="b blank"></td><td class="b">1</td><td class="b">5</td><td class="b">7</td><td class="b">.</td><td class="b">9</td><td class="label"><highlight>→ décalage ET arrondi</highlight></td></tr></table>
-              <p><inline-code>printf("%+09.2f",157.89260032);</inline-code></p>
+              <p><inline-code>printf("%+09.2lf",157.89260032);</inline-code></p>
               <table class="cells"><tr><td class="b">+</td><td class="b">0</td><td class="b">0</td><td class="b">1</td><td class="b">5</td><td class="b">7</td><td class="b">.</td><td class="b">8</td><td class="b">9</td></tr></table>
-              <p><inline-code>printf("%7.5f", 157.89260032);</inline-code></p>
+              <p><inline-code>printf("%7.5lf", 157.89260032);</inline-code></p>
               <table class="cells"><tr><td>1</td><td>5</td><td class="b">7</td><td class="b">.</td><td class="b">8</td><td class="b">9</td><td class="b">2</td><td class="b">6</td><td class="b">0</td><td class="label"><highlight>→ L (7) est un minimum</highlight></td></tr></table>
-              <p><inline-code>printf("%.3f", 157.89260032);</inline-code></p>
+              <p><inline-code>printf("%.3lf", 157.89260032);</inline-code></p>
               <table class="cells"><tr><td>1</td><td>5</td><td>7</td><td>.</td><td class="b">8</td><td class="b">9</td><td class="b">3</td></tr></table>
             </div>
             <div class="col-right" style="flex: 1;">
@@ -385,6 +383,7 @@
               </code></pre>
             </div>
           </div>
+          <p style="font-size: 0.8em;"><warning>⚠</warning> <inline-code>printf</inline-code> <highlight>arrondit</highlight> à la valeur la plus proche, alors qu'un cast <highlight>tronque</highlight> : <inline-code>(int)157.89</inline-code> vaut <inline-code>157</inline-code>, pas <inline-code>158</inline-code> (chapitre 3).</p>
           <aside class="notes">Par défaut, on a 6 chiffres après la virgule.</aside>
         </section>
 
@@ -416,7 +415,7 @@
             <tr><td class="code center">\r</td><td>retour chariot (<em>carriage return</em>)</td><td class="center">13</td></tr>
             <tr><td class="code center">\a</td><td>bip (<em>alert</em>), souvent muet dans les terminaux actuels</td><td class="center">7</td></tr>
           </table>
-          <p class="centered" style="font-size: 0.7em;">Liste complète : <a href="https://en.wikipedia.org/wiki/Escape_sequences_in_C">https://en.wikipedia.org/wiki/Escape_sequences_in_C</a></p>
+          <p>📚 Référence : <a href="https://en.cppreference.com/w/c/language/escape">cppreference → séquences d'échappement</a></p>
         </section>
 
         <section>
@@ -443,10 +442,10 @@
       </section>
 
       <!----------          SYNTAXE DE SCANF          ---------->
-      <section>
+      <section>        
 
         <section>
-          <h2>4.4 scanf() – syntaxe</h2>
+          <h2>4.4 scanf() - syntaxe</h2>
           <p class="centered"><inline-code>scanf("<highlight>&lt;Chaîne de commandes&gt;</highlight>", &amp;&lt;Var1&gt;, &amp;&lt;Var2&gt;,..., &amp;&lt;VarN&gt;);</inline-code></p>
           <h3>Par exemple</h3>
           <div class="container">
@@ -475,14 +474,13 @@
           <p>1. la <highlight>spécification du format de lecture</highlight> des variables → <inline-code>‘%d’</inline-code></p>
           <p>2. des <highlight>caractères ordinaires</highlight> (ici <inline-code>/</inline-code>), à taper à l'identique</p>
           <h3>&lt;Liste de variables&gt;</h3>
-          <p>Liste des adresses des variables à saisir</p>
-          <p><b>Les variables sont autorisées</b> à figurer comme paramètres</p>
-          <p>Les <b>constantes sont interdites</b></p>
+          <p>Liste des <b>adresses</b> des variables à saisir : <inline-code>&amp;day</inline-code>, <inline-code>&amp;month</inline-code>…</p>
+          <p>Uniquement des variables (modifiables) : pas de constante, pas d'expression</p>
           </div>
         </section>
 
         <section>
-          <h2>4.4 scanf() – commentaire</h2>
+          <h2>4.4 scanf() - commentaire</h2>
           <p><highlight>Chaque nom de variable doit être précédé du symbole <inline-code>‘&amp;’</inline-code></highlight></p>
           <p>Ainsi <inline-code>‘&amp;day’</inline-code> signifie <highlight>adresse de</highlight> la variable <inline-code>‘day’</inline-code></p>
           <p>Lors de la saisie, il faut entrer tous les caractères ordinaires de la chaîne de commandes</p>
@@ -496,7 +494,7 @@
             int day, month, year;
             printf("\n\nFill as specified: dd/mm/yyyy ");
             scanf("%d/%d/%d", &amp;day, &amp;month, &amp;year);
-            printf("\nSorted info: %d / %d / %d", day, month, year);
+            printf("\nSorted info: %d / %d / %d\n", day, month, year);
           </code></pre>
           <pre class="terminal" style="width: 1400px;"><code
             class="nohighlight"
@@ -507,26 +505,18 @@
 
             Sorted info: 28 / 11 / 1970
           </code></pre>
-          <aside class="notes">Si l’on introduit les valeurs sans les barres obliques, scanf s’arrête au premier caractère qui ne correspond pas, le laisse dans le tampon et renvoie le nombre de valeurs lues. Voir exemple :</aside>
+          <aside class="notes">Si l’on introduit les valeurs sans les barres obliques, scanf s’arrête au premier caractère qui ne correspond pas, le laisse dans le tampon et renvoie le nombre de valeurs lues (voir 4.5, « Valeur de retour de scanf() »).</aside>
         </section>
 
         <section>
           <h2>4.4 scanf() – format de lecture</h2>
           <div style="font-size: 0.85em;">
-          <p>La chaîne de commandes de <inline-code>scanf()</inline-code> a <highlight>les mêmes spécifications de format</highlight> que <inline-code>printf()</inline-code> <error>sauf pour les types réels</error></p>
-          <table class="ops">
-            <tr><th>Format</th><th>type</th><th>Représentation</th></tr>
-            <tr><td class="code">%f</td><td class="code">float</td><td>valeur signée <inline-code>[-]zzz.fff</inline-code></td></tr>
-            <tr><td class="code">%lf</td><td class="code">double</td><td>valeur signée <inline-code>[-]zzz.fff</inline-code></td></tr>
-          </table>
+          <p>La chaîne de commandes de <inline-code>scanf()</inline-code> a <highlight>les mêmes spécifications de format</highlight> que <inline-code>printf()</inline-code>.</p>
           <br>
-          <p>En résumé, avec <inline-code>printf</inline-code> :</p>
-          <p class="indent-1"><inline-code>%f</inline-code> et <inline-code>%lf</inline-code> pour les variables de type <inline-code>float</inline-code> et <inline-code>double</inline-code></p>
-          <p>et avec <inline-code>scanf</inline-code> :</p>
-          <p class="indent-1"><inline-code>%f</inline-code> pour les variables de type <inline-code>float</inline-code></p>
-          <p class="indent-1"><inline-code>%lf</inline-code> pour les variables de type <inline-code>double</inline-code></p>
-          <p style="font-size: 0.8em;">Pourquoi ? <inline-code>printf</inline-code> reçoit des <highlight>valeurs</highlight> : un <inline-code>float</inline-code> y est converti en <inline-code>double</inline-code>, <inline-code>%f</inline-code> suffit.
-            <inline-code>scanf</inline-code> reçoit des <highlight>adresses</highlight> : il doit savoir s'il écrit 4 octets (<inline-code>float</inline-code>) ou 8 (<inline-code>double</inline-code>).</p>
+          <p>Pour les réels, une seule règle :</p>
+          <p class="centered"><inline-code>double</inline-code> → <inline-code>%lf</inline-code>, dans <inline-code>printf</inline-code> comme dans <inline-code>scanf</inline-code></p>
+          <br>
+          <p style="font-size: 0.8em;">Cas du <inline-code>float</inline-code> : <a href="https://he-arc.github.io/1242.1-Langage_C/docs/cours/chapitre04cours/">support de cours, chapitre 4</a></p>
           </div>
         </section>
 
@@ -536,7 +526,7 @@
           <p>Certains caractères jouent un rôle particulier avec <inline-code>scanf</inline-code>. On les appelle <highlight>séparateurs</highlight> ou <highlight>"caractères blancs"</highlight>. Les plus courants sont <kbd>&nbsp;&nbsp;&nbsp;&nbsp;</kbd> <kbd>TAB</kbd> <kbd>ENTER</kbd></p>
           <p>Si l'un de ces caractères fait partie de la chaîne de commande, on peut saisir à l'endroit où il se trouve autant de caractères blancs que l'on désire (ou aucun).</p>
           <h3>Exemple</h3>
-          <p class="indent-1"><inline-code>scanf(" %d %d",&amp;day,&amp;month);</inline-code></p>
+          <p class="indent-1"><inline-code>scanf("%d %d", &amp;day, &amp;month);</inline-code></p>
           <p class="indent-1">les deux nombres peuvent être séparés par des</p>
           <div class="container">
             <div class="col-left" style="flex: 1; padding-left: 300px;">
@@ -550,8 +540,31 @@
               <p><kbd>1</kbd><kbd>2</kbd><kbd>ENTER</kbd><kbd>7</kbd><kbd>ENTER</kbd></p>
             </div>
           </div>
-          <p style="font-size: 0.8em;"><inline-code>%d</inline-code>, <inline-code>%f</inline-code> et <inline-code>%s</inline-code> sautent déjà les blancs qui précèdent la valeur : l'espace du format compte surtout devant <inline-code>%c</inline-code>, <inline-code style="white-space: nowrap;">%[</inline-code> et les caractères ordinaires.</p>
+          <p style="font-size: 0.8em;"><inline-code>%d</inline-code>, <inline-code>%lf</inline-code> et <inline-code>%s</inline-code> sautent déjà les blancs qui précèdent la valeur : l'espace du format compte surtout devant <inline-code>%c</inline-code> et les caractères ordinaires.</p>
           </div>
+        </section>
+        
+        <section>
+          <h2>⚠ 4.4 scanf() dans un vrai programme ?</h2>
+          <p><inline-code>scanf</inline-code> sert ici à <highlight>comprendre</highlight> les entrées-sorties, mais il est <error>déconseillé</error> en pratique</p>
+          <p>Dans un vrai programme : lire la <highlight>ligne entière</highlight>, puis l'analyser</p>
+
+          <h3>Exemple</h3>
+          <pre style="width: 1300px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.3em;">
+
+            char line[80];
+            int h, m;
+            if (fgets(line, sizeof(line), stdin) != NULL
+                &amp;&amp; sscanf(line, "%d:%d", &amp;h, &amp;m) == 2)
+            {
+                // h and m are valid
+            }
+          </code></pre>
+          <p style="font-size: 0.8em;">Anticipation : <inline-code>fgets</inline-code> est présenté en 4.6 ; <inline-code>sscanf</inline-code> fonctionne comme <inline-code>scanf</inline-code>, mais lit dans une chaîne au lieu du clavier.</p>
         </section>
 
       </section>
@@ -634,12 +647,12 @@
         <section>
           <h2>4.5 Limiter la saisie : largeur et %[...]</h2>
           <div style="font-size: 0.9em;">
-          <p><inline-code>char ligne[80];</inline-code></p>
-          <p><inline-code>scanf("%79[ ABCDEF]", ligne);</inline-code></p>
-          <p class="indent-1">N'accepte que les caractères ABCDEF, ainsi que l’espace ici, dans la variable <highlight><em>ligne</em></highlight></p>
-          <p class="indent-1">Comme vu précédemment, il n'y a pas de signe <highlight>&amp;</highlight> ; <highlight>79</highlight> limite la saisie à la taille de <em>ligne</em> (80, avec le <inline-code>'\0'</inline-code>)</p>
-          <p><inline-code>scanf("%79[^ABCDEF]", ligne);</inline-code></p>
-          <p class="indent-1">Accepte tous les caractères sauf ABCDEF dans la variable ligne</p>
+          <p><inline-code>char line[80];</inline-code></p>
+          <p><inline-code>scanf("%79[ ABCDEF]", line);</inline-code></p>
+          <p class="indent-1">N'accepte que les caractères ABCDEF, ainsi que l’espace ici, dans la variable <highlight><em>line</em></highlight></p>
+          <p class="indent-1">Pas de signe <highlight>&amp;</highlight> devant un tableau de caractères (chapitre 8) ; <highlight>79</highlight> limite la saisie à la taille de <em>line</em> (80, avec le <inline-code>'\0'</inline-code>)</p>
+          <p><inline-code>scanf("%79[^ABCDEF]", line);</inline-code></p>
+          <p class="indent-1">Accepte tous les caractères sauf ABCDEF dans la variable <em>line</em></p>
           <p class="indent-1">Dès qu’un de ces caractères est trouvé, la saisie s’arrête</p>
           </div>
         </section>
@@ -774,7 +787,7 @@
             }
           </code></pre>
           <p style="font-size: 0.8em;">Anticipation : tableaux et chaînes de caractères sont vus au chapitre 8.</p>
-          <aside class="notes">Le programme suivant permet de saisir au clavier puis d'afficher sur l'écran les valeurs de quelques variables de type int et char. !!! Attention aux espaces</aside>
+          <aside class="notes">Le programme suivant lit deux mots au clavier dans des tableaux de char. Pas de &amp; devant un tableau ; %79s limite la saisie à 79 caractères + '\0'. %s s'arrête au premier blanc : un prénom composé avec un espace n'est pas lu en entier.</aside>
         </section>
 
       </section>
@@ -820,24 +833,24 @@
                 data-noescape
                 style="font-size: 1.3em;">
 
-                char premier, lettre, mot[32], phrase[128];
+                char first, letter, word[32], sentence[128];
 
-                premier = getch();
+                first = getch();
 
-                scanf("%c",&amp;lettre);
+                scanf("%c", &amp;letter);
 
-                scanf("%31s",mot);
+                scanf("%31s", word);
 
-                fgets(phrase,128,stdin);
+                fgets(sentence, sizeof(sentence), stdin);
 
 
 
-                printf("premier : %c\n",premier);
-                printf("lettre : %c\n",lettre);
-                printf("mot : %s\n",mot);
-                printf("phrase : %s\n",phrase);
+                printf("first : %c\n", first);
+                printf("letter : %c\n", letter);
+                printf("word : %s\n", word);
+                printf("sentence : %s\n", sentence);
               </code></pre>
-              <p style="padding-left: 0;">📝 Et avec <inline-code>scanf(" %c",&amp;lettre);</inline-code> ?</p>
+              <p style="padding-left: 0;">📝 Et avec <inline-code>scanf(" %c", &amp;letter);</inline-code> ?</p>
             </div>
             <div class="col-right" style="flex: 1;">
               <img data-src="./medias/clavier_tampon.png" alt="Clavier : touches frappées" width="800px">
@@ -861,14 +874,14 @@
                 data-trim
                 style="font-size: 1.3em;">
 
-                premier : S
-                lettre : a
-                mot : lut
-                phrase :  comment vas-tu?
+                first : S
+                letter : a
+                word : lut
+                sentence :  comment vas-tu?
               </code></pre>
             </div>
           </div>
-          <aside class="notes">getch() requière include &lt;conio.h&gt; Que se passerait-il si au lieu de scanf("%c" … il y avait scanf(" %c" ?</aside>
+          <aside class="notes">getch() requiert &lt;conio.h&gt;. Que se passerait-il si au lieu de scanf("%c" … il y avait scanf(" %c" ?</aside>
         </section>
 
       </section>
