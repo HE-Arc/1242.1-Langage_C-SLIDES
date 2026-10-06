@@ -1,0 +1,911 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>HE-Arc - 1242.1 Langage C - Chapitre 4 - Entrées / Sorties</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/hearc.css" id="theme">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="https://www.he-arc.ch/wp-content/uploads/2021/12/cropped-hearc-icon-192x192.png"
+    type="image/vnd.microsoft.icon" />
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/vs.css" id="highlight-theme">
+
+  <style>
+    .reveal .container p,
+    .reveal .container h3,
+    .reveal .container h4 { padding-left: 0; }
+    .reveal .container .col-left { text-align: left; }
+
+    .reveal .indent-1 { padding-left: 300px; }
+    .reveal .indent-2 { padding-left: 400px; }
+    .reveal .centered { text-align: center; padding-left: 0; }
+
+    .reveal table.ops { font-size: 0.8em; margin: 0 auto; }
+    .reveal table.ops th,
+    .reveal table.ops td { border: 2px solid #222; padding: 0.2em 0.8em; }
+    .reveal table.ops th { background-color: #dddddd; }
+    .reveal table.ops td.code {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      color: #0000FF;
+    }
+    .reveal table.ops td.center,
+    .reveal table.ops th.center { text-align: center; }
+    .reveal table.ops tr:last-child td,
+    .reveal table.ops tr:last-child th { border-bottom: 2px solid #222; }
+
+    .reveal pre.terminal code.hljs,
+    .reveal pre.terminal code {
+      background-color: #000000;
+      color: #FFFFFF;
+    }
+
+    .reveal table.cells {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      font-size: 0.9em;
+      margin: 0 0 0.4em 0;
+    }
+    .reveal table.cells td { border: none; padding: 0 0.15em; text-align: center; min-width: 1.1em; }
+    .reveal table.cells td.b { border: 2px solid #222; }
+    .reveal table.cells td.blank { background-color: #c6d9f1; }
+    .reveal table.cells td.label {
+      font-family: "Roboto", Helvetica, sans-serif;
+      font-weight: normal;
+      font-size: 0.8em;
+      text-align: left;
+      padding-left: 0.6em;
+    }
+
+    .reveal kbd {
+      display: inline-block;
+      min-width: 1.4em;
+      padding: 0 0.3em;
+      border: 2px solid #555;
+      border-radius: 8px;
+      box-shadow: 0 3px 0 #555;
+      font-family: "Roboto", Helvetica, sans-serif;
+      font-size: 0.75em;
+      text-align: center;
+      background-color: #f4f4f4;
+    }
+    .reveal .keys { padding-left: 400px; margin: 0.3em 0; white-space: nowrap; }
+    .reveal .keys .ok { color: #38a238; font-weight: bold; padding-left: 1em; }
+    .reveal .keys .ko { color: #FF0000; font-weight: bold; padding-left: 1em; }
+    .reveal .keys .to { font-size: 0.6em; color: #555; }
+
+    .reveal .precaution {
+      border: 4px solid #FF0000;
+      padding: 0.3em 0.6em;
+      margin: 0.5em auto;
+    }
+    .reveal .precaution p { padding-left: 0; }
+  </style>
+</head>
+
+<body>
+  <img id="logo-hearc" src="./medias/logo_he-arc.png" alt="Logo HE-ARC">
+  <img id="logo-hesso" src="./medias/logo_hes-so.png" alt="Logo HES-SO">
+  <p id="course-infos">1242.1 Langage C - 2026-2027</p>
+
+  <!----------          CONTENT          ---------->
+  <div class="reveal">
+    <div class="slides">
+
+      <!----------          TITLE          ---------->
+      <section>
+        <h1>
+          Chapitre 4
+        </h1>
+        <h2>
+          Entrées / Sorties
+        </h2>
+        <p>1. Syntaxe de printf()</p>
+        <p>2. Spécifications de format</p>
+        <p>3. Séquences d'échappement '\'</p>
+        <p>4. Syntaxe de scanf()</p>
+        <p>5. Précautions avec scanf()</p>
+        <p>6. Autres fonctions d'entrée/sortie</p>
+      </section>
+
+      <!----------          SYNTAXE DE PRINTF          ---------->
+      <section>
+
+        <section>
+          <h2>4.1 Affichage &amp; saisie</h2>
+          <p><highlight>Affichage d’informations à l'écran</highlight> <span class="indent-1"><inline-code>printf()</inline-code></span></p>
+          <p class="indent-1">Texte, contenu de variables</p>
+          <br>
+          <p><highlight>Saisie de valeurs à partir du clavier</highlight> <span class="indent-1"><inline-code>scanf()</inline-code></span></p>
+          <p class="indent-1">Les valeurs saisies sont toujours stockées dans des variables.</p>
+          <br>
+          <p>Ces fonctions nécessitent d’inclure le fichier</p>
+          <p class="indent-2"><inline-code>#include &lt;stdio.h&gt;</inline-code></p>
+        </section>
+
+        <section>
+          <h2>4.1 printf()</h2>
+          <p class="centered"><inline-code>printf("<highlight>&lt;Chaîne de commandes&gt;</highlight>", <highlight>&lt;Liste d’expressions&gt;</highlight>);</inline-code></p>
+          <h3>&lt;Chaîne de commandes&gt;</h3>
+          <p>1. Un <highlight>texte</highlight> (<inline-code>"hello, world"</inline-code>)</p>
+          <p>2. La <highlight>spécification du format d’affichage</highlight> des variables → <inline-code>‘%d’</inline-code></p>
+          <p>3. Les <highlight>caractères d'échappement</highlight> pour la mise en page → <inline-code>‘\n’</inline-code></p>
+          <h3>&lt;Liste d’expressions&gt;</h3>
+          <p>Liste des variables ou d’expressions à afficher</p>
+          <h3>Exemple</h3>
+          <div class="container">
+            <div class="col-left" style="flex: 3;">
+              <pre style="width: 1000px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                nb=20;
+                printf("nb %d x %d\n", nb, 5+2);
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <pre class="terminal" style="width: 400px;"><code
+                class="nohighlight"
+                data-trim
+                style="font-size: 1.8em;">
+
+                nb 20 x 7
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+      </section>
+
+      <!----------          SPECIFICATIONS DE FORMAT          ---------->
+      <section>
+
+        <section>
+          <h2>4.2 printf() – formats d’affichage</h2>
+          <h3>Caractères</h3>
+          <table class="ops">
+            <tr><th class="center">Format</th><th>Type</th><th>Représentation</th></tr>
+            <tr><td class="code center">%c</td><td class="code">char</td><td>caractère simple</td></tr>
+            <tr><td class="code center">%s</td><td class="code">char *</td><td>chaîne de caractères (via un pointeur sur char)</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>4.2 printf() – formats d’affichage</h2>
+          <h3>Entiers</h3>
+          <table class="ops">
+            <tr><th class="center">Format</th><th>Type</th><th>Représentation</th></tr>
+            <tr><td class="code center">%d</td><td class="code">int</td><td><b>entier décimal signé</b></td></tr>
+            <tr><td class="code center">%i</td><td class="code">int</td><td>entier décimal signé (comme <inline-code>%d</inline-code> ; le préfixe ne compte qu’avec <inline-code>scanf</inline-code>)</td></tr>
+            <tr><td class="code center">%u</td><td class="code">unsigned int</td><td>entier décimal non-signé</td></tr>
+            <tr><td class="code center">%x %X</td><td class="code">unsigned int</td><td>entier hexadécimal non-signé [a…f] ou [A…F]</td></tr>
+            <tr><td class="code center">%o</td><td class="code">unsigned int</td><td>entier octal non-signé</td></tr>
+            <tr><td class="code center">%p</td><td class="code">void *</td><td><b>pointeur pur</b></td></tr>
+          </table>
+          <aside class="notes">http://www.gnu.org/software/libc/manual/html_node/Table-of-Output-Conversions.html</aside>
+        </section>
+
+        <section>
+          <h2>4.2 printf() – formats d’affichage</h2>
+          <h3>Nombre à virgule flottante</h3>
+          <table class="ops">
+            <tr><th class="center">Format</th><th>Type</th><th>Représentation</th></tr>
+            <tr><td class="code center">%f<br>%lf</td><td class="code">float<br>double</td><td>valeur signée <inline-code>[-]zzz.fff</inline-code></td></tr>
+            <tr><td class="code center">%e<br>%E</td><td class="code">float<br>double</td><td>valeur signée <inline-code>[-]z.ffffffe±nn</inline-code><br><span style="padding-left: 5.5em;"></span><inline-code>[-]z.ffffffE±nn</inline-code></td></tr>
+            <tr><td class="code center">%g<br>%G</td><td class="code">float<br>double</td><td>Utilise automatiquement le format <inline-code>%e</inline-code> ou <inline-code>%f</inline-code> suivant la valeur et la précision données.</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>4.2 printf() – formats d’affichage</h2>
+          <p>D'autres spécifications de formats peuvent être utilisées par l'instruction <inline-code>printf()</inline-code></p>
+          <br>
+          <div class="container">
+            <div class="col-left">
+              <table class="ops">
+                <tr><th>Type</th><th class="center">Format</th></tr>
+                <tr><td class="code">short</td><td class="code center">%hd</td></tr>
+                <tr><td class="code">long</td><td class="code center">%ld</td></tr>
+                <tr><td class="code">long long</td><td class="code center">%lld</td></tr>
+                <tr><td class="code">long double</td><td class="code center">%Lf</td></tr>
+                <tr><td class="code">size_t</td><td class="code center">%zu</td></tr>
+              </table>
+            </div>
+            <div class="col-right">
+              <table class="ops">
+                <tr><th>Type</th><th class="center">Format</th></tr>
+                <tr><td class="code">unsigned char</td><td class="code center">%hhu</td></tr>
+                <tr><td class="code">unsigned short</td><td class="code center">%hu</td></tr>
+                <tr><td class="code">unsigned int</td><td class="code center">%u</td></tr>
+                <tr><td class="code">unsigned long</td><td class="code center">%lu</td></tr>
+              </table>
+            </div>
+          </div>
+          <p style="font-size: 0.8em;"><inline-code>size_t</inline-code> : type du résultat de <inline-code>sizeof</inline-code> (chapitre 2) → <inline-code>printf("%zu\n", sizeof(int));</inline-code></p>
+        </section>
+
+        <section>
+          <h2>4.2 Affichage multiple</h2>
+          <p>Un seul <inline-code>printf()</inline-code> peut afficher simultanément plusieurs variables et constantes.</p>
+          <h3>Exemple</h3>
+          <pre style="width: 1300px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            printf("Annee %d, Mois %d, Jour %d\n",1991,5,10);
+          </code></pre>
+          <pre class="terminal" style="width: 1300px;"><code
+            class="nohighlight"
+            data-trim
+            style="font-size: 1.8em;">
+
+            Annee 1991, Mois 5, Jour 10
+          </code></pre>
+          <br>
+          <p>La <em>liste d'expressions</em> doit <highlight>posséder le même nombre de valeurs</highlight> qu'il y a de spécifications de format.</p>
+          <aside class="notes">valeurs supplémentaires : ignorées / valeurs manquantes : comportement indéfini (UB) / si le type des expressions ne correspond pas au format d'affichage spécifié : comportement indéfini (UB), la valeur affichée est imprévisible.</aside>
+        </section>
+
+        <section>
+          <h2>4.2 Affichage multiple – Erreurs possibles</h2>
+          <p>(a) valeurs supplémentaires → ignorées</p>
+          <p>(b) valeurs manquantes → <error>comportement indéfini (UB)</error> : affichage aléatoire</p>
+          <p>(c) type des expressions ne correspondant pas au format d'affichage → <error>comportement indéfini (UB)</error> : décodage incorrect</p>
+          <pre style="width: 1500px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            /* What should have been implemented: */
+            printf("Year %d, month %d, day %d\n", 1991, 5, 10);
+
+            /* 3 types of implementation issues: */
+            printf("(a) Year %d, month %d\n",         1991, 5, <error>10</error>);
+            printf("(b) Year %d, month %d, day <error>%d</error>\n", 1991, 5);
+            printf("(c) Year %d, month %d, day <error>%f</error>\n", 1991, 5, <error>10</error>);
+          </code></pre>
+          <pre class="terminal" style="width: 1500px;"><code
+            class="nohighlight"
+            data-trim
+            style="font-size: 1.5em;">
+
+            Year 1991, month 5, day 10
+            (a) Year 1991, month 5
+            (b) Year 1991, month 5, day -2120229984
+            (c) Year 1991, month 5, day 0.000000
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>4.2 printf() – le type char</h2>
+          <p>Avec le <highlight>type <inline-code>char</inline-code></highlight></p>
+          <p class="indent-1"><inline-code>%c</inline-code> affiche le caractère <span style="padding-left: 2em;"><b>Z</b></span></p>
+          <p class="indent-1"><inline-code>%d</inline-code> affiche son code ASCII <span style="padding-left: 0.5em;"><b>90</b></span></p>
+          <br>
+          <div class="container">
+            <div class="col-left" style="flex: 2;">
+              <pre style="width: 800px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                printf("%c \n", 'Z');
+                printf("%d \n", 'Z');
+                printf(<error>"%c \n", "Z"</error>);
+                printf("%s \n", "Zoo");
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <pre class="terminal" style="width: 300px;"><code
+                class="nohighlight"
+                data-trim
+                style="font-size: 1.8em;">
+
+                Z
+                90
+                ?
+                Zoo
+              </code></pre>
+            </div>
+          </div>
+          <p style="font-size: 0.8em;"><inline-code>"Z"</inline-code> est une chaîne, pas un caractère : <error>comportement indéfini (UB)</error>, affichage imprévisible.</p>
+        </section>
+
+        <section>
+          <h2>4.2 gcc détecte ces erreurs</h2>
+          <p>Avec <inline-code>-Wall</inline-code> (qui active <inline-code>-Wformat</inline-code>), gcc compare chaque format de <inline-code>printf</inline-code> et <inline-code>scanf</inline-code> aux arguments :</p>
+          <pre class="terminal" style="width: 1750px;"><code
+            class="nohighlight"
+            data-trim
+            style="font-size: 1.05em;">
+
+            $ gcc -Wall -Wextra -Wpedantic -Werror -std=c23 -o errors.exe errors.c
+            errors.c: In function 'main':
+            errors.c:5:16: error: too many arguments for format [-Werror=format-extra-args]
+            errors.c:6:45: error: format '%d' expects a matching 'int' argument [-Werror=format=]
+            errors.c:7:45: error: format '%f' expects argument of type 'double', but argument 4 has type 'int' [-Werror=format=]
+            errors.c:8:18: error: format '%c' expects argument of type 'int', but argument 2 has type 'char *' [-Werror=format=]
+            cc1.exe: all warnings being treated as errors
+          </code></pre>
+          <p>Lignes 5 à 7 : les cas (a), (b) et (c) ; ligne 8 : <inline-code>printf("%c \n", "Z");</inline-code></p>
+          <p>Même (a), qui est défini, est signalé. Avec <inline-code>-Werror</inline-code>, le programme ne compile pas : <highlight>l'erreur est trouvée avant l'exécution</highlight>.</p>
+        </section>
+
+        <section>
+          <h2>4.2 printf() – types réels</h2>
+          <p>Avec les <highlight>types réels</highlight>, le format peut contenir des indications pour la <highlight>largeur et la précision</highlight>.</p>
+          <p class="centered"><inline-code>%[drapeaux][L][.P]f</inline-code></p>
+          <p class="centered"><inline-code>%[drapeaux][L][.P]lf</inline-code></p>
+          <br>
+          <p>La spécification de <highlight>largeur L</highlight> fixe la largeur minimale de la valeur à afficher.</p>
+          <p>La spécification de <highlight>précision P</highlight> commence toujours par un point et indique que <highlight>P</highlight> décimales sont affichées (avec <inline-code>%g</inline-code> : P chiffres significatifs).</p>
+          <p>Les <highlight>drapeaux</highlight> : <inline-code>+</inline-code> affiche toujours le signe, <inline-code>0</inline-code> complète à gauche avec des zéros, <inline-code>-</inline-code> aligne à gauche.</p>
+          <p>Largeur et précision existent aussi pour les entiers et les chaînes : <inline-code>%5d</inline-code>, <inline-code>%.3s</inline-code>.</p>
+        </section>
+
+        <section>
+          <h2>4.2 printf() – formats d’affichage</h2>
+          <div class="container">
+            <div class="col-left" style="flex: 3; padding-left: 150px;">
+              <p><inline-code>printf("%f", 157.892600<error>32</error>);</inline-code></p>
+              <table class="cells"><tr><td>1</td><td>5</td><td>7</td><td>.</td><td>8</td><td>9</td><td>2</td><td>6</td><td>0</td><td>0</td></tr></table>
+              <p><inline-code>printf("%6.1f", 157.89260032);</inline-code></p>
+              <table class="cells"><tr><td class="b blank"></td><td class="b">1</td><td class="b">5</td><td class="b">7</td><td class="b">.</td><td class="b">9</td><td class="label"><highlight>→ décalage ET arrondi</highlight></td></tr></table>
+              <p><inline-code>printf("%+09.2f",157.89260032);</inline-code></p>
+              <table class="cells"><tr><td class="b">+</td><td class="b">0</td><td class="b">0</td><td class="b">1</td><td class="b">5</td><td class="b">7</td><td class="b">.</td><td class="b">8</td><td class="b">9</td></tr></table>
+              <p><inline-code>printf("%7.5f", 157.89260032);</inline-code></p>
+              <table class="cells"><tr><td>1</td><td>5</td><td class="b">7</td><td class="b">.</td><td class="b">8</td><td class="b">9</td><td class="b">2</td><td class="b">6</td><td class="b">0</td><td class="label"><highlight>→ L (7) est un minimum</highlight></td></tr></table>
+              <p><inline-code>printf("%.3f", 157.89260032);</inline-code></p>
+              <table class="cells"><tr><td>1</td><td>5</td><td>7</td><td>.</td><td class="b">8</td><td class="b">9</td><td class="b">3</td></tr></table>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <pre class="terminal" style="width: 350px;"><code
+                class="nohighlight"
+                data-trim
+                style="font-size: 1.5em;">
+
+                157.892600
+                 157.9
+                +00157.89
+                157.89260
+                157.893
+              </code></pre>
+            </div>
+          </div>
+          <aside class="notes">Par défaut, on a 6 chiffres après la virgule.</aside>
+        </section>
+
+      </section>
+
+      <!----------          SEQUENCES D'ECHAPPEMENT          ---------->
+      <section>
+
+        <section>
+          <h2>4.3 printf() – séquences d'échappement</h2>
+          <p>Les séquences d'échappement commencent par un <b><em>backslash</em></b> <inline-code>'\'</inline-code></p>
+          <p class="indent-1">Appelé également <highlight>caractère d’échappement</highlight></p>
+          <p class="indent-1">→ <em>escape character</em></p>
+          <br>
+          <p>Il existe plusieurs séquences d'échappement : certaines représentent un caractère de contrôle (<inline-code>'\n'</inline-code>, <inline-code>'\a'</inline-code>), d'autres un caractère spécial (<inline-code>'\\'</inline-code>, <inline-code>'\"'</inline-code>).</p>
+          <p>En particulier <inline-code>'\n'</inline-code> correspond à un «retour à la ligne».</p>
+        </section>
+
+        <section>
+          <h2>4.3 printf() – séquences d'échappement</h2>
+          <table class="ops">
+            <tr><th class="center">Séquence</th><th>Caractère</th><th class="center">Code ASCII</th></tr>
+            <tr><td class="code center">\n</td><td>retour à la ligne (<em>line feed</em>)</td><td class="center">10</td></tr>
+            <tr><td class="code center">\t</td><td>tabulation horizontale</td><td class="center">9</td></tr>
+            <tr><td class="code center">\\</td><td>backslash</td><td class="center">92</td></tr>
+            <tr><td class="code center">\"</td><td>guillemet double</td><td class="center">34</td></tr>
+            <tr><td class="code center">\'</td><td>apostrophe</td><td class="center">39</td></tr>
+            <tr><td class="code center">\0</td><td>caractère nul (fin de chaîne, chapitre 8)</td><td class="center">0</td></tr>
+            <tr><td class="code center">\r</td><td>retour chariot (<em>carriage return</em>)</td><td class="center">13</td></tr>
+            <tr><td class="code center">\a</td><td>bip (<em>alert</em>), souvent muet dans les terminaux actuels</td><td class="center">7</td></tr>
+          </table>
+          <p class="centered" style="font-size: 0.7em;">Liste complète : <a href="https://en.wikipedia.org/wiki/Escape_sequences_in_C">https://en.wikipedia.org/wiki/Escape_sequences_in_C</a></p>
+        </section>
+
+        <section>
+          <h2>4.3 printf() – séquences d'échappement</h2>
+          <h3>Quelques exemples</h3>
+          <pre style="width: 1300px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            /* Bip sonore sur le haut-parleur du PC */
+            printf("\a");
+
+            /* Afficher : C:\EXEMPLES\TOTO.TXT à l'écran. */
+            printf("C:\\EXEMPLES\\TOTO.TXT");
+
+            /* Afficher: "Pardon ?" */
+            printf("\"Pardon ?\"");
+          </code></pre>
+          <p style="font-size: 0.8em;"><inline-code>\a</inline-code> est souvent muet dans les terminaux actuels.</p>
+        </section>
+
+      </section>
+
+      <!----------          SYNTAXE DE SCANF          ---------->
+      <section>
+
+        <section>
+          <h2>4.4 scanf() – syntaxe</h2>
+          <p class="centered"><inline-code>scanf("<highlight>&lt;Chaîne de commandes&gt;</highlight>", &amp;&lt;Var1&gt;, &amp;&lt;Var2&gt;,..., &amp;&lt;VarN&gt;);</inline-code></p>
+          <h3>Par exemple</h3>
+          <div class="container">
+            <div class="col-left" style="flex: 3;">
+              <pre style="width: 850px; margin-left: 100px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.5em;">
+
+                int day, month, year;
+                scanf("%d/%d/%d",&amp;day, &amp;month, &amp;year);
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 2;">
+              <p style="white-space: nowrap; padding-left: 0;">
+                <kbd>2</kbd><kbd>8</kbd> <kbd>/</kbd> <kbd>1</kbd><kbd>1</kbd> <kbd>/</kbd> <kbd>1</kbd><kbd>9</kbd><kbd>7</kbd><kbd>0</kbd> <kbd>Enter</kbd>
+              </p>
+              <p style="font-family: 'Courier New', Courier, monospace; font-size: 0.8em;">
+                <span style="padding-left: 0.5em;">day</span><span style="padding-left: 3em;">month</span><span style="padding-left: 5em;">year</span>
+              </p>
+            </div>
+          </div>
+          <div style="font-size: 0.85em;">
+          <h3>&lt;Chaîne de commandes&gt;</h3>
+          <p>1. la <highlight>spécification du format de lecture</highlight> des variables → <inline-code>‘%d’</inline-code></p>
+          <p>2. des <highlight>caractères ordinaires</highlight> (ici <inline-code>/</inline-code>), à taper à l'identique</p>
+          <h3>&lt;Liste de variables&gt;</h3>
+          <p>Liste des adresses des variables à saisir</p>
+          <p><b>Les variables sont autorisées</b> à figurer comme paramètres</p>
+          <p>Les <b>constantes sont interdites</b></p>
+          </div>
+        </section>
+
+        <section>
+          <h2>4.4 scanf() – commentaire</h2>
+          <p><highlight>Chaque nom de variable doit être précédé du symbole <inline-code>‘&amp;’</inline-code></highlight></p>
+          <p>Ainsi <inline-code>‘&amp;day’</inline-code> signifie <highlight>adresse de</highlight> la variable <inline-code>‘day’</inline-code></p>
+          <p>Lors de la saisie, il faut entrer tous les caractères ordinaires de la chaîne de commandes</p>
+          <h3>Exemple</h3>
+          <pre style="width: 1400px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            int day, month, year;
+            printf("\n\nFill as specified: dd/mm/yyyy ");
+            scanf("%d/%d/%d", &amp;day, &amp;month, &amp;year);
+            printf("\nSorted info: %d / %d / %d", day, month, year);
+          </code></pre>
+          <pre class="terminal" style="width: 1400px;"><code
+            class="nohighlight"
+            data-trim
+            style="font-size: 1.5em;">
+
+            Fill as specified: dd/mm/yyyy 28/11/1970
+
+            Sorted info: 28 / 11 / 1970
+          </code></pre>
+          <aside class="notes">Si l’on introduit les valeurs sans les barres obliques, scanf s’arrête au premier caractère qui ne correspond pas, le laisse dans le tampon et renvoie le nombre de valeurs lues. Voir exemple :</aside>
+        </section>
+
+        <section>
+          <h2>4.4 scanf() – format de lecture</h2>
+          <div style="font-size: 0.85em;">
+          <p>La chaîne de commandes de <inline-code>scanf()</inline-code> a <highlight>les mêmes spécifications de format</highlight> que <inline-code>printf()</inline-code> <error>sauf pour les types réels</error></p>
+          <table class="ops">
+            <tr><th>Format</th><th>type</th><th>Représentation</th></tr>
+            <tr><td class="code">%f</td><td class="code">float</td><td>valeur signée <inline-code>[-]zzz.fff</inline-code></td></tr>
+            <tr><td class="code">%lf</td><td class="code">double</td><td>valeur signée <inline-code>[-]zzz.fff</inline-code></td></tr>
+          </table>
+          <br>
+          <p>En résumé, avec <inline-code>printf</inline-code> :</p>
+          <p class="indent-1"><inline-code>%f</inline-code> et <inline-code>%lf</inline-code> pour les variables de type <inline-code>float</inline-code> et <inline-code>double</inline-code></p>
+          <p>et avec <inline-code>scanf</inline-code> :</p>
+          <p class="indent-1"><inline-code>%f</inline-code> pour les variables de type <inline-code>float</inline-code></p>
+          <p class="indent-1"><inline-code>%lf</inline-code> pour les variables de type <inline-code>double</inline-code></p>
+          <p style="font-size: 0.8em;">Pourquoi ? <inline-code>printf</inline-code> reçoit des <highlight>valeurs</highlight> : un <inline-code>float</inline-code> y est converti en <inline-code>double</inline-code>, <inline-code>%f</inline-code> suffit.
+            <inline-code>scanf</inline-code> reçoit des <highlight>adresses</highlight> : il doit savoir s'il écrit 4 octets (<inline-code>float</inline-code>) ou 8 (<inline-code>double</inline-code>).</p>
+          </div>
+        </section>
+
+        <section>
+          <h2>4.4 scanf() – format de lecture</h2>
+          <div style="font-size: 0.85em;">
+          <p>Certains caractères jouent un rôle particulier avec <inline-code>scanf</inline-code>. On les appelle <highlight>séparateurs</highlight> ou <highlight>"caractères blancs"</highlight>. Les plus courants sont <kbd>&nbsp;&nbsp;&nbsp;&nbsp;</kbd> <kbd>TAB</kbd> <kbd>ENTER</kbd></p>
+          <p>Si l'un de ces caractères fait partie de la chaîne de commande, on peut saisir à l'endroit où il se trouve autant de caractères blancs que l'on désire (ou aucun).</p>
+          <h3>Exemple</h3>
+          <p class="indent-1"><inline-code>scanf(" %d %d",&amp;day,&amp;month);</inline-code></p>
+          <p class="indent-1">les deux nombres peuvent être séparés par des</p>
+          <div class="container">
+            <div class="col-left" style="flex: 1; padding-left: 300px;">
+              <p><b>espaces</b></p>
+              <p><b>tabulations</b></p>
+              <p><b>retours à la ligne</b></p>
+            </div>
+            <div class="col-right" style="flex: 2;">
+              <p><kbd>1</kbd><kbd>2</kbd><kbd>&nbsp;&nbsp;&nbsp;&nbsp;</kbd><kbd>&nbsp;&nbsp;&nbsp;&nbsp;</kbd><kbd>7</kbd><kbd>ENTER</kbd></p>
+              <p><kbd>1</kbd><kbd>2</kbd><kbd>TAB</kbd><kbd>7</kbd><kbd>ENTER</kbd></p>
+              <p><kbd>1</kbd><kbd>2</kbd><kbd>ENTER</kbd><kbd>7</kbd><kbd>ENTER</kbd></p>
+            </div>
+          </div>
+          <p style="font-size: 0.8em;"><inline-code>%d</inline-code>, <inline-code>%f</inline-code> et <inline-code>%s</inline-code> sautent déjà les blancs qui précèdent la valeur : l'espace du format compte surtout devant <inline-code>%c</inline-code>, <inline-code style="white-space: nowrap;">%[</inline-code> et les caractères ordinaires.</p>
+          </div>
+        </section>
+
+      </section>
+
+      <!----------          PRECAUTIONS AVEC SCANF          ---------->
+      <section>
+
+        <section>
+          <h2>4.5 Lire deux caractères (1)</h2>
+          <h3><highlight>Comment lire deux caractères ?</highlight></h3>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <p><b>Méthode 1</b></p>
+            </div>
+            <div class="col-right" style="flex: 3;">
+              <pre style="width: 800px; margin-left: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                char a, b;
+                scanf("%c %c", &amp;a, &amp;b);
+              </code></pre>
+            </div>
+          </div>
+          <br>
+          <p class="keys"><kbd>x</kbd><span class="to">→a</span> <kbd>ENTER</kbd> <kbd>y</kbd><span class="to">→b</span> <kbd>ENTER</kbd> <span class="ok">OK</span></p>
+          <p class="keys"><kbd>x</kbd><span class="to">→a</span> <kbd>&nbsp;&nbsp;&nbsp;&nbsp;</kbd> <kbd>y</kbd><span class="to">→b</span> <kbd>ENTER</kbd> <span class="ok">OK</span></p>
+          <p class="keys"><kbd>x</kbd><span class="to">→a</span> <kbd>y</kbd><span class="to">→b</span> <kbd>ENTER</kbd> <span class="ok">OK</span></p>
+        </section>
+
+        <section>
+          <h2>4.5 Lire deux caractères (2)</h2>
+          <h3><highlight>Comment lire deux caractères ?</highlight></h3>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <p>Méthode 2:</p>
+            </div>
+            <div class="col-right" style="flex: 2;">
+              <pre style="width: 600px; margin-left: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.5em;">
+
+                char a, b;
+                scanf("%c", &amp;a);
+                scanf("%c", &amp;b);
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 2;">
+              <p><error>Pas d’espace !</error></p>
+              <pre style="width: 600px; margin-left: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.5em;">
+
+                scanf("%c%c", &amp;a, &amp;b);
+              </code></pre>
+            </div>
+          </div>
+          <div class="container">
+            <div class="col-left" style="flex: 3;">
+              <p class="keys" style="padding-left: 100px;"><kbd>x</kbd><span class="to">→a</span> <kbd>y</kbd><span class="to">→b</span> <kbd>ENTER</kbd> <span class="ok">OK</span></p>
+              <p class="keys" style="padding-left: 100px;"><kbd>x</kbd><span class="to">→a</span> <kbd>ENTER</kbd><span class="to">→b</span> <kbd>y</kbd> <kbd>ENTER</kbd> <span class="ko">PAS OK</span></p>
+              <p class="keys" style="padding-left: 100px;"><kbd>x</kbd><span class="to">→a</span> <kbd>&nbsp;&nbsp;&nbsp;&nbsp;</kbd><span class="to">→b</span> <kbd>y</kbd> <kbd>ENTER</kbd> <span class="ko">PAS OK</span></p>
+            </div>
+            <div class="col-right" style="flex: 2;">
+              <div class="precaution">
+                <p><error>Précaution :</error></p>
+                <p>En cas de plusieurs scanf, mettre un espace devant <inline-code>%c</inline-code> : il saute le <kbd>ENTER</kbd> laissé dans le tampon par la saisie précédente</p>
+                <p><inline-code>scanf("<span style="outline: 4px solid #FF0000;">&nbsp;</span>%c", &amp;a);</inline-code></p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>4.5 Limiter la saisie : largeur et %[...]</h2>
+          <div style="font-size: 0.9em;">
+          <p><inline-code>char ligne[80];</inline-code></p>
+          <p><inline-code>scanf("%79[ ABCDEF]", ligne);</inline-code></p>
+          <p class="indent-1">N'accepte que les caractères ABCDEF, ainsi que l’espace ici, dans la variable <highlight><em>ligne</em></highlight></p>
+          <p class="indent-1">Comme vu précédemment, il n'y a pas de signe <highlight>&amp;</highlight> ; <highlight>79</highlight> limite la saisie à la taille de <em>ligne</em> (80, avec le <inline-code>'\0'</inline-code>)</p>
+          <p><inline-code>scanf("%79[^ABCDEF]", ligne);</inline-code></p>
+          <p class="indent-1">Accepte tous les caractères sauf ABCDEF dans la variable ligne</p>
+          <p class="indent-1">Dès qu’un de ces caractères est trouvé, la saisie s’arrête</p>
+          </div>
+        </section>
+
+        <section>
+          <h2>4.5 Vider le tampon d'entrée</h2>
+          <p>Après une saisie, le reste de la ligne (au moins le <kbd>ENTER</kbd>) <highlight>reste dans le tampon</highlight> et sera lu par la saisie suivante.</p>
+          <p>Pour le jeter, on lit et ignore les caractères jusqu'à la fin de la ligne :</p>
+          <pre style="width: 1200px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            int c;
+            while ((c = getchar()) != '\n' &amp;&amp; c != EOF)
+            {
+            }
+          </code></pre>
+          <p><inline-code>c</inline-code> est un <inline-code>int</inline-code> pour pouvoir comparer avec <inline-code>EOF</inline-code> (fin de l'entrée).</p>
+          <p><warning>⚠</warning> <inline-code>fflush(stdin)</inline-code> : <error>comportement indéfini (UB)</error>, <inline-code>fflush</inline-code> ne s'applique qu'aux flux de sortie.</p>
+        </section>
+
+        <section>
+          <h2>4.5 Valeur de retour de scanf()</h2>
+          <p><inline-code>status = scanf("%d:%d", &amp;h, &amp;m);</inline-code></p>
+          <p class="indent-1">Lit les variables <highlight>h</highlight> et <highlight>m</highlight> au clavier, séparées du signe <highlight>:</highlight></p>
+          <p class="indent-1">La variable <highlight>status</highlight> (de type <highlight>int</highlight>) contient le nombre de paramètres saisis sans erreur, ou <inline-code>EOF</inline-code> si l'entrée se termine avant</p>
+          <p><b>Saisie avec validation</b></p>
+          <pre style="width: 1300px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.1em;">
+
+            int h, m, status;
+            do
+            {
+                printf("Hour (h:m): ");
+                status = scanf("%d:%d", &amp;h, &amp;m);
+                if (status == EOF)
+                {
+                    return 1; // input closed
+                }
+                int c;
+                while ((c = getchar()) != '\n' &amp;&amp; c != EOF)
+                {
+                }
+            } while (status != 2);
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>4.5 Un message qui n'apparaît pas ?</h2>
+          <p><inline-code>printf</inline-code> écrit d'abord dans un <highlight>tampon de sortie</highlight>, vidé à chaque <inline-code>'\n'</inline-code> quand la sortie est un terminal, et à la fin du programme.</p>
+          <p>Si un message sans <inline-code>'\n'</inline-code> n'apparaît pas avant la saisie (sortie redirigée, certains terminaux), vider le tampon après le <inline-code>printf</inline-code> :</p>
+          <pre style="width: 1100px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            printf("Hour (h:m): ");
+            fflush(stdout);
+            scanf("%d:%d", &amp;h, &amp;m);
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>4.5 Exemple (avec des char)</h2>
+          <pre style="width: 1500px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.3em;">
+
+            #include &#60;stdio.h&#62;
+
+            int main(void)
+            {
+              int year, month, day;
+              char name1, name2;
+
+              printf("First letter in your first name: ");
+              scanf(" %c", &amp;name1);
+              printf("First letter in your last name: ");
+              scanf(" %c", &amp;name2);
+
+              printf("Your birthdate (dd/mm/yy): ");
+              scanf(" %d/%d/%d", &amp;day, &amp;month, &amp;year);
+
+              printf("\nYour initials are %c.%c.\n", name1, name2);
+              printf("You are born on %d/%d/%d\n", day, month, year);
+
+              printf("\nASCII CODE: %c=%d, %c=%d\n", name1, name1, name2, name2);
+
+              return 0;
+            }
+          </code></pre>
+          <aside class="notes">Le programme suivant permet de saisir au clavier puis d'afficher sur l'écran les valeurs de quelques variables de type int et char. !!! Attention aux espaces</aside>
+        </section>
+
+        <section>
+          <h2>4.5 Exemple (avec des strings)</h2>
+          <pre style="width: 1700px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.2em;">
+
+            #include &#60;stdio.h&#62;
+
+            int main(void)
+            {
+              // Messages are "const char *" because they are not supposed to be modified
+              const char *enter_your_first_name_msg = "Enter your first name: ";
+              const char *enter_your_last_name_msg = "Enter your last name: ";
+              // first_name and last_name are arrays of characters because they are supposed to be modified
+              char first_name[80];
+              char last_name[80];
+
+              // WARNING: this will not work if the name has a space in it
+              // %79s: at most 79 characters + '\0' in 80
+              printf("%s", enter_your_first_name_msg);
+              scanf("%79s", first_name);
+              printf("%s", enter_your_last_name_msg);
+              scanf("%79s", last_name);
+
+              printf("Your name is %s %s\n", first_name, last_name);
+
+              return 0;
+            }
+          </code></pre>
+          <p style="font-size: 0.8em;">Anticipation : tableaux et chaînes de caractères sont vus au chapitre 8.</p>
+          <aside class="notes">Le programme suivant permet de saisir au clavier puis d'afficher sur l'écran les valeurs de quelques variables de type int et char. !!! Attention aux espaces</aside>
+        </section>
+
+      </section>
+
+      <!----------          AUTRES FONCTIONS D'ENTREE/SORTIE          ---------->
+      <section>
+
+        <section>
+          <h2>4.6 Autres possibilités d’entrée / sortie</h2>
+          <pre style="width: 1700px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.3em;">
+
+            int ch;                     // ‘ch’: caractère (int pour détecter EOF)
+            char line[80];              // ‘line’: chaîne de caractères
+            int Nmax = sizeof(line);
+
+            puts(line);                 // écrit le texte sur l'écran avec un '\n'*
+            fputs(line, stdout);        // Idem sans '\n'*
+
+            <s>gets(line);</s>                 // lit la variable line au clavier* (<error>supprimé en C11</error>)
+            gets_s(line, Nmax);         // C11, annexe K optionnelle (absente sous Linux)*
+            fgets(line, Nmax, stdin);   // ou lecture d’un flux (garde le '\n')
+
+            putchar(ch);                // affiche le caractère ‘ch’ sur l'écran*
+
+            ch = getchar();             // Lit le caractère ‘ch’ au clavier (tampon)*
+            ch = getch();               // Lit le caractère ‘ch’ du clavier (direct, non standard)<error>**</error>
+          </code></pre>
+          <p style="font-size: 0.7em;">*<inline-code>&lt;stdio.h&gt;</inline-code></p>
+          <p style="font-size: 0.7em;"><error>**</error><inline-code>&lt;conio.h&gt;</inline-code>, Windows uniquement</p>
+        </section>
+
+        <section>
+          <h2>4.6 Exemple – utilisation du tampon</h2>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <pre style="width: 800px; margin-left: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.3em;">
+
+                char premier, lettre, mot[32], phrase[128];
+
+                premier = getch();
+
+                scanf("%c",&amp;lettre);
+
+                scanf("%31s",mot);
+
+                fgets(phrase,128,stdin);
+
+
+
+                printf("premier : %c\n",premier);
+                printf("lettre : %c\n",lettre);
+                printf("mot : %s\n",mot);
+                printf("phrase : %s\n",phrase);
+              </code></pre>
+              <p style="padding-left: 0;">📝 Et avec <inline-code>scanf(" %c",&amp;lettre);</inline-code> ?</p>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <img data-src="./medias/clavier_tampon.png" alt="Clavier : touches frappées" width="800px">
+              <pre class="terminal" style="width: 600px;"><code
+                class="nohighlight"
+                data-trim
+                style="font-size: 1.3em;">
+
+                alut     comment vas-tu?
+              </code></pre>
+              <table class="cells" style="font-size: 0.7em;">
+                <tr>
+                  <td class="b">a</td><td class="b">l</td><td class="b">u</td><td class="b">t</td><td class="b blank"></td>
+                  <td class="b">c</td><td class="b">o</td><td class="b">m</td><td class="b">m</td><td class="b">e</td><td class="b">n</td><td class="b">t</td><td class="b blank"></td>
+                  <td class="b">v</td><td class="b">a</td><td class="b">s</td><td class="b">-</td><td class="b">t</td><td class="b">u</td><td class="b">?</td><td class="b" style="background-color: #a6d84a;"></td>
+                </tr>
+              </table>
+              <p class="centered" style="font-size: 0.6em;"><em>Tampon</em></p>
+              <pre class="terminal" style="width: 600px;"><code
+                class="nohighlight"
+                data-trim
+                style="font-size: 1.3em;">
+
+                premier : S
+                lettre : a
+                mot : lut
+                phrase :  comment vas-tu?
+              </code></pre>
+            </div>
+          </div>
+          <aside class="notes">getch() requière include &lt;conio.h&gt; Que se passerait-il si au lieu de scanf("%c" … il y avait scanf(" %c" ?</aside>
+        </section>
+
+      </section>
+
+      <!----------          EXERCICES          ---------->
+      <section>
+        <h2>📝 Exercices</h2>
+        <p style="text-align: center; padding-left: 0;">
+          <a href="https://he-arc.github.io/1242.1-Langage_C/docs/cours/chapitre04cours/">Exercices du chapitre 04</a>
+        </p>
+      </section>
+
+    </div>
+  </div>
+
+  <!----------          CONTENT          ---------->
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/notes/notes.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      hash: true,
+      width: 1920,
+      height: 1080,
+      transition: "none",
+      center: false,
+      slideNumber: 'c/t',
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+    });
+  </script>
+</body>
+
+</html>
