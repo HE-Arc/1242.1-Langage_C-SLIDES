@@ -1,0 +1,1429 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>HE-Arc - 1242.1 Langage C - Chapitre 5 - Structures de contrôle</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/hearc.css" id="theme">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="https://www.he-arc.ch/wp-content/uploads/2021/12/cropped-hearc-icon-192x192.png"
+    type="image/vnd.microsoft.icon" />
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/vs.css" id="highlight-theme">
+
+  <style>
+    .reveal .container p,
+    .reveal .container h3,
+    .reveal .container h4 { padding-left: 0; }
+    .reveal .container .col-left { text-align: left; }
+
+    .reveal .indent-1 { padding-left: 300px; }
+    .reveal .indent-2 { padding-left: 400px; }
+    .reveal .centered { text-align: center; padding-left: 0; }
+
+    .reveal table.ops { font-size: 0.8em; margin: 0 auto; }
+    .reveal table.ops th,
+    .reveal table.ops td { border: 2px solid #222; padding: 0.2em 0.8em; }
+    .reveal table.ops th { background-color: #dddddd; }
+    .reveal table.ops td.code {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      color: #0000FF;
+    }
+    .reveal table.ops td.center,
+    .reveal table.ops th.center { text-align: center; }
+    .reveal table.ops tr:last-child td,
+    .reveal table.ops tr:last-child th { border-bottom: 2px solid #222; }
+
+    .reveal pre.terminal code.hljs,
+    .reveal pre.terminal code {
+      background-color: #000000;
+      color: #FFFFFF;
+    }
+
+    .reveal code .red { color: #FF0000; font-weight: bold; }
+    .reveal code .arrow { color: #0000FF; font-weight: bold; }
+    .reveal code .step { color: #000099; font-weight: normal; }
+
+    .reveal svg.nsd text { font-family: "Roboto", Helvetica, sans-serif; font-size: 34px; }
+    .reveal svg.nsd text.mono { font-family: 'Courier New', Courier, monospace; }
+    .reveal svg.nsd line,
+    .reveal svg.nsd rect { stroke: #000; stroke-width: 3; fill: none; }
+
+    .reveal .loop-nsd {
+      background-color: #b7dde8;
+      border: 3px solid #000;
+      font-size: 1em;
+      text-align: left;
+    }
+    .reveal .loop-nsd p { padding-left: 0; margin: 0; }
+    .reveal .loop-nsd .head { padding: 0.3em 0.5em; }
+    .reveal .loop-nsd .body {
+      background-color: #FFFFFF;
+      border-top: 3px solid #000;
+      border-left: 3px solid #000;
+      margin-left: 80px;
+      padding: 0.4em 1em 1.5em 2.5em;
+    }
+    .reveal .loop-nsd .body.top { border-top: none; border-bottom: 3px solid #000; }
+    .reveal .loop-nsd .body.boxed { border-right: 3px solid #000; border-bottom: 3px solid #000; margin: 0 80px 30px 80px; padding: 0.2em 0; }
+    .reveal .loop-nsd .body.boxed p { text-align: center; }
+    .reveal .loop-nsd .muted { color: #888888; }
+
+    .reveal .init { border: 3px solid #FF0000; border-radius: 50%; padding: 0 0.2em; }
+    .reveal .cond { border: 3px solid #000000; border-radius: 0.6em; padding: 0 0.2em; }
+    .reveal .incr { border: 3px solid #000099; padding: 0 0.2em; }
+
+    .reveal table.keywords {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      font-size: 0.8em;
+      margin: 0 auto;
+    }
+    .reveal table.keywords td { border: none; padding: 0.05em 1em 0.05em 0; }
+    .reveal table.keywords td.seen { color: #0000FF; }
+    .reveal table.keywords sup { font-size: 0.5em; }
+  </style>
+</head>
+
+<body>
+  <img id="logo-hearc" src="./medias/logo_he-arc.png" alt="Logo HE-ARC">
+  <img id="logo-hesso" src="./medias/logo_hes-so.png" alt="Logo HES-SO">
+  <p id="course-infos">1242.1 Langage C - 2026-2027</p>
+
+  <!----------          CONTENT          ---------->
+  <div class="reveal">
+    <div class="slides">
+
+      <!----------          TITLE          ---------->
+      <section>
+        <h1>
+          Chapitre 5
+        </h1>
+        <h2>
+          Structures de contrôle
+        </h2>
+        <p>1. Branchement conditionnel : <inline-code>if</inline-code></p>
+        <p>2. Branchement conditionnel : <inline-code>if</inline-code> <inline-code>else</inline-code></p>
+        <p>3. Branchement multiple : <inline-code>switch</inline-code></p>
+        <p>4. Boucle <inline-code>while</inline-code></p>
+        <p>5. Boucle <inline-code>do...while</inline-code></p>
+        <p>6. Boucle <inline-code>for</inline-code></p>
+        <p>7. Branchements inconditionnels : <inline-code>return</inline-code>, <inline-code>exit()</inline-code>, <inline-code>break</inline-code>, <inline-code>continue</inline-code>, <inline-code>goto</inline-code></p>
+      </section>
+
+      <!----------          IF          ---------->
+      <section>
+
+        <section>
+          <h2>5.1 Branchement conditionnel : <inline-code>if</inline-code></h2>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 2em;">
+
+                if (&lt;Condition&gt;)
+                  &lt;Instruction&gt;;
+              </code></pre>
+              <p class="centered">ou</p>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 2em;">
+
+                if (&lt;Condition&gt;)
+                {
+                  &lt;instruction&gt;;
+                  …
+                }
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <h3 class="centered">Structogramme</h3>
+              <svg class="nsd" width="640" height="400" viewBox="0 0 640 400">
+                <rect x="2" y="2" width="636" height="396"></rect>
+                <line x1="2" y1="2" x2="320" y2="140"></line>
+                <line x1="320" y1="140" x2="638" y2="2"></line>
+                <line x1="2" y1="140" x2="638" y2="140"></line>
+                <line x1="320" y1="140" x2="320" y2="398"></line>
+                <text x="320" y="55" text-anchor="middle" font-weight="bold">&lt;condition&gt;</text>
+                <text x="60" y="125">vrai</text>
+                <text x="520" y="125">faux</text>
+                <text x="160" y="235" text-anchor="middle">&lt;Instruction&gt;</text>
+                <text x="160" y="280" text-anchor="middle">ou</text>
+                <text x="160" y="325" text-anchor="middle">&lt;bloc&gt;</text>
+                <line x1="420" y1="270" x2="540" y2="270" style="stroke-width: 2;"></line>
+              </svg>
+              <p class="centered"><error>Attention à ne pas mettre de « ; »</error></p>
+              <pre style="width: 550px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.4em;">
+
+                if (&lt;condition&gt;)<span class="red">; ❌</span>
+                  printf(...);
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+      </section>
+
+      <!----------          IF ELSE          ---------->
+      <section>
+
+        <section>
+          <h2>5.2 Branchement conditionnel : <inline-code>if</inline-code> <inline-code>else</inline-code></h2>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.4em;">
+
+                if (&lt;Condition&gt;)
+                  &lt;Instruction&gt;;
+                else
+                  &lt;Instruction&gt;;
+              </code></pre>
+              <p class="centered">ou</p>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.4em;">
+
+                if (&lt;Condition&gt;)
+                {
+                  &lt;instruction&gt;;
+                  …
+                }
+                else
+                {
+                  &lt;instruction&gt;;
+                  …
+                }
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <h3 class="centered">Structogramme</h3>
+              <svg class="nsd" width="640" height="400" viewBox="0 0 640 400">
+                <rect x="2" y="2" width="636" height="396"></rect>
+                <line x1="2" y1="2" x2="320" y2="140"></line>
+                <line x1="320" y1="140" x2="638" y2="2"></line>
+                <line x1="2" y1="140" x2="638" y2="140"></line>
+                <line x1="320" y1="140" x2="320" y2="398"></line>
+                <text x="320" y="55" text-anchor="middle" font-weight="bold">&lt;condition&gt;</text>
+                <text x="60" y="125">vrai</text>
+                <text x="520" y="125">faux</text>
+                <text x="160" y="235" text-anchor="middle">&lt;Instruction&gt;</text>
+                <text x="160" y="280" text-anchor="middle">ou</text>
+                <text x="160" y="325" text-anchor="middle">&lt;bloc&gt;</text>
+                <text x="480" y="235" text-anchor="middle">&lt;Instruction&gt;</text>
+                <text x="480" y="280" text-anchor="middle">ou</text>
+                <text x="480" y="325" text-anchor="middle">&lt;bloc&gt;</text>
+              </svg>
+              <pre style="width: 640px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.4em;">
+
+                if (solde &gt;= retrait)
+                  argent = retrait;
+                else
+                  argent = 0;
+              </code></pre>
+            </div>
+          </div>
+          <aside class="notes">if (A > B) C = A - B ; else C = B - A;
+
+STRUCTOGRAMME:: page 2</aside>
+        </section>
+
+        <section>
+          <h2>5.2 Exemple avec <inline-code>if</inline-code> ... <inline-code>else</inline-code></h2>
+          <h3>Calcul de l’évaluation ECTS en fonction de la moyenne</h3>
+          <div class="container">
+            <div class="col-left" style="flex: 3;">
+              <pre style="width: 1100px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.3em;">
+
+                if (mean &gt;= 5.3) {  // 5.3 &lt;= mean
+                   evalECTS = 'A';
+                }
+                else {
+                   <span class="red">if</span> (mean &gt;= 4.8) <span class="red">{</span>  // 4.8 &lt;= mean &lt; 5.3
+                      evalECTS = 'B';
+                   <span class="red">}</span>
+                   <span class="red">else {</span>
+                      if (mean &gt;= 4.4) {  // 4.4 &lt;= mean &lt; 4.8
+                         evalECTS = 'C';
+                      }
+                      ...
+                   <span class="red">}</span>
+                }
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 2;">
+              <h3><success>✅ Bonne habitude</success></h3>
+              <p>Toujours mettre les <inline-code>{}</inline-code> même s'il n'y a qu'une instruction</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>5.2 Idem, avec une autre mise en page</h2>
+          <div class="container">
+            <div class="col-left" style="flex: 3;">
+              <pre style="width: 1100px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.3em;">
+
+                if (mean &gt;= 5.3)  // 5.3 &lt;= mean &lt;= 6
+                   evalECTS = 'A';
+                else if (mean &gt;= 4.8)  // 4.8 &lt;= mean &lt; 5.3
+                   evalECTS = 'B';
+                else if (mean &gt;= 4.4)  // 4.4 &lt;= mean &lt; 4.8
+                   evalECTS = 'C';
+                <span class="red">...</span>
+                else
+                   ...;
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 2;">
+              <h3><warning>⚠ Attention</warning></h3>
+              <p>L'absence des <inline-code>{}</inline-code> rend le code moins lisible et moins maintenable</p>
+            </div>
+          </div>
+          <aside class="notes">Attention: Bonne habitude, toujours mettre des {      }    pour évolution future du code</aside>
+        </section>
+
+        <section>
+          <h2>5.2 <inline-code>if</inline-code>, <inline-code>else</inline-code> : remarques</h2>
+          <p><b>La condition doit être entre parenthèses</b></p>
+          <br>
+          <p><inline-code>if(condition)</inline-code> et <inline-code>else</inline-code> ne se terminent pas par des "<b>;</b>"</p>
+          <br>
+          <p><inline-code>{</inline-code> et <inline-code>}</inline-code> définissent un bloc d'instructions</p>
+          <br>
+          <p><inline-code>else</inline-code> n'existe pas sans <inline-code>if</inline-code></p>
+          <br>
+          <p><inline-code>if</inline-code> existe sans <inline-code>else</inline-code></p>
+        </section>
+
+        <section>
+          <h2>5.2 Styles de codage</h2>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <h3>style Kernighan &amp; Ritchie</h3>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.4em;">
+
+                if (x == y) {
+                    ..
+                } else if (x &gt; y){
+                    ...
+                } else {
+                    ....
+                }
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <h3>style Allman</h3>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.4em;">
+
+                if (x == y)
+                {
+                   ...
+                }
+                else if (x &gt; y)
+                {
+                   ...
+                }
+                else
+                {
+                   ...
+                }
+              </code></pre>
+            </div>
+          </div>
+          <aside class="notes">voir http://fr.wikipedia.org/wiki/Style_d%27indentation pour plus de détails</aside>
+        </section>
+
+        <section>
+          <h2>5.2 L'opérateur ternaire : <inline-code>?:</inline-code></h2>
+          <p>Aussi appelé opérateur conditionnel.</p>
+          <p>Il calcule une valeur selon le résultat d’une condition logique.</p>
+          <p class="centered"><inline-code>&lt;Condition&gt; <span style="color: #FF0000;">?</span> &lt;Expression_vraie&gt; <span style="color: #FF0000;">:</span> &lt;Expression_fausse&gt;</inline-code></p>
+          <pre style="width: 1500px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.4em;">
+
+            int a = 3, b = 9, max, min;
+            max = ((a &gt; b) <span class="red">?</span> a <span class="red">:</span> b);
+            min = ((a &gt; b) <span class="red">?</span> b <span class="red">:</span> a);
+            printf("Plus grande variable : %c", (a &gt; b) <span class="red">?</span> 'a' <span class="red">:</span> 'b');
+          </code></pre>
+          <pre style="width: 1500px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.4em;">
+
+            int b = 28213;
+            const bool divisible_by_7 = (b % 7 == 0);
+            if(divisible_by_7) printf("'b' a une division entière par 7");
+          </code></pre>
+          <aside class="notes">Cours page 5
+
+Cas d'utilisation intéressant : l'initialisation conditionnelle de constante :-)</aside>
+        </section>
+
+      </section>
+
+      <!----------          SWITCH          ---------->
+      <section>
+
+        <section>
+          <h2>5.3 Branchement multiple : <inline-code>switch</inline-code></h2>
+          <pre style="width: 1000px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.4em;">
+
+            switch (value)
+            {
+              case 1 : printf("Cas 1\n");
+                       value = 10;
+              case 2 : printf("Cas 2\n");
+                       value = 20;
+              case 3 : printf("Cas 3\n");
+                       value = 30;
+            }
+          </code></pre>
+          <table class="ops">
+            <tr><th>Au début si <inline-code>value</inline-code> vaut</th><th class="center">1</th><th class="center">2</th><th class="center">3</th><th class="center">autre</th></tr>
+            <tr><td>Affichage</td><td class="center">Cas 1<br>Cas 2<br>Cas 3</td><td class="center">Cas 2<br>Cas 3</td><td class="center">Cas 3</td><td></td></tr>
+            <tr><td>À la fin <inline-code>value</inline-code> vaut</td><td class="center">30</td><td class="center">30</td><td class="center">30</td><td class="center">value</td></tr>
+          </table>
+          <p style="font-size: 0.8em;"><warning>⚠</warning> gcc (<inline-code>-Wextra</inline-code>) signale chaque passage au <inline-code>case</inline-code> suivant (<inline-code>this statement may fall through</inline-code>) : refusé avec <inline-code>-Werror</inline-code>.</p>
+        </section>
+
+        <section>
+          <h2>5.3 Syntaxe de <inline-code>switch</inline-code></h2>
+          <pre style="width: 1300px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            switch (&lt;Paramètre&gt;)
+            {
+              case &lt;valeur_A&gt; : &lt;Instruction_A1&gt;;
+                                &lt;Instruction_A2&gt;;
+                                ...
+
+              case &lt;valeur_B&gt; : &lt;Instruction_B1&gt;;
+                                &lt;Instruction_B2&gt;;
+                                ...
+              [default: &lt;instruction(s)&gt;]
+            }
+          </code></pre>
+          <aside class="notes">les &lt;valeur_X&gt; sont des constantes
+l'étiquette default est un mot-clef , où se branchera l'exécution si aucune des valeurs précédentes ne correspondait à paramètre</aside>
+        </section>
+
+        <section>
+          <h2>5.3 Organigramme du switch</h2>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <img data-src="./medias/switch_organigramme.png" alt="Organigramme du switch sans break" height="750px">
+            </div>
+            <div class="col-right" style="flex: 2;">
+              <br><br><br>
+              <p class="centered"><b>Programmation non structurée</b></p>
+              <p class="centered">(pas représentable par un structogramme)</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>5.3 Exemple avec le mot-clé <inline-code>break</inline-code></h2>
+          <pre style="width: 1000px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.3em;">
+
+            switch (value)
+            {
+              case 1 : printf("Cas 1\n");
+                       value = 10;
+                       break;
+              case 2 : printf("Cas 2\n");
+                       value = 20;
+                       break;
+              case 3 : printf("Cas 3\n");
+                       value = 30;
+                       break;
+              default: printf("Autres\n");
+            }
+          </code></pre>
+          <table class="ops">
+            <tr><th>Au début si <inline-code>value</inline-code> vaut</th><th class="center">1</th><th class="center">2</th><th class="center">3</th><th class="center">autre</th></tr>
+            <tr><td>Affichage</td><td class="center">Cas 1</td><td class="center">Cas 2</td><td class="center">Cas 3</td><td class="center">Autres</td></tr>
+            <tr><td>À la fin <inline-code>value</inline-code> vaut</td><td class="center">10</td><td class="center">20</td><td class="center">30</td><td class="center"><inline-code>value</inline-code></td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>5.3 <inline-code>switch</inline-code> + <inline-code>break</inline-code></h2>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <h3 class="centered">Organigramme</h3>
+              <img data-src="./medias/switch_break_organigramme.png" alt="Organigramme du switch avec break" width="700px">
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <h3 class="centered">Structogramme</h3>
+              <svg class="nsd" width="640" height="560" viewBox="0 0 640 560">
+                <rect x="2" y="2" width="636" height="556"></rect>
+                <line x1="2" y1="2" x2="450" y2="250"></line>
+                <line x1="450" y1="250" x2="638" y2="2"></line>
+                <line x1="2" y1="250" x2="638" y2="250"></line>
+                <line x1="150" y1="83" x2="150" y2="558"></line>
+                <line x1="300" y1="166" x2="300" y2="558"></line>
+                <line x1="450" y1="250" x2="450" y2="558"></line>
+                <text class="mono" x="380" y="65" text-anchor="middle">nombre == ?</text>
+                <text class="mono" x="75" y="220" text-anchor="middle">1</text>
+                <text class="mono" x="225" y="220" text-anchor="middle">2</text>
+                <text class="mono" x="365" y="240" text-anchor="middle">3</text>
+                <text class="mono" x="545" y="240" text-anchor="middle">default</text>
+                <text class="mono" x="75" y="340" text-anchor="middle">cas1</text>
+                <text class="mono" x="225" y="340" text-anchor="middle">cas2</text>
+                <text class="mono" x="375" y="340" text-anchor="middle">cas3</text>
+                <text class="mono" x="545" y="340" text-anchor="middle">autres</text>
+                <text class="mono" x="545" y="385" text-anchor="middle">cas</text>
+              </svg>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>5.3 Comparaison <inline-code>switch</inline-code> vs <inline-code>if...else</inline-code></h2>
+          <p><inline-code>switch</inline-code> <error>permet de tester des égalités entre valeurs <b style="color: #000000;">entières</b></error></p>
+          <br>
+          <p><inline-code>switch</inline-code> <error>ne peut pas tester des valeurs <b style="color: #000000;">réelles</b>, des <b style="color: #000000;">chaînes de caractères</b>, des <b style="color: #000000;">structures</b>, des <b style="color: #000000;">tableaux</b>, des <b style="color: #000000;">intervalles de valeurs</b></error></p>
+          <br>
+          <p class="indent-1"><b>↪ Un <inline-code>if-else</inline-code> peut toujours remplacer un <inline-code>switch</inline-code></b></p>
+          <p class="indent-1"><b>&nbsp;&nbsp;&nbsp;&nbsp;L'inverse n'est souvent pas possible</b></p>
+        </section>
+
+      </section>
+
+      <!----------          WHILE          ---------->
+      <section>
+
+        <section>
+          <h2>Les boucles : motivations</h2>
+          <p>Beaucoup de programmes <b>réalisent des actions répétitives.</b> Par exemple, pour créer un agenda, on donne chaque fois le nom, le prénom, le numéro de téléphone.</p>
+          <br>
+          <p><error>NE PAS écrire un programme avec autant d'instructions qu'il y a de personnes.</error></p>
+          <br>
+          <p><success>Faire RÉPÉTER les instructions nécessaires à la saisie d'UNE personne</success></p>
+        </section>
+
+        <section>
+          <h2>5.4 Boucle <inline-code>while</inline-code></h2>
+          <h3 class="centered">"Tant que la condition est vraie, répéter …"</h3>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <h3 class="centered">Syntaxe</h3>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.6em;">
+
+                while (&lt;Condition&gt;)
+                    &lt;Instruction&gt;;
+              </code></pre>
+              <br>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.6em;">
+
+                while (&lt;Condition &gt;)
+                {
+                    &lt;Instruction&gt;;
+                    …
+                }
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <h3 class="centered">Structogramme</h3>
+              <div class="loop-nsd" style="width: 640px;">
+                <p class="head">Tant que &lt;condition&gt; vraie</p>
+                <div class="body">
+                  <p>&lt;Instruction&gt;;</p>
+                  <p class="muted">ou</p>
+                  <p>{ &nbsp; &lt;Bloc&gt; &nbsp; }</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="notes">Remarque: Attention, le ';' marque la fin de l'instruction  pas de ; directement après while( )</aside>
+        </section>
+
+        <section>
+          <h2>5.4 Exemple de boucle <inline-code>while</inline-code></h2>
+          <p>Calcul du modulo : <inline-code>n % m</inline-code></p>
+          <p><b>Solution : tant que n≥m , soustraire m à n.</b></p>
+          <pre style="width: 900px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            int main(void)
+            {
+                int n = 10, m = 3;
+                while (n &gt;= m)
+                {
+                    n = n - m;
+                }
+                printf("modulo = %d\n", n);
+
+                return 0;
+            }
+          </code></pre>
+          <aside class="notes">while (nombre &lt;= limite)               /* Boucle */
+		somme += nombre++;</aside>
+        </section>
+
+        <section>
+          <h2>📝 5.4 Exemples de boucle <inline-code>while</inline-code></h2>
+          <h3>quel sera l'affichage ?</h3>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <h3 class="centered">A</h3>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                i=0;
+                while(i++ &lt; 3)
+                  printf(" %d ",i);
+                printf(" et %d ",i);
+              </code></pre>
+              <h3 class="centered">C</h3>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                i=0;
+                while(i &lt; 3)
+                  printf(" %d ",i++);
+                printf(" et %d ",i);
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <h3 class="centered">B</h3>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                i=0;
+                while(++i &lt; 3)
+                  printf(" %d ",i);
+                printf(" et %d ",i);
+              </code></pre>
+              <h3 class="centered">D</h3>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                i=0;
+                while(i &lt; 3)
+                  printf(" %d ",++i);
+                printf(" et %d ",i);
+              </code></pre>
+            </div>
+          </div>
+          <aside class="notes">while(i++&lt;3) : 1  2  3 et 4
+
+while(++i&lt;3) : 1  2 et 3
+
+while(i&lt;3) i++ : 0  1  2 et 3
+
+while(i&lt;3) ++i : 1  2  3 et 3</aside>
+        </section>
+
+        <section>
+          <h2>📝 5.4 Exemples de boucle <inline-code>while</inline-code> – solutions</h2>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <h3 class="centered">A</h3>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.5em;">
+
+                i=0;
+                while(i++ &lt; 3)
+                  printf(" %d ",i);
+                printf(" et %d ",i);
+              </code></pre>
+              <pre class="terminal" style="width: 650px;"><code
+                class="nohighlight"
+                data-trim
+                style="font-size: 1.5em;">
+
+                1  2  3  et 4
+              </code></pre>
+              <h3 class="centered">C</h3>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.5em;">
+
+                i=0;
+                while(i &lt; 3)
+                  printf(" %d ",i++);
+                printf(" et %d ",i);
+              </code></pre>
+              <pre class="terminal" style="width: 650px;"><code
+                class="nohighlight"
+                data-trim
+                style="font-size: 1.5em;">
+
+                0  1  2  et 3
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <h3 class="centered">B</h3>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.5em;">
+
+                i=0;
+                while(++i &lt; 3)
+                  printf(" %d ",i);
+                printf(" et %d ",i);
+              </code></pre>
+              <pre class="terminal" style="width: 650px;"><code
+                class="nohighlight"
+                data-trim
+                style="font-size: 1.5em;">
+
+                1  2  et 3
+              </code></pre>
+              <h3 class="centered">D</h3>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.5em;">
+
+                i=0;
+                while(i &lt; 3)
+                  printf(" %d ",++i);
+                printf(" et %d ",i);
+              </code></pre>
+              <pre class="terminal" style="width: 650px;"><code
+                class="nohighlight"
+                data-trim
+                style="font-size: 1.5em;">
+
+                1  2  3  et 3
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>5.4 Remarques</h2>
+          <p>Avec <inline-code>while</inline-code>, tant que la condition est vraie, l'instruction ou le bloc suivant la condition (le corps de la boucle) est exécuté.</p>
+          <br>
+          <p>Le corps de la boucle <inline-code>while</inline-code> n’est donc pas forcément exécuté.</p>
+          <br>
+          <p>Les instructions dans le corps de la boucle doivent modifier la condition afin de la rendre fausse à un moment donné. C’est la condition de sortie de la boucle.</p>
+          <p>Sinon, on exécute une <error>boucle sans fin</error>.</p>
+        </section>
+
+      </section>
+
+      <!----------          DO WHILE          ---------->
+      <section>
+
+        <section>
+          <h2>5.5 Boucle <inline-code>do...while</inline-code></h2>
+          <h3 class="centered">"Répéter … tant que la condition est vraie"</h3>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <h3 class="centered">Syntaxe</h3>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.6em;">
+
+                do
+                   &lt;Instruction&gt;;
+                while (&lt;Condition&gt;);
+              </code></pre>
+              <br>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.6em;">
+
+                do
+                {
+                   &lt;Bloc&gt;
+                }
+                while (&lt;Condition&gt;);
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <h3 class="centered">Structogramme</h3>
+              <div class="loop-nsd" style="width: 640px;">
+                <div class="body top">
+                  <p>&lt;Instruction&gt;;</p>
+                  <p class="muted">ou</p>
+                  <p>{ &nbsp; &lt;Bloc&gt; &nbsp; }</p>
+                </div>
+                <p class="head">À répéter tant que<br>&lt;condition&gt; est vraie</p>
+              </div>
+            </div>
+          </div>
+          <aside class="notes">Attention REPETER TANT QUE != REPETER JUSQUA</aside>
+        </section>
+
+        <section>
+          <h2>5.5 Exemple de boucle <inline-code>do...while</inline-code></h2>
+          <p>Lire un nombre au clavier compris entre 0 et 10</p>
+          <pre style="width: 1100px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.4em;">
+
+            int main(void)
+            {
+                int nb, status;
+                do
+                {
+                    printf("Entrez un nombre(0-10):");
+                    status = scanf("%d", &amp;nb);
+                    if (status == EOF)
+                    {
+                        return 1;
+                    }
+                    int c;
+                    while ((c = getchar()) != '\n' &amp;&amp; c != EOF)
+                    {
+                    }
+                }while (status != 1 || nb&lt;0 || nb&gt;10);
+
+                return 0;
+            }
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>5.5 Remarques</h2>
+          <p>La ou les instructions du corps de la boucle sont exécutées tant que la condition est vraie.</p>
+          <br>
+          <p>Le corps de la boucle <inline-code>do...while</inline-code> est exécuté<b> au moins une fois.</b></p>
+          <br>
+          <p>Les instructions dans le corps de la boucle doivent modifier la condition pour la rendre fausse à un moment donné</p>
+          <pre style="width: 600px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            do
+             {
+              ...
+            }while(condition)<span class="red">;</span>
+          </code></pre>
+          <p class="centered"><error>Doit se terminer par ";"</error></p>
+        </section>
+
+      </section>
+
+      <!----------          FOR          ---------->
+      <section>
+
+        <section>
+          <h2>5.6 Boucle <inline-code>for</inline-code></h2>
+          <h3 class="centered">"Répéter un certain nombre de fois …"</h3>
+          <h3>Syntaxe</h3>
+          <pre style="width: 1300px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.2em;">
+
+            for (&lt;Init&gt;; &lt;Condition&gt;; &lt;Incrémentation&gt;)
+                &lt;Instruction&gt;;
+          </code></pre>
+          <pre style="width: 1300px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.2em;">
+
+            for (&lt;Init&gt;; &lt;Condition&gt;; &lt;Incrémentation &gt;)
+            {
+                &lt;Bloc&gt;
+            }
+          </code></pre>
+          <h3>Structogramme</h3>
+          <div class="loop-nsd" style="width: 1300px; margin: 0 auto;">
+            <p class="head"><inline-code style="background: none; font-size: 0.8em;"><span style="color: #0000FF;">for</span> (&lt;Initialisation&gt;; &lt;Condition&gt;; &lt;Incrémentation&gt;)</inline-code></p>
+            <div class="body boxed">
+              <p>&lt;Instruction&gt;;</p>
+              <p class="muted">ou</p>
+              <p>{ &nbsp; &lt;Bloc&gt; &nbsp; }</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>5.6 Boucle <inline-code>for</inline-code></h2>
+          <pre style="width: 1300px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            for (<span class="arrow">initialisation</span>; <span class="arrow">condition</span>; <span class="arrow">incrément</span>)
+            {
+                liste d'instructions;
+            }
+          </code></pre>
+          <p><highlight>Initialisation-s</highlight></p>
+          <p class="indent-1">initialise la variable d'indice une seule fois, à l'entrée dans la boucle</p>
+          <p><highlight>Condition-s</highlight></p>
+          <p class="indent-1">doit être vraie pour que les instructions de la boucle s'exécutent</p>
+          <p><highlight>Incrément-s</highlight></p>
+          <p class="indent-1">modifie la valeur de l'indice</p>
+          <aside class="notes">Attention, les 3 instructions sont séparées par des ;</aside>
+        </section>
+
+        <section>
+          <h2>5.6 Remarques</h2>
+          <p>Permet de répéter une ou plusieurs instructions, un <b>nombre de fois déterminé.</b></p>
+          <br>
+          <p>Utilise un <b>indice (un entier)</b> pour compter le nombre de fois que la boucle est effectuée.</p>
+          <br>
+          <p>Sa <b>valeur doit être</b></p>
+          <p class="indent-1"><highlight>initialisée au départ,</highlight></p>
+          <p class="indent-1"><highlight>testée à chaque passage pour savoir si le programme a effectué le nombre de boucles souhaitées,</highlight></p>
+          <p class="indent-1">et <highlight>modifiée (augmentée/diminuée) à chaque passage.</highlight></p>
+          <aside class="notes">Attention avec les valeurs réelles
+ for (double f=0.0; f!=1.0; f+=0.1)
+        printf("%lf     ",f);</aside>
+        </section>
+
+        <section>
+          <h2>5.6 Exemple</h2>
+          <p>Calculer a<sup>n</sup> = a*a* ... *a pour n&gt;=0 en partant de a<sup>0</sup> qui vaut 1</p>
+          <pre style="width: 1000px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            int main(void)
+            {
+                int i, n = 3;
+                double a = 2.0;
+                double power = 1.0;
+                for( i=0; i&lt;n; i++ )
+                {
+                    power = power * a;
+                }
+                printf("%lf\n", power);
+
+                return 0;
+            }
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>5.6 Fonctionnement de la boucle <inline-code>for</inline-code></h2>
+          <pre style="width: 1300px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+                     <span class="step">1    2,5,8  4,7</span>
+              for (n = 0; n &lt; 2; ++n){
+                  <span class="step">3 6</span>
+                  printf("Iteration:%d\n", n);
+              }
+            <span class="step">9</span> printf("Fin:%d", n);
+          </code></pre>
+          <div class="container">
+            <div class="col-left" style="flex: 3; padding-left: 300px;">
+              <pre class="terminal" style="width: 600px; margin-left: 0;"><code
+                class="nohighlight"
+                data-trim
+                style="font-size: 1.8em;">
+
+                Iteration:0
+                Iteration:1
+                Fin:2
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 2;">
+              <p class="fragment">n=0</p>
+              <p class="fragment">n=1</p>
+              <p class="fragment">n=2</p>
+            </div>
+          </div>
+          <aside class="notes">(1) l'expression d'&lt;Initialisation&gt; est exécutée (1).
+(2) &lt;Condition&gt; est testée (2).
+(3) Si elle est remplie, alors, l'&lt;Instruction&gt; est exécutée (3),
+(4) puis l'&lt;Incrémentation&gt; est effectuée (4)
+
+(5) &lt;Condition&gt; est à nouveau testée (5).
+
+(8)Si la &lt;Condition&gt; n'est pas remplie (8), la boucle for prend fin.
+L'instruction d'&lt;Incrémentation&gt; est effectuée une dernière fois avant de terminer la boucle (7).
+La variable utilisée prend donc la prochaine valeur supérieure à la dernière autorisée par la &lt;Condition&gt;, sauf dans le cas où la &lt;Condition&gt; n'est d'emblée pas remplie.</aside>
+        </section>
+
+        <section>
+          <h2>5.6 Commentaires</h2>
+          <p>(1) l'expression d'&lt;Initialisation&gt; est exécutée (1).</p>
+          <p>(2) &lt;Condition&gt; est testée (2).</p>
+          <p>(3) Si elle est remplie, alors, l'&lt;Instruction&gt; est exécutée (3),</p>
+          <p>(4) puis l'&lt;Incrémentation&gt; est effectuée (4)</p>
+          <p>(5) &lt;Condition&gt; est à nouveau testée (5).</p>
+          <p>(8) Si la &lt;Condition&gt; n'est pas remplie (8), la boucle for prend fin.</p>
+          <p>L'instruction d'&lt;Incrémentation&gt; est effectuée une dernière fois avant de terminer la boucle (7).</p>
+          <p><highlight>La variable utilisée prend donc la prochaine valeur supérieure à la dernière autorisée par la &lt;Condition&gt;, sauf dans le cas où la &lt;Condition&gt; n'est d'emblée pas remplie.</highlight></p>
+        </section>
+
+        <section>
+          <h2>📝 5.6 Valeur de l’indice</h2>
+          <table class="ops">
+            <tr><th></th><th class="center">init</th><th class="center">fin</th><th class="center">pas</th><th class="center">Nb itérations</th><th class="center">Affichage</th></tr>
+            <tr><td class="code" style="color: #000000;">for(i=0;i&lt;5;i++)<br>&nbsp;&nbsp;printf("%d,",i);</td><td class="center">0</td><td class="center">5</td><td class="center">1</td><td class="center">5</td><td class="center">0,1,2,3,4,</td></tr>
+            <tr><td class="code" style="color: #000000;">for(j=4;j&lt;=12;j=j+2)<br>&nbsp;&nbsp;printf("%d,",j);</td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td class="code" style="color: #000000;">for(c='a';c&lt;'f';c+=1)<br>&nbsp;&nbsp;printf("%c,",c);</td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td class="code" style="color: #000000;">for(k=5;k&gt;0;k--)<br>&nbsp;&nbsp;printf("%d,",k);</td><td></td><td></td><td></td><td></td><td></td></tr>
+          </table>
+          <aside class="notes">0	4	‘a’	5
+5	14	‘f’	0
+1	2	1	-1
+5	5	5	5
+0,1,2,3,4	4,6,8,10,12	‘a’,’b’,’c’,’d’,’e’	5,4,3,2,1</aside>
+        </section>
+
+        <section>
+          <h2>5.6 Boucle <inline-code>for</inline-code> et boucle <inline-code>while</inline-code></h2>
+          <div class="container">
+            <div class="col-left" style="flex: 2;">
+              <pre style="width: 900px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.6em;">
+
+                for ( <span class="init">i=1</span>; <span class="cond">i&lt;132</span> ; <span class="incr">i=i+2</span>  )
+                {
+                    <span class="step">Instructions;</span>
+                }
+              </code></pre>
+              <p><highlight>...est équivalent à...</highlight></p>
+              <pre style="width: 900px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.6em;">
+
+                <span class="init">i=1;</span>
+                while ( <span class="cond">i&lt;132</span> )
+                {
+                    <span class="step">Instructions;</span>
+                    <span class="incr">i=i+2;</span>
+                }
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <br><br>
+              <p class="centered"><span class="init">initialisation</span></p>
+              <br>
+              <p class="centered"><span class="cond">condition</span></p>
+              <br>
+              <p class="centered"><span class="incr">incrémentation</span></p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>5.6 Exemple d’une boucle <inline-code>for</inline-code></h2>
+          <div class="container">
+            <div class="col-left" style="flex: 3;">
+              <pre style="width: 1150px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.4em;">
+
+                for (int i=0, j=0; i &lt; 10; i++, j=i*i )
+                {
+                   printf("x = %2d, x^2 = %2d\n", i,j);
+                }
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <pre class="terminal" style="width: 400px;"><code
+                class="nohighlight"
+                data-trim
+                style="font-size: 1.4em;">
+
+                x =  0, x^2 =  0
+                x =  1, x^2 =  1
+                x =  2, x^2 =  4
+                x =  3, x^2 =  9
+                x =  4, x^2 = 16
+                x =  5, x^2 = 25
+                x =  6, x^2 = 36
+                x =  7, x^2 = 49
+                x =  8, x^2 = 64
+                x =  9, x^2 = 81
+              </code></pre>
+            </div>
+          </div>
+          <aside class="notes">Dans le premier exemple, on utilise l’opérateur séquentiel, pour initialiser et modifier plusieurs variables dans une instruction du for.</aside>
+        </section>
+
+        <section>
+          <h2>5.6 Exemples de boucles 'infinies'</h2>
+          <pre style="width: 600px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            for (;;)
+            {
+            }
+
+
+            while (true)
+            {
+            }
+          </code></pre>
+          <aside class="notes">Dans le premier exemple, on aura une boucle infinie car par défaut la condition est considérée VRAIE
+while(); ne se compile pas !</aside>
+        </section>
+
+        <section>
+          <h2>5.6 Choisir la «bonne boucle»</h2>
+          <p>La boucle <inline-code>for</inline-code> est à privilégier quand on <error>connaît à l'avance le nombre d'itérations.</error></p>
+          <br>
+          <p>Si on <error>ne connaît pas à l’avance le nombre d’itérations à effectuer :</error></p>
+          <br>
+          <p class="indent-1">On choisit <inline-code>do...while</inline-code> quand le corps de la boucle doit être effectué <b>au moins une fois.</b></p>
+          <br>
+          <p class="indent-1">On choisit <inline-code>while</inline-code> lorsqu'il ne faut pas obligatoirement entrer dans la boucle.</p>
+        </section>
+
+      </section>
+
+      <!----------          BRANCHEMENTS INCONDITIONNELS          ---------->
+      <section>
+
+        <section>
+          <h2>5.7 L'instruction <inline-code>return</inline-code></h2>
+          <p>L'instruction <inline-code>return</inline-code> termine l'exécution de la fonction courante.</p>
+          <br>
+          <p>Dans les programmes simples faits jusqu'ici, le code s'exécute dans la fonction <inline-code>main()</inline-code> et l'instruction <inline-code>return</inline-code> termine l'exécution du programme.</p>
+          <pre style="width: 800px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            int Inc(int x)
+            {
+                return ++x;
+                printf("%d",x);
+            }
+            int main(void)
+            {
+                int y = Inc(10);
+                printf("%d\n", y);
+                return 0;
+            }
+          </code></pre>
+          <aside class="notes">Le return de la fonction Inc termine cette fonction : retour au main avec la valeur 11 (le ++ est fait, le printf qui suit le return ne l'est pas)
+Le return de la fonction main termine l’exécution du programme</aside>
+        </section>
+
+        <section>
+          <h2>5.7 La fonction <inline-code>exit(&lt;int&gt;)</inline-code></h2>
+          <p>La fonction <inline-code>exit</inline-code> permet de terminer l'exécution du programme où que l'on se trouve.</p>
+          <br>
+          <p>Elle agit de manière similaire à une instruction <inline-code>return</inline-code> depuis le programme principal <inline-code>main</inline-code>.</p>
+          <br>
+          <p>Elle prend un paramètre (code d'erreur entier) destiné à l'environnement d'exécution ( <success>0:ok</success> , 1:erreur, ...)</p>
+          <p>une directive <inline-code>#include &lt;stdlib.h&gt;</inline-code> est nécessaire</p>
+        </section>
+
+        <section>
+          <h2>5.7 La fonction <inline-code>exit(&lt;int&gt;)</inline-code></h2>
+          <h3>Exemples</h3>
+          <p>Le bon déroulement:</p>
+          <p class="indent-1"><inline-code>exit(0);</inline-code></p>
+          <p class="indent-1"><inline-code>exit(EXIT_SUCCESS); // 0</inline-code></p>
+          <p>Une erreur lors du déroulement</p>
+          <p class="indent-1"><inline-code>exit(1);</inline-code></p>
+          <p class="indent-1"><inline-code>exit(EXIT_FAILURE); // 1</inline-code></p>
+          <p>Définition de ses propres codes:</p>
+          <pre style="width: 1200px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.4em;">
+
+            #define EX_OK     0       // success
+            #define EX__BASE 64       // error messages
+            #define EX_USAGE 65       // command usage error
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>5.7 La fonction <inline-code>exit(&lt;int&gt;)</inline-code></h2>
+          <pre style="width: 1000px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            #include &lt;stdio.h&gt;
+            #include &lt;stdlib.h&gt;
+            int main(void)
+            {
+              int n;
+              printf("Number: ");
+              if (scanf("%d", &amp;n) != 1)
+              {
+                printf("Error: not a number\n");
+                <span class="red">exit(EXIT_FAILURE)</span>;
+              }
+              printf("n = %d\n", n);
+              return 0;
+            }
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>5.7 La fonction <inline-code>exit(&lt;int&gt;)</inline-code></h2>
+          <p>Utilisation de l’information envoyée par <inline-code>exit()</inline-code></p>
+          <p>Dans un fichier de commande sous Windows (.bat)</p>
+          <pre style="width: 1000px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            test.exe
+            IF ERRORLEVEL 1 ECHO erreur lecture
+          </code></pre>
+          <p>Sous Linux dans un fichier script bash</p>
+          <pre style="width: 1000px;"><code
+            class="bash"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            #!/bin/bash
+            ./test
+            if [ "$?" = "1" ]; then
+                echo " erreur lecture "
+            fi
+          </code></pre>
+          <aside class="notes">#!/bin/csh -f
+
+mycmd
+if ($status) then
+echo "error executing mycmd"
+exit 1
+endif
+echo "successful execution of mycmd"</aside>
+        </section>
+
+        <section>
+          <h2>5.7 L'instruction <inline-code>break</inline-code></h2>
+          <h3 class="centered"><error>⚠ Programmation non structurée</error></h3>
+          <pre style="width: 900px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            for (i = 0; i &lt;= 20; i++)
+            {
+                instructions;
+                if(condition)
+                  <span class="arrow">break;</span> <span class="arrow">─────────────┐</span>
+                instructions;         <span class="arrow">│</span>
+            } <span class="arrow">◄───────────────────────┘</span>
+          </code></pre>
+          <aside class="notes">Sortie immédiate de la boucle
+Break «peut» être utilisé dans une boucle (for, while, do…while) et dans un switch (pas dans un if)</aside>
+        </section>
+
+        <section>
+          <h2>5.7 L'instruction <inline-code>continue</inline-code></h2>
+          <h3 class="centered"><error>⚠ Programmation non structurée</error></h3>
+          <pre style="width: 900px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            while (condition w) <span class="arrow">◄───────┐</span>
+            {                           <span class="arrow">│</span>
+                instructions;           <span class="arrow">│</span>
+                if(condition i)         <span class="arrow">│</span>
+                  <span class="arrow">continue;</span> <span class="arrow">────────────┘</span>
+                instructions;
+            }
+          </code></pre>
+          <aside class="notes">Passe au test w sans effectuer les instructions qui suivent</aside>
+        </section>
+
+        <section>
+          <h2>5.7 L'instruction <inline-code>goto</inline-code></h2>
+          <h3 class="centered"><error>⚠ Programmation non structurée</error></h3>
+          <pre style="width: 1100px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.4em;">
+
+              {
+                instructions;
+                if(a &gt; b)
+                  <span class="red">goto erreur</span>; <span class="arrow">───────────┐</span>
+                else                      <span class="arrow">│</span>
+                {                         <span class="arrow">│</span>
+                  instructions;           <span class="arrow">│</span>
+                }                         <span class="arrow">│</span>
+                return 0;                 <span class="arrow">│</span>
+                erreur: <span class="arrow">◄─────────────────┘</span>
+                instructions en cas d'erreur;
+              }
+          </code></pre>
+        </section>
+
+      </section>
+
+      <!----------          MOTS RESERVES          ---------->
+      <section>
+        <h2>Mots réservés du langage C</h2>
+        <h3>En bleu, les mots-clés déjà vus → <highlight>26 sur 54 !</highlight></h3>
+        <table class="keywords">
+          <tr><td>alignas<sup>(C23)</sup></td><td>alignof<sup>(C23)</sup></td><td>auto</td><td class="seen">bool<sup>(C23)</sup></td><td class="seen">break</td><td class="seen">case</td></tr>
+          <tr><td class="seen">char</td><td class="seen">const</td><td>constexpr<sup>(C23)</sup></td><td class="seen">continue</td><td class="seen">default</td><td class="seen">do</td></tr>
+          <tr><td class="seen">double</td><td class="seen">else</td><td>enum</td><td>extern</td><td class="seen">false<sup>(C23)</sup></td><td class="seen">float</td></tr>
+          <tr><td class="seen">for</td><td class="seen">goto</td><td class="seen">if</td><td>inline<sup>(C99)</sup></td><td class="seen">int</td><td class="seen">long</td></tr>
+          <tr><td>nullptr<sup>(C23)</sup></td><td>register</td><td>restrict<sup>(C99)</sup></td><td class="seen">return</td><td class="seen">short</td><td class="seen">signed</td></tr>
+          <tr><td class="seen">sizeof</td><td>static</td><td>static_assert<sup>(C23)</sup></td><td>struct</td><td class="seen">switch</td><td>thread_local<sup>(C23)</sup></td></tr>
+          <tr><td class="seen">true<sup>(C23)</sup></td><td>typedef</td><td>typeof<sup>(C23)</sup></td><td>typeof_unqual<sup>(C23)</sup></td><td>union</td><td class="seen">unsigned</td></tr>
+          <tr><td class="seen">void</td><td>volatile</td><td class="seen">while</td><td>_Atomic<sup>(C11)</sup></td><td>_BitInt<sup>(C23)</sup></td><td>_Complex<sup>(C99)</sup></td></tr>
+          <tr><td>_Decimal128<sup>(C23)</sup></td><td>_Decimal32<sup>(C23)</sup></td><td>_Decimal64<sup>(C23)</sup></td><td>_Generic<sup>(C11)</sup></td><td>_Imaginary<sup>(C99)</sup></td><td>_Noreturn<sup>(C11)</sup></td></tr>
+        </table>
+        <p style="font-size: 0.7em;">Norme C23. Les anciennes orthographes <inline-code>_Bool</inline-code>, <inline-code>_Alignas</inline-code>, <inline-code>_Alignof</inline-code>, <inline-code>_Static_assert</inline-code>, <inline-code>_Thread_local</inline-code> restent réservées.</p>
+        <p style="font-size: 0.7em;">📚 Référence : <a href="https://en.cppreference.com/w/c/keyword">en.cppreference.com/w/c/keyword</a> <span style="padding-left: 3em;"><highlight>Quel est leur rôle?</highlight></span></p>
+      </section>
+
+      <!----------          EXERCICES          ---------->
+      <section>
+        <h2>📝 Exercices</h2>
+        <p style="text-align: center; padding-left: 0;">
+          <a href="https://he-arc.github.io/1242.1-Langage_C/docs/cours/chapitre05cours/">Exercices du chapitre 05</a>
+        </p>
+      </section>
+
+    </div>
+  </div>
+
+  <!----------          CONTENT          ---------->
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/notes/notes.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      hash: true,
+      width: 1920,
+      height: 1080,
+      transition: "none",
+      center: false,
+      slideNumber: 'c/t',
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+    });
+  </script>
+</body>
+
+</html>
