@@ -1,0 +1,1256 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>HE-Arc - 1242.1 Langage C - Chapitre 6 - Les fonctions</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/hearc.css" id="theme">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="https://www.he-arc.ch/wp-content/uploads/2021/12/cropped-hearc-icon-192x192.png"
+    type="image/vnd.microsoft.icon" />
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/vs.css" id="highlight-theme">
+
+  <style>
+    .reveal .container p,
+    .reveal .container h3,
+    .reveal .container h4 { padding-left: 0; }
+    .reveal .container .col-left { text-align: left; }
+
+    .reveal .indent-1 { padding-left: 300px; }
+    .reveal .indent-2 { padding-left: 400px; }
+    .reveal .centered { text-align: center; padding-left: 0; }
+    .reveal .container .col-left.text { padding-left: 200px; }
+    .reveal .container p.indent-1 { padding-left: 100px; }
+    .reveal p.tight { margin: 8px 0; }
+
+    .reveal pre.terminal code.hljs,
+    .reveal pre.terminal code {
+      background-color: #000000;
+      color: #FFFFFF;
+    }
+    .reveal pre.global code.hljs,
+    .reveal pre.global code { background-color: #fbd4b4; }
+
+    .reveal code .red { color: #FF0000; font-weight: bold; }
+    .reveal code .blue { color: #0000FF; font-weight: bold; }
+    .reveal code .green { color: #008000; font-weight: bold; }
+    .reveal code .arrow { color: #0000FF; font-weight: bold; }
+    .reveal code .step { color: #0000FF; font-weight: bold; }
+    .reveal code .box-red { border: 3px solid #FF0000; display: inline-block; padding: 0 0.2em; }
+    .reveal code .box-blue { border: 3px solid #0000FF; display: inline-block; padding: 0 0.2em; }
+    .reveal code .box-black { border: 2px solid #000000; border-radius: 0.3em; padding: 0 0.1em; }
+
+    .reveal .red { color: #FF0000; }
+    .reveal .blue { color: #0000FF; }
+    .reveal .green { color: #008000; }
+
+    .reveal .syntax {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      background-color: #ffff99;
+      border: 2px solid #000;
+      padding: 0.1em 0.5em;
+    }
+
+    .reveal svg text { font-family: "Roboto", Helvetica, sans-serif; font-size: 32px; }
+    .reveal svg text.mono { font-family: 'Courier New', Courier, monospace; }
+    .reveal svg .cell { stroke: #000; stroke-width: 2; }
+    .reveal .def-wrap {
+      position: relative;
+      width: fit-content;
+      margin: 230px auto 0 auto;
+    }
+    /* anchors and braces use the computed font of the code (2em = 46.2px), so ch / em follow its columns and lines */
+    .reveal .def-wrap .anchor,
+    .reveal .def-wrap svg.brace { font-family: monospace; font-size: 46.2px; line-height: 1.1; }
+    .reveal .def-wrap pre { margin: 0; width: auto; }
+    .reveal .def-wrap .anchor { position: absolute; height: 0; }
+    .reveal .def-wrap .note {
+      position: absolute;
+      font-family: "Roboto", Helvetica, sans-serif;
+      font-size: 34px;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    .reveal .def-wrap .bracket-top {
+      position: absolute;
+      height: 0.5em;
+      border: 2px solid #000;
+      border-bottom: none;
+    }
+    .reveal .def-wrap svg.brace { position: absolute; left: calc(100% + 0.3em); width: 0.8em; overflow: visible; }
+    .reveal .def-wrap svg.brace path { fill: none; stroke: #000; stroke-width: 2; }
+    .reveal code .outline-blue { outline: 3px solid #0000FF; outline-offset: 2px; border-radius: 4px; color: #0000FF; font-weight: bold; }
+    .reveal code .red *, .reveal code .blue *, .reveal code .green * { color: inherit; }
+  </style>
+</head>
+
+<body>
+  <img id="logo-hearc" src="./medias/logo_he-arc.png" alt="Logo HE-ARC">
+  <img id="logo-hesso" src="./medias/logo_hes-so.png" alt="Logo HES-SO">
+  <p id="course-infos">1242.1 Langage C - 2026-2027</p>
+
+  <!----------          CONTENT          ---------->
+  <div class="reveal">
+    <div class="slides">
+
+      <!----------          TITLE          ---------->
+      <section>
+        <h1>
+          Chapitre 6
+        </h1>
+        <h2>
+          Les fonctions
+        </h2>
+        <p class="tight">1. Notion de fonction</p>
+        <p class="tight indent-1" style="font-size: 0.8em;">1. Appel de fonction</p>
+        <p class="tight indent-1" style="font-size: 0.8em;">2. Définition de fonction</p>
+        <p class="tight indent-1" style="font-size: 0.8em;">3. Déclaration de fonction</p>
+        <p class="tight indent-1" style="font-size: 0.8em;">4. Valeurs retournées par une fonction</p>
+        <p class="tight indent-1" style="font-size: 0.8em;">5. Paramètres d’une fonction</p>
+        <p class="tight">2. Variables locales / globales</p>
+        <p class="tight">3. Organisation de la mémoire</p>
+      </section>
+
+      <!----------          NOTION DE FONCTION          ---------->
+      <section>
+
+        <section>
+          <h2>6.1 Exemple</h2>
+          <div class="container">
+            <div class="col-left" style="flex: 3;">
+              <pre style="width: 1150px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.3em;">
+
+                int f(int x)
+                {
+                    return x * x + 3 * x - 25;
+                }
+                int main(void)
+                {
+                    int val = 3;
+                    int y = f(val); // int y = val * val + 3 * val - 25;
+                    printf("%d\n", y);
+                    y = f(34);      // y = 34 * 34 + 3 * 34 - 25;
+                    printf("%d\n", y);
+                    return 0;
+                }
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 2;">
+              <br><br>
+              <p style="font-family: 'Times New Roman', serif; font-style: italic; font-size: 1.2em;">f : x → x² + 3x − 25</p>
+              <p style="font-family: 'Times New Roman', serif; font-style: italic; font-size: 1.2em;">f (x) = x² + 3x − 25</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>6.1 Décomposition en fonctions</h2>
+          <svg width="1560" height="760" viewBox="0 0 1560 760" style="display: block; margin: 0 auto;">
+            <defs>
+              <marker id="ar-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#FF0000"></path>
+              </marker>
+              <marker id="ar-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#0000FF"></path>
+              </marker>
+            </defs>
+            <!-- main -->
+            <rect x="380" y="110" width="520" height="560" fill="#f2f2f2" stroke="#000" stroke-width="3"></rect>
+            <text class="mono" x="400" y="160">int main(void)</text>
+            <text class="mono" x="400" y="210">{</text>
+            <text class="mono" x="430" y="265">…</text>
+            <text class="mono" x="430" y="325">appel fonction1</text>
+            <text class="mono" x="430" y="385">…</text>
+            <text class="mono" x="430" y="445">appel fonction2</text>
+            <text class="mono" x="430" y="505">…</text>
+            <text class="mono" x="400" y="645">}</text>
+            <line x1="470" y1="235" x2="470" y2="295" stroke="#FF0000" stroke-width="3" marker-end="url(#ar-red)"></line>
+            <line x1="470" y1="355" x2="470" y2="415" stroke="#FF0000" stroke-width="3" marker-end="url(#ar-red)"></line>
+            <line x1="470" y1="475" x2="470" y2="620" stroke="#FF0000" stroke-width="3" marker-end="url(#ar-red)"></line>
+            <circle cx="520" cy="265" r="22" fill="#fff" stroke="#FF0000" stroke-width="3"></circle>
+            <text x="520" y="276" text-anchor="middle" font-size="28">1</text>
+            <circle cx="520" cy="385" r="22" fill="#fff" stroke="#FF0000" stroke-width="3"></circle>
+            <text x="520" y="396" text-anchor="middle" font-size="28">3</text>
+            <circle cx="520" cy="555" r="22" fill="#fff" stroke="#FF0000" stroke-width="3"></circle>
+            <text x="520" y="566" text-anchor="middle" font-size="28">7</text>
+            <line x1="280" y1="150" x2="375" y2="150" stroke="#FF0000" stroke-width="3" marker-end="url(#ar-red)"></line>
+            <line x1="380" y1="640" x2="285" y2="640" stroke="#FF0000" stroke-width="3" marker-end="url(#ar-red)"></line>
+
+            <!-- fonction1 -->
+            <rect x="1020" y="30" width="440" height="240" fill="#f2f2f2" stroke="#000" stroke-width="3"></rect>
+            <text class="mono" x="1035" y="75">void fonction1()</text>
+            <text class="mono" x="1035" y="120">{</text>
+            <text class="mono" x="1060" y="185">…</text>
+            <text class="mono" x="1035" y="255">}</text>
+            <line x1="1110" y1="140" x2="1110" y2="230" stroke="#FF0000" stroke-width="3" marker-end="url(#ar-red)"></line>
+            <circle cx="1160" cy="185" r="22" fill="#fff" stroke="#FF0000" stroke-width="3"></circle>
+            <text x="1160" y="196" text-anchor="middle" font-size="28">2</text>
+            <line x1="1220" y1="140" x2="1220" y2="230" stroke="#0000FF" stroke-width="3" marker-end="url(#ar-blue)"></line>
+            <circle cx="1270" cy="185" r="22" fill="#fff" stroke="#0000FF" stroke-width="3"></circle>
+            <text x="1270" y="196" text-anchor="middle" font-size="28">5</text>
+
+            <!-- fonction2 -->
+            <rect x="1020" y="330" width="440" height="400" fill="#f2f2f2" stroke="#000" stroke-width="3"></rect>
+            <text class="mono" x="1035" y="375">void fonction2()</text>
+            <text class="mono" x="1035" y="420">{</text>
+            <text class="mono" x="1060" y="485">…</text>
+            <text class="mono" x="1060" y="555">appel fonction1</text>
+            <text class="mono" x="1060" y="625">…</text>
+            <text class="mono" x="1035" y="715">}</text>
+            <line x1="1110" y1="440" x2="1110" y2="525" stroke="#FF0000" stroke-width="3" marker-end="url(#ar-red)"></line>
+            <circle cx="1160" cy="485" r="22" fill="#fff" stroke="#FF0000" stroke-width="3"></circle>
+            <text x="1160" y="496" text-anchor="middle" font-size="28">4</text>
+            <line x1="1110" y1="580" x2="1110" y2="690" stroke="#FF0000" stroke-width="3" marker-end="url(#ar-red)"></line>
+            <circle cx="1160" cy="635" r="22" fill="#fff" stroke="#FF0000" stroke-width="3"></circle>
+            <text x="1160" y="646" text-anchor="middle" font-size="28">6</text>
+
+            <!-- main <-> fonction1 -->
+            <line x1="880" y1="315" x2="1015" y2="60" stroke="#FF0000" stroke-width="3" marker-end="url(#ar-red)"></line>
+            <line x1="1020" y1="250" x2="885" y2="335" stroke="#FF0000" stroke-width="3" marker-end="url(#ar-red)"></line>
+            <!-- main <-> fonction2 -->
+            <line x1="880" y1="435" x2="1015" y2="365" stroke="#FF0000" stroke-width="3" marker-end="url(#ar-red)"></line>
+            <line x1="1020" y1="710" x2="885" y2="455" stroke="#FF0000" stroke-width="3" marker-end="url(#ar-red)"></line>
+            <!-- fonction2 <-> fonction1 -->
+            <polyline points="1440,545 1500,545 1500,60 1465,60" fill="none" stroke="#0000FF" stroke-width="3" marker-end="url(#ar-blue)"></polyline>
+            <polyline points="1300,210 1530,210 1530,570 1465,570" fill="none" stroke="#0000FF" stroke-width="3" marker-end="url(#ar-blue)"></polyline>
+          </svg>
+        </section>
+
+        <section>
+          <h2>6.1 Avantages</h2>
+          <p><b>Découper</b> un long programme en sous-programmes</p>
+          <br>
+          <p><b>Factoriser</b> : écrire une seule fois des <highlight>instructions répétées</highlight> à plusieurs endroits</p>
+          <br>
+          <p><b>Rendre lisible</b> : chaque fonction a un nom et un rôle précis</p>
+          <br>
+          <p><b>Faciliter la maintenance</b> : une correction se fait à un seul endroit</p>
+          <br>
+          <p><b>Réutiliser</b> une fonction dans d'autres programmes</p>
+        </section>
+
+        <section>
+          <h2>6.1 Appel de fonction</h2>
+          <p>Fonction <inline-code>sin(x)</inline-code>, prédéfinie dans une bibliothèque</p>
+          <pre style="width: 1000px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            #include &lt;math.h&gt;
+            const double PI = 3.14159265358979323846;
+            printf("%lf\n", <span class="red">sin(</span>45 * PI / 180<span class="red">)</span>);
+          </code></pre>
+          <br>
+          <p>Fonction <inline-code>sum(x,y)</inline-code>, définie par l’utilisateur</p>
+          <pre style="width: 1000px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            int n = 4, result = 0;
+            result = <span class="red">sum(</span><span class="green">n, 37</span><span class="red">)</span>;
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>6.1 Définition de fonction</h2>
+          <div class="def-wrap">
+            <pre><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 2em;">
+
+              <span class="blue">int</span> <span class="red">sum(</span><span class="green">int a</span>, <span class="green">int b</span><span class="red">)</span>
+              {
+                  int s = a + b;
+                  return <span class="outline-blue">s</span>;
+              }
+            </code></pre>
+            <!-- annotations: anchors in ch / em of the code font (10px = code padding), labels in px -->
+            <div class="anchor" style="left: 10px; top: 10px;">
+              <div class="note blue" style="right: 12px; bottom: -8px;">Type de retour ↘</div>
+            </div>
+            <div class="anchor" style="left: calc(10px + 5.5ch); top: 10px;">
+              <div class="note red" style="right: -40px; bottom: 50px;">Nom de la fonction</div>
+              <div class="note red" style="left: -10px; bottom: 4px;">↓</div>
+            </div>
+            <div class="anchor" style="left: calc(10px + 8ch); top: 10px; width: 12ch;">
+              <div class="bracket-top" style="left: 0; right: 0; bottom: 10px; height: 16px;"></div>
+              <div class="note green" style="left: 50%; transform: translateX(-50%); bottom: 32px;">Paramètres formels</div>
+            </div>
+            <svg class="brace" style="top: 10px; height: 1.1em;" viewBox="0 0 20 100" preserveAspectRatio="none"><path d="M2,2 Q12,2 12,25 L12,40 Q12,50 20,50 Q12,50 12,60 L12,75 Q12,98 2,98" vector-effect="non-scaling-stroke"></path></svg>
+            <div class="anchor" style="left: 100%; top: calc(10px + 0.55em);">
+              <div class="note" style="left: 60px; transform: translateY(-50%); color: #000;"><b>En-tête</b> de la fonction</div>
+            </div>
+            <svg class="brace" style="top: calc(10px + 1.2em); height: 4.3em;" viewBox="0 0 20 100" preserveAspectRatio="none"><path d="M2,1 Q12,1 12,10 L12,45 Q12,50 20,50 Q12,50 12,55 L12,90 Q12,99 2,99" vector-effect="non-scaling-stroke"></path></svg>
+            <div class="anchor" style="left: 100%; top: calc(10px + 3.3em);">
+              <div class="note" style="left: 60px; transform: translateY(-50%); color: #000;"><b>Corps</b> de la fonction</div>
+            </div>
+            <div class="anchor" style="left: calc(10px + 11.5ch); top: calc(20px + 5.5em);">
+              <div class="note blue" style="left: 0; top: 4px; transform: translateX(-50%); text-align: center;">↑<br>Valeur retournée</div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>6.1 Où définir les fonctions ?</h2>
+          <p><error>IMPORTANT</error></p>
+          <p class="tight">Une fonction doit être <b>déclarée</b>, et donc son en-tête doit être connu par le compilateur, avant son premier appel</p>
+          <br>
+          <p class="tight">Une fonction peut être <b>définie</b></p>
+          <p class="tight indent-1">A) Dans le fichier où elle est appelée</p>
+          <p class="tight indent-2">1) Avant le premier appel</p>
+          <p class="tight indent-2">2) Après le premier appel</p>
+          <p class="tight indent-1">B) Dans un fichier différent (voir chapitre 07 sur la modularisation)</p>
+        </section>
+
+        <section>
+          <h2>6.1 Où définir les fonctions ?</h2>
+          <p><b>A) Dans le même fichier, la fonction peut être définie</b></p>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 30px;">
+            <div style="width: 280px; text-align: center; padding-top: 80px; font-size: 0.9em;">
+              <p class="centered tight"><span class="red"><b>déclaration</b></span></p>
+              <p class="centered tight">et</p>
+              <p class="centered tight"><span class="blue"><b>définition</b></span></p>
+            </div>
+            <div>
+              <p class="centered tight"><u>Avant</u> son appel</p>
+              <pre style="width: 520px; margin: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.3em;">
+
+                <span class="box-blue">int <span class="red">f</span>(int nb)
+                {
+                    …;
+                }</span>
+
+                int main(void)
+                {
+                    int x = <span class="red">f</span>(4); // APPEL
+                    return 0;
+                }
+              </code></pre>
+            </div>
+            <div>
+              <p class="centered tight"><u>Après</u> son appel</p>
+              <pre style="width: 520px; margin: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.3em;">
+
+                <span class="box-red">int <span class="red">f</span>(int nb);</span>
+
+                int main(void)
+                {
+                    int x = <span class="red">f</span>(4); // APPEL
+                    return 0;
+                }
+
+                <span class="box-blue">int <span class="red">f</span>(int nb)
+                {
+                    …;
+                }</span>
+              </code></pre>
+            </div>
+            <div style="width: 240px; text-align: left; font-size: 0.9em;">
+              <p class="tight" style="padding-left: 0; margin-top: 70px;"><span class="red"><b>déclaration</b></span></p>
+              <p class="tight" style="padding-left: 0; margin-top: 340px;"><span class="blue"><b>définition</b></span></p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>6.1 Où définir les fonctions ?</h2>
+          <p><b>B) Dans un fichier différent</b></p>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 40px;">
+            <div>
+              <p class="tight" style="padding-left: 0;"><inline-code>main.c</inline-code></p>
+              <pre style="width: 620px; margin: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.4em;">
+
+                #include "foo.h"
+                int main(void)
+                {
+                    int x = <span class="red">f</span>(4); // APPEL
+                    return 0;
+                }
+                 …
+              </code></pre>
+            </div>
+            <div>
+              <p class="tight" style="padding-left: 0;"><inline-code>foo.h</inline-code></p>
+              <pre style="width: 520px; margin: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.4em;">
+
+                <span class="box-red">int <span class="red">f</span>(int nb);</span>
+              </code></pre>
+              <p class="tight" style="padding-left: 0;"><inline-code>foo.c</inline-code></p>
+              <pre style="width: 520px; margin: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.4em;">
+
+                #include "foo.h"
+
+                <span class="box-blue">int <span class="red">f</span>(int nb)
+                {
+                    …;
+                }</span>
+              </code></pre>
+            </div>
+            <div style="width: 240px; text-align: left; font-size: 0.9em;">
+              <p class="tight" style="padding-left: 0; margin-top: 90px;"><span class="red"><b>Déclaration</b></span></p>
+              <p class="tight" style="padding-left: 0; margin-top: 230px;"><span class="blue"><b>Définition</b></span></p>
+            </div>
+          </div>
+          <aside class="notes">« foo » = machin
+
+Souvent utilisé avec « bar » = truc dans les exemples</aside>
+        </section>
+
+        <section>
+          <h2>6.1 Déclaration de fonction</h2>
+          <p>On <highlight>déclare une fonction</highlight> avec son <highlight>prototype</highlight></p>
+          <p><highlight>Syntaxe d’un prototype</highlight></p>
+          <pre style="width: 1200px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em; background-color: #ffff99;">
+
+            TypeDeRetour <span class="blue">nomFonction</span>(<span class="blue">Type1</span> [nomParametre1],
+                                      <span class="blue">Type2</span> [nomParametre2],
+                                      …
+                                      <span class="blue">TypeN</span> [nomParametreN]
+                                     )<span class="red">;</span>
+          </code></pre>
+          <p class="tight">Les <highlight>noms des paramètres sont facultatifs</highlight> dans le prototype</p>
+          <p class="tight">Le compilateur vérifie l'adéquation entre le prototype et les appels</p>
+          <p class="tight">Le nom de fonction doit être unique. On ne peut pas définir 2 fonctions avec le même nom (pas de surcharge).</p>
+          <aside class="notes">[extern/static/]  retiré (voir plus tard)
+Signature: nom de la fonction + liste des types (sans le type de retour)</aside>
+        </section>
+
+        <section>
+          <h2>6.1 Valeur retournée</h2>
+          <p>Instruction : <inline-code>return</inline-code></p>
+          <p class="tight"><error>⚠ Fonction non <inline-code>void</inline-code> sans <inline-code>return</inline-code> : utiliser sa valeur est un comportement indéfini (UB)</error></p>
+          <p class="tight indent-1" style="font-size: 0.8em;">gcc avertit (<inline-code>-Wreturn-type</inline-code>) → erreur avec nos options (<inline-code>-Werror</inline-code>)</p>
+          <br>
+          <p class="tight"><b>L'exécution</b> de toute fonction se <b>termine</b> soit</p>
+          <p class="tight indent-1">- à l’exécution d’une instruction <inline-code>return</inline-code></p>
+          <p class="tight indent-1">- à la fin du bloc d’instructions, marqué par <inline-code>}</inline-code></p>
+          <p class="tight indent-1">- par un <inline-code>exit</inline-code> (<warning>⚠</warning> le programme complet s’arrête)</p>
+          <br>
+          <p>Remarque : une fonction peut avoir plusieurs <inline-code>return</inline-code></p>
+        </section>
+
+        <section>
+          <h2>6.1 Type de retour</h2>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <p>Fonction qui <highlight>retourne une valeur</highlight></p>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.5em;">
+
+                <span class="box-blue">int</span> <span class="red">inc(</span>int nb<span class="red">)</span>
+                {
+                    <span class="box-blue">return nb + 1;</span>
+                }
+                int main(void)
+                {
+                    int x = <span class="red">inc(</span>4<span class="red">)</span>;
+                    printf("%d\n", x);
+                    return 0;
+                }
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <p>Fonction qui <highlight>ne retourne rien</highlight></p>
+              <pre style="width: 650px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.5em;">
+
+                <span class="box-blue">void</span> <span class="red">show(</span>int nb<span class="red">)</span>
+                {
+                    printf("%d", nb);
+                }
+                int main(void)
+                {
+                    <span class="red">show(</span>4<span class="red">)</span>;
+                    return 0;
+                }
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>6.1 Type de retour</h2>
+          <p class="centered"><span class="syntax"><span class="blue">TypeDeRetour</span> nomFonction(...)</span></p>
+          <p>Exemples</p>
+          <pre style="width: 800px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            void show(...)
+            int  inc(...)
+          </code></pre>
+          <p class="tight"><highlight>TypeDeRetour</highlight> : entier, réel, pointeur, <inline-code>struct</inline-code>, <inline-code>void</inline-code></p>
+          <p class="tight"><highlight>TypeDeRetour</highlight> doit être compatible avec la valeur retournée par <inline-code>return</inline-code></p>
+          <br>
+          <p><error>⚠ Toujours indiquer le type de retour.</error></p>
+        </section>
+
+        <section>
+          <h2>6.1 Paramètres formels</h2>
+          <p class="centered"><span class="syntax">TypeDeRetour nomFonction(<span class="blue">Type1</span> nomParametre1, <span class="blue">Type2</span> nomParametre2, …);</span></p>
+          <br>
+          <p>Fonction sans paramètre formel → <inline-code>void</inline-code></p>
+          <pre style="width: 1000px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.4em;">
+
+            void showMenu(void);
+          </code></pre>
+          <p class="tight indent-1" style="font-size: 0.8em;">Depuis C23, <inline-code>void f();</inline-code> équivaut à <inline-code>void f(void);</inline-code> (avant C23 : paramètres non précisés). Le cours écrit <inline-code>void</inline-code>.</p>
+          <p>Les paramètres peuvent être <b>de n'importe quel type</b></p>
+          <pre style="width: 1000px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.4em;">
+
+            void interest(float money, double rate, int time);
+          </code></pre>
+          <br>
+          <p>Remarque : <inline-code>printf</inline-code>, <inline-code>scanf</inline-code> acceptent un nombre <b>variable</b> de paramètres<br>(voir chapitre Fonction II)</p>
+        </section>
+
+        <section>
+          <h2>6.1 Paramètres effectifs</h2>
+          <p class="centered"><span class="syntax"><span class="blue">nomFonction</span>( &lt;Liste paramètres effectifs&gt; )</span></p>
+          <p class="tight"><b>Lors de l’appel → paramètres effectifs</b></p>
+          <p class="tight indent-1">Doivent être de type compatible avec les paramètres formels</p>
+          <p class="tight indent-1">Peuvent être des expressions, des constantes ou des variables</p>
+          <pre style="width: 700px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.4em;">
+
+            sum(a + b, pow(2, n));
+          </code></pre>
+          <p class="tight">Si la fonction retourne une valeur, elle peut être :</p>
+          <div class="container">
+            <div class="col-left" style="flex: 1; text-align: right;">
+              <p class="tight" style="padding-left: 300px;">affectée à une autre variable</p>
+              <p class="tight" style="padding-left: 300px; margin-top: 45px;">utilisée dans une expression</p>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <pre style="width: 650px; margin: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.3em;">
+
+                x = sum(nb1, nb2);
+              </code></pre>
+              <pre style="width: 650px; margin: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.3em;">
+
+                x = y + sum(nb1, nb2) + z;
+                x = sqrt(sum(nb1, nb2));
+              </code></pre>
+            </div>
+          </div>
+          <aside class="notes">!!! Ici , n'est pas l'opérateur de succession. L'ordre d'évaluation des paramètres dépend du compilateur.</aside>
+        </section>
+
+      </section>
+
+      <!----------          VARIABLES LOCALES / GLOBALES          ---------->
+      <section>
+
+        <section>
+          <h2>6.2 Visibilité des variables</h2>
+          <h3 class="centered"><error>Les variables sont visibles dans le bloc où elles sont déclarées</error></h3>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <pre style="width: 800px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.3em;">
+
+                <span class="red">int x, y, z; // Variables globales</span>
+
+                void f1(void)
+                {
+                    <span class="blue">int x, z; // Variables locales</span>
+                }
+
+                void f2(void)
+                {
+                    <span class="blue">int y, z; // Variables locales</span>
+                }
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <pre style="width: 850px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.3em;">
+
+                int x = 3, y = 2, z = 10;  <span class="arrow">◄──┐</span>
+                                              <span class="arrow">│</span>
+                void f(void)                  <span class="arrow">│</span>
+                {                             <span class="arrow">│</span>
+                    <span class="blue">int x = 1;</span>  <span class="arrow">◄─────────────┼──</span> <b>x?, y?, z?</b>
+                    {                         <span class="arrow">│</span>
+                        <span class="blue">int x = 2, y = 3;</span>  <span class="arrow">◄──┘</span>
+                    }
+                }
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>6.2 Visibilité des variables : solution</h2>
+          <pre style="width: 1300px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            int x = 3, y = 2, z = 10;   <span class="red">// x = 3, y = 2, z = 10</span>
+
+            void f(void)
+            {
+                int x = 1;              <span class="red">// x = 1, y = 2, z = 10</span>
+                {
+                    int x = 2, y = 3;   <span class="red">// x = 2, y = 3, z = 10</span>
+                }
+            }
+          </code></pre>
+          <p>Une variable locale <highlight>masque</highlight> la variable de même nom déclarée hors de son bloc.</p>
+        </section>
+
+        <section>
+          <h2>6.2 Visibilité des variables</h2>
+          <h3><error>Variables globales</error></h3>
+          <p class="tight">déclarées hors de toute fonction → on parle de portée globale</p>
+          <p class="tight indent-1">sont visibles partout</p>
+          <p class="tight indent-1">existent jusqu’à la fin du programme</p>
+          <br>
+          <h3><highlight>Variables locales</highlight></h3>
+          <p class="tight">déclarées dans un bloc <inline-code>{ }</inline-code> → corps d’une fonction, <inline-code>if</inline-code>, <inline-code>for</inline-code>…</p>
+          <p class="tight indent-1">les paramètres formels sont aussi des variables locales</p>
+          <p class="tight indent-1">sont <highlight>visibles</highlight> dans le bloc où elles sont déclarées</p>
+          <p class="tight indent-1"><highlight>masquent</highlight> les variables de même nom déclarées hors du bloc</p>
+          <p class="tight indent-1">leur <highlight>durée de vie</highlight> s’étend de leur déclaration jusqu’à la sortie du bloc :</p>
+          <p class="tight centered"><inline-code>}</inline-code> ou <inline-code>return</inline-code></p>
+        </section>
+
+        <section>
+          <h2>6.2 Dangerosité des variables globales</h2>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <pre style="width: 800px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 0.9em;">
+
+                void print_stars(int);
+
+                int main(void)
+                {
+                    <span class="blue">int i; // Variable locale</span>
+                    for (i = 0; i &lt; 5; i++)
+                    {
+                        print_stars(5);
+                    }
+                    return 0;
+                }
+
+                void print_stars(int n)
+                {
+                    <span class="blue">int i; // Variable locale</span>
+                    for (i = 0; i &lt; n; i++)
+                    {
+                        printf("*");
+                    }
+                    printf("\n");
+                }
+              </code></pre>
+              <pre class="terminal" style="width: 800px; margin: 8px auto 0 auto;"><code
+                class="nohighlight"
+                data-trim
+                style="font-size: 0.9em;">
+
+                *****
+                *****
+                *****
+                *****
+                *****
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <pre class="global" style="width: 800px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 0.9em;">
+
+                void print_stars(int);
+                <span class="red">int i; // Variable globale</span>
+
+                int main(void)
+                {
+                    for (<span class="red">i</span> = 0; <span class="red">i</span> &lt; 5; <span class="red">i</span>++)
+                    {
+                        print_stars(5);
+                    }
+                    return 0;
+                }
+
+                void print_stars(int n)
+                {
+                    for (<span class="red">i</span> = 0; <span class="red">i</span> &lt; n; <span class="red">i</span>++)
+                    {
+                        printf("*");
+                    }
+                    printf("\n");
+                }
+              </code></pre>
+              <pre class="terminal" style="width: 800px; margin: 8px auto 0 auto;"><code
+                class="nohighlight"
+                data-trim
+                style="font-size: 0.9em;">
+
+                *****
+              </code></pre>
+            </div>
+          </div>
+          <p class="centered tight"><error><inline-code>print_stars</inline-code> modifie le <inline-code>i</inline-code> de <inline-code>main</inline-code> : la boucle de <inline-code>main</inline-code> ne fait qu'un tour</error></p>
+          <aside class="notes">locale
+*****
+*****
+*****
+*****
+*****
+
+globale
+*****</aside>
+        </section>
+
+        <section>
+          <h2>6.2 Visibilité des variables</h2>
+          <p>Une variable <b>locale</b> déclarée avec le mot-clé <inline-code>static</inline-code></p>
+          <div class="container">
+            <div class="col-left" style="flex: 3;">
+              <p class="tight" style="padding-left: 200px;">n’est visible que dans la fonction où elle est déclarée</p>
+              <p class="tight" style="padding-left: 200px;">→ comme une variable locale</p>
+              <p class="tight" style="padding-left: 200px;"><highlight>Conserve son contenu entre 2 appels</highlight></p>
+              <p class="tight" style="padding-left: 200px;">→ comme une variable globale</p>
+              <p class="tight" style="padding-left: 200px;">L’initialisation (<inline-code>x = 15</inline-code>) n’est faite qu’<b>une seule fois</b>, pas à chaque appel</p>
+              <p class="tight" style="padding-left: 200px;">Est initialisée à 0 avant le démarrage du programme si pas de valeur initiale.</p>
+              <p class="tight" style="padding-left: 200px;">→ comme une variable globale</p>
+            </div>
+            <div class="col-right" style="flex: 2;">
+              <pre style="width: 600px; margin: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.3em;">
+
+                void f1(void)
+                {
+                    static int <span class="box-black">x = 15</span>;
+                    printf("%d ", ++x);
+                }
+                int main(void)
+                {
+                    <span class="box-black">f1()</span>; <span class="box-black">f1()</span>; <span class="box-black">f1()</span>;
+                    return 0;
+                }
+              </code></pre>
+              <pre class="terminal" style="width: 600px; margin: 10px 0 0 0;"><code
+                class="nohighlight"
+                data-trim
+                style="font-size: 1.3em;">
+
+                16 17 18
+              </code></pre>
+            </div>
+          </div>
+          <p><highlight>Les variables statiques gardent leur valeur entre les appels, mais restent visibles seulement dans leur fonction</highlight></p>
+          <aside class="notes">16  17  18</aside>
+        </section>
+
+      </section>
+
+      <!----------          ORGANISATION DE LA MEMOIRE          ---------->
+      <section>
+
+        <section>
+          <h2>6.3 Organisation mémoire</h2>
+          <svg width="1700" height="800" viewBox="0 0 1700 800" style="display: block; margin: 0 auto;">
+            <defs>
+              <marker id="ar-mem" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0000FF"></path></marker>
+              <pattern id="hatch" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="16" height="16" fill="#eeeeee"></rect><line x1="0" y1="0" x2="0" y2="16" stroke="#999" stroke-width="4"></line></pattern>
+            </defs>
+            <!-- column -->
+            <rect class="cell" x="560" y="20" width="300" height="80" fill="#d9d9d9"></rect>
+            <text x="710" y="70" text-anchor="middle" font-weight="bold">Noyau (kernel)</text>
+            <rect class="cell" x="560" y="100" width="300" height="40" fill="#FFFFFF"></rect>
+            <text x="710" y="128" text-anchor="middle">…</text>
+            <rect class="cell" x="560" y="140" width="300" height="300" fill="#00cc33"></rect>
+            <path d="M775,155 L815,155 L815,175 L835,175 L795,205 L755,175 L775,175 z" fill="#0000FF"></path>
+            <path d="M775,425 L815,425 L815,405 L835,405 L795,375 L755,405 L775,405 z" fill="#0000FF"></path>
+            <rect class="cell" x="560" y="440" width="300" height="55" fill="#ffc000"></rect>
+            <text x="710" y="478" text-anchor="middle" font-style="italic">bss</text>
+            <rect class="cell" x="560" y="495" width="300" height="55" fill="#ffff00"></rect>
+            <text x="710" y="533" text-anchor="middle" font-style="italic">data</text>
+            <rect class="cell" x="560" y="550" width="300" height="55" fill="#d8e4bc"></rect>
+            <text x="710" y="588" text-anchor="middle" font-style="italic">text</text>
+            <rect class="cell" x="560" y="605" width="300" height="40" fill="#FFFFFF"></rect>
+            <text x="710" y="633" text-anchor="middle">…</text>
+            <rect class="cell" x="560" y="645" width="300" height="60" fill="url(#hatch)"></rect>
+            <text x="710" y="686" text-anchor="middle" font-weight="bold">Réservé</text>
+
+            <!-- left side -->
+            <text x="40" y="45" font-weight="bold">haute</text>
+            <text x="40" y="725" font-weight="bold">basse</text>
+            <path d="M75,60 L115,60 L115,650 L140,650 L95,700 L50,650 L75,650 z" fill="none" stroke="#5b9bd5" stroke-width="3"></path>
+            <text transform="translate(105,380) rotate(-90)" text-anchor="middle" font-size="28">Adresses</text>
+            <line x1="460" y1="145" x2="460" y2="600" stroke="#0000FF" stroke-width="3" marker-start="url(#ar-mem)" marker-end="url(#ar-mem)"></line>
+            <text transform="translate(440,372) rotate(-90)" text-anchor="middle" fill="#0000FF">Mémoire du programme</text>
+            <line x1="430" y1="140" x2="560" y2="140" stroke="#000" stroke-width="1"></line>
+            <line x1="430" y1="605" x2="560" y2="605" stroke="#000" stroke-width="1"></line>
+
+            <!-- right side labels -->
+            <text x="880" y="70" fill="#666666">inaccessible au programme</text>
+            <text x="880" y="180" fill="#0000FF">Pile : <tspan font-style="italic">stack</tspan></text>
+            <text x="880" y="215" font-size="26">variables locales : allocation <tspan font-weight="bold">automatique</tspan></text>
+            <text x="880" y="395" fill="#0000FF">Tas : <tspan font-style="italic">heap</tspan></text>
+            <text x="880" y="430" font-size="26"><tspan font-family="'Courier New', monospace">malloc</tspan> / <tspan font-family="'Courier New', monospace">free</tspan> : allocation <tspan font-weight="bold">dynamique</tspan></text>
+            <text x="880" y="478">Données non initialisées</text>
+            <text x="880" y="533">Données initialisées</text>
+            <text x="880" y="588">Instructions du programme</text>
+            <path d="M1250,445 Q1265,445 1265,465 L1265,485 Q1265,495 1280,495 Q1265,495 1265,505 L1265,525 Q1265,545 1250,545" fill="none" stroke="#000" stroke-width="2"></path>
+            <text x="1295" y="505" font-size="26">allocation <tspan font-weight="bold">statique</tspan></text>
+            <text x="880" y="686" fill="#666666">adresse <tspan font-family="'Courier New', monospace">NULL</tspan> : accès interdit</text>
+
+            <text x="880" y="770" fill="#FF0000" font-size="26">⚠ Schéma simplifié : dépend de l’OS et du matériel</text>
+          </svg>
+          <aside class="notes">https://stackoverflow.com/questions/79923/what-and-where-are-the-stack-and-heap
+
+"Quel est le rôle du kernel ?
+Un noyau de système d'exploitation, ou simplement noyau, ou kernel en anglais, est une des parties fondamentales de certains systèmes d'exploitation. Il gère les ressources de l'ordinateur et permet aux différents composants — matériels et logiciels — de communiquer entre eux. " [wikipédia]</aside>
+        </section>
+
+        <section>
+          <h2>6.3 Variables globales &amp; statiques</h2>
+          <div class="container">
+            <div class="col-left text" style="flex: 3;">
+              <p class="tight">La <b>mémoire statique</b> (segments <i>data</i> et <i>bss</i>) contient</p>
+              <p class="tight indent-1">les <highlight>variables globales</highlight></p>
+              <p class="tight indent-1">les <highlight>variables locales <inline-code>static</inline-code></highlight></p>
+              <p class="tight">La mémoire statique est fixée lors de la compilation</p>
+              <p class="tight">Une <error>variable globale initialisée</error> va dans <error>data</error></p>
+              <p class="tight">Une <error>variable globale non initialisée</error> va dans <error>bss</error> et prend la <error>valeur 0</error></p>
+              <pre style="width: 650px; margin-top: 40px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.4em;">
+
+                int x;
+                float y = 3.14; int p = 3;
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <svg width="360" height="760" viewBox="0 0 360 760">
+                <rect class="cell" x="110" y="10" width="190" height="530" fill="#FFFFFF"></rect>
+                <path d="M190,25 L220,25 L220,45 L240,45 L205,75 L170,45 L190,45 z" fill="#0000FF"></path>
+                <path d="M190,525 L220,525 L220,505 L240,505 L205,475 L170,505 L190,505 z" fill="#0000FF"></path>
+                <rect class="cell" x="110" y="540" width="190" height="45" fill="#ffc000"></rect>
+                <text x="205" y="573" text-anchor="middle" font-size="28">0</text>
+                <rect class="cell" x="110" y="585" width="190" height="40" fill="#ffff00"></rect>
+                <text x="205" y="615" text-anchor="middle" font-size="28">3</text>
+                <rect class="cell" x="110" y="625" width="190" height="40" fill="#ffff00"></rect>
+                <text x="205" y="655" text-anchor="middle" font-size="28">3.14</text>
+                <rect class="cell" x="110" y="665" width="190" height="80" fill="#FFFFFF"></rect>
+                <text x="205" y="715" text-anchor="middle">code</text>
+                <text x="100" y="40" text-anchor="end" font-size="24">stack</text>
+                <text x="100" y="530" text-anchor="end" font-size="24">heap</text>
+                <text x="100" y="572" text-anchor="end" font-size="24">bss</text>
+                <text x="100" y="635" text-anchor="end" font-size="24">data</text>
+                <text x="100" y="715" text-anchor="end" font-size="24">text</text>
+                <text x="310" y="573" font-size="26" font-weight="bold">x</text>
+                <text x="310" y="615" font-size="26" font-weight="bold">p</text>
+                <text x="310" y="655" font-size="26" font-weight="bold">y</text>
+              </svg>
+            </div>
+          </div>
+          <aside class="notes">Bss : “Block Started by Symbol”</aside>
+        </section>
+
+        <section>
+          <h2>6.3 Variables locales (automatiques)</h2>
+          <div class="container">
+            <div class="col-left text" style="flex: 3;">
+              <p class="tight">La <b>pile "<i>stack</i>"</b> contient</p>
+              <p class="tight indent-1">les <highlight>variables locales</highlight></p>
+              <p class="tight indent-1">les <highlight>adresses de retour des fonctions</highlight></p>
+              <p class="tight indent-1">les <highlight>paramètres formels</highlight> (copies des paramètres effectifs)</p>
+              <br>
+              <p class="tight">Si les variables locales <highlight>ne sont pas initialisées</highlight> explicitement, alors elles ont une valeur indéterminée</p>
+              <br>
+              <p class="tight">L’allocation mémoire change à chaque appel de fonction</p>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <svg width="360" height="760" viewBox="0 0 360 760">
+                <rect class="cell" x="110" y="10" width="190" height="530" fill="#FFFFFF"></rect>
+                <rect class="cell" x="110" y="10" width="190" height="40" fill="#00cc33"></rect>
+                <text x="205" y="40" text-anchor="middle" font-size="24" fill="#0000FF">Adr. retour</text>
+                <rect class="cell" x="110" y="50" width="190" height="40" fill="#00cc33"></rect>
+                <text x="205" y="80" text-anchor="middle" font-size="24" fill="#0000FF">Paramètre 1</text>
+                <rect class="cell" x="110" y="90" width="190" height="40" fill="#00cc33"></rect>
+                <text x="205" y="120" text-anchor="middle" font-size="24" fill="#0000FF">Paramètre 2</text>
+                <rect class="cell" x="110" y="130" width="190" height="40" fill="#00cc33"></rect>
+                <text x="205" y="160" text-anchor="middle" font-size="24" fill="#0000FF">Variable 1</text>
+                <rect class="cell" x="110" y="170" width="190" height="40" fill="#00cc33"></rect>
+                <text x="205" y="200" text-anchor="middle" font-size="24" fill="#0000FF">Variable 2</text>
+                <path d="M190,225 L220,225 L220,245 L240,245 L205,275 L170,245 L190,245 z" fill="#0000FF"></path>
+                <path d="M190,525 L220,525 L220,505 L240,505 L205,475 L170,505 L190,505 z" fill="#0000FF"></path>
+                <rect class="cell" x="110" y="540" width="190" height="45" fill="#FFFFFF"></rect>
+                <rect class="cell" x="110" y="585" width="190" height="80" fill="#FFFFFF"></rect>
+                <rect class="cell" x="110" y="665" width="190" height="80" fill="#FFFFFF"></rect>
+                <text x="205" y="715" text-anchor="middle">code</text>
+                <text x="100" y="40" text-anchor="end" font-size="24" font-style="italic" fill="#0000FF">stack</text>
+                <text x="100" y="530" text-anchor="end" font-size="24">heap</text>
+                <text x="100" y="572" text-anchor="end" font-size="24">bss</text>
+                <text x="100" y="635" text-anchor="end" font-size="24">data</text>
+                <text x="100" y="715" text-anchor="end" font-size="24">text</text>
+              </svg>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>6.3 Variables <highlight>dynamiques</highlight></h2>
+          <div class="container">
+            <div class="col-left text" style="flex: 3;">
+              <p class="tight">La <highlight>durée de vie</highlight> de ces variables est <highlight>gérée par le programmeur</highlight></p>
+              <br>
+              <p class="tight">Leur existence commence grâce à la fonction <inline-code>malloc</inline-code> et se termine avec la fonction <inline-code>free</inline-code> (voir chapitre 10)</p>
+              <br>
+              <p class="tight">La zone d'allocation s'appelle le tas (<i>heap</i>)</p>
+              <p class="tight">Cette zone mémoire est une réserve dans laquelle le programmeur peut puiser durant l'exécution</p>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <svg width="360" height="760" viewBox="0 0 360 760">
+                <rect class="cell" x="110" y="10" width="190" height="530" fill="#FFFFFF"></rect>
+                <path d="M190,25 L220,25 L220,45 L240,45 L205,75 L170,45 L190,45 z" fill="#0000FF"></path>
+                <path d="M190,405 L220,405 L220,385 L240,385 L205,355 L170,385 L190,385 z" fill="#0000FF"></path>
+                <rect class="cell" x="110" y="420" width="190" height="40" fill="#00cc33"></rect>
+                <text x="205" y="450" text-anchor="middle" font-size="24" fill="#0000FF">Variable 3</text>
+                <rect class="cell" x="110" y="460" width="190" height="40" fill="#00cc33"></rect>
+                <text x="205" y="490" text-anchor="middle" font-size="24" fill="#0000FF">Variable 2</text>
+                <rect class="cell" x="110" y="500" width="190" height="40" fill="#00cc33"></rect>
+                <text x="205" y="530" text-anchor="middle" font-size="24" fill="#0000FF">Variable 1</text>
+                <rect class="cell" x="110" y="540" width="190" height="45" fill="#FFFFFF"></rect>
+                <rect class="cell" x="110" y="585" width="190" height="80" fill="#FFFFFF"></rect>
+                <rect class="cell" x="110" y="665" width="190" height="80" fill="#FFFFFF"></rect>
+                <text x="205" y="715" text-anchor="middle">code</text>
+                <text x="100" y="40" text-anchor="end" font-size="24">stack</text>
+                <text x="100" y="530" text-anchor="end" font-size="24" font-style="italic" fill="#0000FF">heap</text>
+                <text x="100" y="572" text-anchor="end" font-size="24">bss</text>
+                <text x="100" y="635" text-anchor="end" font-size="24">data</text>
+                <text x="100" y="715" text-anchor="end" font-size="24">text</text>
+              </svg>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>6.3 Allocation mémoire</h2>
+          <h3 class="centered">Exemple : <highlight>variables locales, globales</highlight></h3>
+          <div class="container">
+            <div class="col-left" style="flex: 2;">
+              <pre style="width: 520px; margin-left: 100px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.3em;">
+
+                int y;
+                int x = 32;
+                int main(void)
+                { <span class="step">①</span>
+                    int i;
+                    int s = 0;
+                    if (s == 0) <span class="step">②</span>
+                    {
+                        int j = 5; <span class="step">③</span>
+                    } <span class="step">④</span>
+                    return 0;
+                }
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 3;">
+              <svg width="1000" height="680" viewBox="0 0 1000 680">
+                <!-- column template: x, top 60, bottom 640 -->
+                <g font-size="24">
+                  <text x="130" y="85" text-anchor="end">stack</text>
+                  <text x="130" y="600" text-anchor="end">bss</text>
+                  <text x="130" y="634" text-anchor="end">data</text>
+                </g>
+                <!-- state 1 -->
+                <circle cx="200" cy="30" r="20" fill="#4472c4"></circle><text x="200" y="40" text-anchor="middle" fill="#fff" font-size="26">1</text>
+                <rect class="cell" x="145" y="60" width="110" height="580" fill="#fff"></rect>
+                <rect class="cell" x="145" y="60" width="110" height="34" fill="#00cc33"></rect><text x="200" y="87" text-anchor="middle" font-size="24" fill="#0000FF">Adr.</text>
+                <rect class="cell" x="145" y="572" width="110" height="34" fill="#ffc000"></rect><text x="200" y="600" text-anchor="middle" font-size="24">0</text>
+                <rect class="cell" x="145" y="606" width="110" height="34" fill="#ffff00"></rect><text x="200" y="634" text-anchor="middle" font-size="24">32</text>
+                <text x="262" y="600" font-size="22">y</text><text x="262" y="634" font-size="22">x</text>
+                <!-- state 2 -->
+                <circle cx="420" cy="30" r="20" fill="#4472c4"></circle><text x="420" y="40" text-anchor="middle" fill="#fff" font-size="26">2</text>
+                <rect class="cell" x="365" y="60" width="110" height="580" fill="#fff"></rect>
+                <rect class="cell" x="365" y="60" width="110" height="34" fill="#00cc33"></rect><text x="420" y="87" text-anchor="middle" font-size="24" fill="#0000FF">Adr.</text>
+                <rect class="cell" x="365" y="94" width="110" height="34" fill="#00cc33"></rect><text x="420" y="121" text-anchor="middle" font-size="24" fill="#0000FF">?</text>
+                <rect class="cell" x="365" y="128" width="110" height="34" fill="#00cc33"></rect><text x="420" y="155" text-anchor="middle" font-size="24" fill="#0000FF">0</text>
+                <text x="482" y="121" font-size="22">i</text><text x="482" y="155" font-size="22">s</text>
+                <rect class="cell" x="365" y="572" width="110" height="34" fill="#ffc000"></rect><text x="420" y="600" text-anchor="middle" font-size="24">0</text>
+                <rect class="cell" x="365" y="606" width="110" height="34" fill="#ffff00"></rect><text x="420" y="634" text-anchor="middle" font-size="24">32</text>
+                <text x="482" y="600" font-size="22">y</text><text x="482" y="634" font-size="22">x</text>
+                <!-- state 3 -->
+                <circle cx="640" cy="30" r="20" fill="#4472c4"></circle><text x="640" y="40" text-anchor="middle" fill="#fff" font-size="26">3</text>
+                <rect class="cell" x="585" y="60" width="110" height="580" fill="#fff"></rect>
+                <rect class="cell" x="585" y="60" width="110" height="34" fill="#00cc33"></rect><text x="640" y="87" text-anchor="middle" font-size="24" fill="#0000FF">Adr.</text>
+                <rect class="cell" x="585" y="94" width="110" height="34" fill="#00cc33"></rect><text x="640" y="121" text-anchor="middle" font-size="24" fill="#0000FF">?</text>
+                <rect class="cell" x="585" y="128" width="110" height="34" fill="#00cc33"></rect><text x="640" y="155" text-anchor="middle" font-size="24" fill="#0000FF">0</text>
+                <rect class="cell" x="585" y="162" width="110" height="34" fill="#00cc33"></rect><text x="640" y="189" text-anchor="middle" font-size="24" fill="#0000FF">5</text>
+                <text x="702" y="121" font-size="22">i</text><text x="702" y="155" font-size="22">s</text><text x="702" y="189" font-size="22">j</text>
+                <rect class="cell" x="585" y="572" width="110" height="34" fill="#ffc000"></rect><text x="640" y="600" text-anchor="middle" font-size="24">0</text>
+                <rect class="cell" x="585" y="606" width="110" height="34" fill="#ffff00"></rect><text x="640" y="634" text-anchor="middle" font-size="24">32</text>
+                <text x="702" y="600" font-size="22">y</text><text x="702" y="634" font-size="22">x</text>
+                <!-- state 4 -->
+                <circle cx="860" cy="30" r="20" fill="#4472c4"></circle><text x="860" y="40" text-anchor="middle" fill="#fff" font-size="26">4</text>
+                <rect class="cell" x="805" y="60" width="110" height="580" fill="#fff"></rect>
+                <rect class="cell" x="805" y="60" width="110" height="34" fill="#00cc33"></rect><text x="860" y="87" text-anchor="middle" font-size="24" fill="#0000FF">Adr.</text>
+                <rect class="cell" x="805" y="94" width="110" height="34" fill="#00cc33"></rect><text x="860" y="121" text-anchor="middle" font-size="24" fill="#0000FF">?</text>
+                <rect class="cell" x="805" y="128" width="110" height="34" fill="#00cc33"></rect><text x="860" y="155" text-anchor="middle" font-size="24" fill="#0000FF">0</text>
+                <text x="922" y="121" font-size="22">i</text><text x="922" y="155" font-size="22">s</text>
+                <rect class="cell" x="805" y="572" width="110" height="34" fill="#ffc000"></rect><text x="860" y="600" text-anchor="middle" font-size="24">0</text>
+                <rect class="cell" x="805" y="606" width="110" height="34" fill="#ffff00"></rect><text x="860" y="634" text-anchor="middle" font-size="24">32</text>
+                <text x="922" y="600" font-size="22">y</text><text x="922" y="634" font-size="22">x</text>
+              </svg>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>6.3 Allocation mémoire</h2>
+          <h3 class="centered">Exemple : <highlight>fonctions</highlight></h3>
+          <div class="container">
+            <div class="col-left" style="flex: 2;">
+              <pre style="width: 600px; margin-left: 100px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.3em;">
+
+                int f(int i, int j);
+
+                int main(void)
+                {
+                    int i = 1;
+                    i = f(i, 3); <span class="step">①</span>
+                    return 0; <span class="step">④</span>
+                }
+
+                int f(int i, int j)
+                { <span class="step">②</span>
+                    return i + j;
+                } <span class="step">③</span>
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 3;">
+              <svg width="1000" height="470" viewBox="0 0 1000 470">
+                <defs>
+                  <marker id="ar-frame" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#000"></path></marker>
+                </defs>
+                <text x="80" y="90" text-anchor="end" font-size="26">main</text>
+                <line x1="100" y1="62" x2="100" y2="126" stroke="#000" stroke-width="2" marker-start="url(#ar-frame)" marker-end="url(#ar-frame)"></line>
+                <text x="80" y="175" text-anchor="end" font-size="26">f</text>
+                <line x1="100" y1="130" x2="100" y2="228" stroke="#000" stroke-width="2" marker-start="url(#ar-frame)" marker-end="url(#ar-frame)"></line>
+                <!-- state 1 -->
+                <circle cx="200" cy="30" r="20" fill="#4472c4"></circle><text x="200" y="40" text-anchor="middle" fill="#fff" font-size="26">1</text>
+                <rect class="cell" x="145" y="60" width="110" height="360" fill="#fff"></rect>
+                <rect class="cell" x="145" y="60" width="110" height="34" fill="#00cc33"></rect><text x="200" y="87" text-anchor="middle" font-size="24" fill="#0000FF">Adr.</text>
+                <rect class="cell" x="145" y="94" width="110" height="34" fill="#00cc33"></rect><text x="200" y="121" text-anchor="middle" font-size="24" fill="#0000FF">1</text>
+                <text x="262" y="121" font-size="22">i</text>
+                <!-- state 2 -->
+                <circle cx="420" cy="30" r="20" fill="#4472c4"></circle><text x="420" y="40" text-anchor="middle" fill="#fff" font-size="26">2</text>
+                <rect class="cell" x="365" y="60" width="110" height="360" fill="#fff"></rect>
+                <rect class="cell" x="365" y="60" width="110" height="34" fill="#00cc33"></rect><text x="420" y="87" text-anchor="middle" font-size="24" fill="#0000FF">Adr.</text>
+                <rect class="cell" x="365" y="94" width="110" height="34" fill="#00cc33"></rect><text x="420" y="121" text-anchor="middle" font-size="24" fill="#0000FF">1</text>
+                <rect class="cell" x="365" y="128" width="110" height="34" fill="#ffff99"></rect><text x="420" y="155" text-anchor="middle" font-size="24" fill="#0000FF">Adr.</text>
+                <rect class="cell" x="365" y="162" width="110" height="34" fill="#ffff99"></rect><text x="420" y="189" text-anchor="middle" font-size="24" fill="#0000FF">1</text>
+                <rect class="cell" x="365" y="196" width="110" height="34" fill="#ffff99"></rect><text x="420" y="223" text-anchor="middle" font-size="24" fill="#0000FF">3</text>
+                <text x="482" y="121" font-size="22">i</text><text x="482" y="189" font-size="22">i</text><text x="482" y="223" font-size="22">j</text>
+                <!-- state 3 -->
+                <circle cx="640" cy="30" r="20" fill="#4472c4"></circle><text x="640" y="40" text-anchor="middle" fill="#fff" font-size="26">3</text>
+                <rect class="cell" x="585" y="60" width="110" height="360" fill="#fff"></rect>
+                <rect class="cell" x="585" y="60" width="110" height="34" fill="#00cc33"></rect><text x="640" y="87" text-anchor="middle" font-size="24" fill="#0000FF">Adr.</text>
+                <rect class="cell" x="585" y="94" width="110" height="34" fill="#00cc33"></rect><text x="640" y="121" text-anchor="middle" font-size="24" fill="#0000FF">1</text>
+                <text x="702" y="121" font-size="22">i</text>
+                <text x="640" y="455" text-anchor="middle" font-size="24" fill="#FF0000">f retourne 4</text>
+                <!-- state 4 -->
+                <circle cx="860" cy="30" r="20" fill="#4472c4"></circle><text x="860" y="40" text-anchor="middle" fill="#fff" font-size="26">4</text>
+                <rect class="cell" x="805" y="60" width="110" height="360" fill="#fff"></rect>
+                <rect class="cell" x="805" y="60" width="110" height="34" fill="#00cc33"></rect><text x="860" y="87" text-anchor="middle" font-size="24" fill="#0000FF">Adr.</text>
+                <rect class="cell" x="805" y="94" width="110" height="34" fill="#00cc33"></rect><text x="860" y="121" text-anchor="middle" font-size="24" fill="#0000FF">4</text>
+                <text x="922" y="121" font-size="22">i</text>
+              </svg>
+            </div>
+          </div>
+          <p class="tight">Adr. = adresse de retour</p>
+          <p class="tight">Le <inline-code>i</inline-code> de <inline-code>f</inline-code> et le <inline-code>i</inline-code> de <inline-code>main</inline-code> sont <highlight>deux variables distinctes</highlight></p>
+        </section>
+
+        <section>
+          <h2>6.3 Passage de paramètres</h2>
+          <p>Deux modes de passage de paramètres</p>
+          <br>
+          <p class="tight">1) Passage par <highlight>valeur</highlight></p>
+          <p class="tight indent-1">la fonction reçoit une <b>copie</b> de la valeur : la modifier ne change pas la variable de l’appelant</p>
+          <p class="tight">2) Passage par <highlight>adresse</highlight></p>
+          <p class="tight indent-1">la fonction reçoit l’<b>adresse</b> de la variable : elle peut lire et modifier la variable de l’appelant</p>
+          <br>
+          <h3><error>En C, le passage des paramètres ne se fait que par valeur</error></h3>
+          <br>
+          <p>Simuler le passage par adresse : voir chapitre Fonction II</p>
+          <aside class="notes">la fonction appelante fait une copie des valeurs passées en paramètre dans la pile d'exécution et la fonction appelée utilise ces copies pour ses paramètres. Ces copies disparaîtront lors du retour à la fonction appelante. Donc toute modification de ces copies dans la fonction appelée n'a aucun effet sur les valeurs des variables de la fonction appelante. </aside>
+        </section>
+
+        <section>
+          <h2>6.3 Passage par valeur : exemple</h2>
+          <div class="container">
+            <div class="col-left" style="flex: 3;">
+              <pre style="width: 900px; margin-left: 100px;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.5em;">
+
+                void increment(int n)
+                {
+                    <span class="red">n++;</span>
+                    printf("n = %d\n", n);
+                }
+
+                int main(void)
+                {
+                    int a = 5;
+                    increment(a);
+                    printf("a = %d\n", a);
+                    return 0;
+                }
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 2;">
+              <pre class="terminal" style="width: 400px; margin: 0;"><code
+                class="nohighlight"
+                data-trim
+                style="font-size: 1.5em;">
+
+                n = 6
+                a = 5
+              </code></pre>
+            </div>
+          </div>
+          <p><inline-code>n</inline-code> est une <highlight>copie</highlight> de <inline-code>a</inline-code> : modifier <inline-code>n</inline-code> ne change pas <inline-code>a</inline-code></p>
+        </section>
+
+      </section>
+
+      <!----------          EXERCICES          ---------->
+      <section>
+        <h2>📝 Exercices</h2>
+        <p style="text-align: center; padding-left: 0;">
+          <a href="https://he-arc.github.io/1242.1-Langage_C/docs/cours/chapitre06cours/">Exercices du chapitre 06</a>
+        </p>
+      </section>
+
+    </div>
+  </div>
+
+  <!----------          CONTENT          ---------->
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/notes/notes.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      hash: true,
+      width: 1920,
+      height: 1080,
+      transition: "none",
+      center: false,
+      slideNumber: 'c/t',
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+    });
+  </script>
+</body>
+
+</html>
