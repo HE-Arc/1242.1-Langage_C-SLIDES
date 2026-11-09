@@ -1,0 +1,1586 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>HE-Arc - 1242.1 Langage C - Chapitre 8 - Tableaux et structures</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/hearc.css" id="theme">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="https://www.he-arc.ch/wp-content/uploads/2021/12/cropped-hearc-icon-192x192.png"
+    type="image/vnd.microsoft.icon" />
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/vs.css" id="highlight-theme">
+
+  <style>
+    .reveal .container p,
+    .reveal .container h3,
+    .reveal .container h4 { padding-left: 0; }
+    .reveal .container .col-left { text-align: left; }
+
+    .reveal .indent-1 { padding-left: 300px; }
+    .reveal .indent-2 { padding-left: 400px; }
+    .reveal .centered { text-align: center; padding-left: 0; }
+    .reveal p.tight { margin: 8px 0; }
+    .reveal p.flush { padding-left: 0; }
+    .reveal i { font-style: italic; }
+    .reveal h3.plain { text-transform: none; }
+    .reveal h2 .mono { text-transform: none; }
+
+    .reveal pre.terminal code.hljs,
+    .reveal pre.terminal code {
+      background-color: #000000;
+      color: #FFFFFF;
+    }
+
+    .reveal .mono { font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+    .reveal code .red { color: #FF0000; font-weight: bold; }
+    .reveal code .blue { color: #0000FF; font-weight: bold; }
+    .reveal code .green { color: #00B050; font-weight: bold; }
+    .reveal code .purple { color: #7030A0; font-weight: bold; }
+    .reveal code .gray { color: #808080; }
+    .reveal code .note { font-family: "Roboto", Helvetica, sans-serif; font-style: italic; }
+    .reveal code .box-black { border: 2px solid #000000; background-color: #FFFFFF; padding: 0 0.3em; }
+    .reveal code .hl-yellow { background-color: #FFFF00; font-weight: bold; }
+    .reveal code .red *, .reveal code .blue *, .reveal code .green *, .reveal code .purple * { color: inherit; }
+
+    .reveal .red { color: #FF0000; }
+    .reveal .blue { color: #0000FF; }
+    .reveal .green { color: #00B050; }
+    .reveal .purple { color: #7030A0; }
+
+    .reveal .syntax {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      background-color: #ffff99;
+      border: 2px solid #000;
+      padding: 0.1em 0.5em;
+    }
+
+    /* memory cells: one flex row per array, same cell width in the value row and in the index row */
+    .reveal .memblock { display: table; margin: 0 auto; --cw: 96px; --ch: 84px; }
+    .reveal .mem {
+      display: flex;
+      justify-content: flex-start;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      font-size: 34px;
+    }
+    .reveal .mem .cell {
+      box-sizing: border-box;
+      width: var(--cw);
+      height: var(--ch);
+      line-height: calc(var(--ch) - 4px);
+      margin-left: -2px;
+      border: 2px solid #000000;
+      background-color: #00B0F0;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .reveal .mem .cell.free { background-color: #FFFFFF; }
+    .reveal .mem .cell.other { background-color: #4F81BD; }
+    .reveal .mem .cell.alt { background-color: #92D050; }
+    .reveal .mem .cell.gap { border-color: transparent; background: none; }
+    .reveal .mem .cell.mark { outline: 5px solid #FF0000; outline-offset: -4px; }
+    .reveal .mem.index .cell {
+      height: 50px;
+      line-height: 50px;
+      border-color: transparent;
+      background: none;
+      font-weight: normal;
+    }
+    .reveal .mem.index .cell.lbl {
+      font-family: "Roboto", Helvetica, sans-serif;
+      font-size: 30px;
+      font-style: italic;
+      font-weight: bold;
+      color: #0000FF;
+    }
+    .reveal .mem-label {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      font-size: 34px;
+      text-align: left;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    /* structure layout: --b is the width of one byte */
+    .reveal .memblock.struct { --b: 30px; --ch: 90px; }
+    .reveal .memblock.struct.mini { --b: 9px; --ch: 50px; }
+    .reveal .memblock.struct .mem { font-size: 26px; }
+    .reveal .memblock.struct .mem.index { font-size: 32px; }
+    .reveal .memblock.struct .mem.frame { outline: 3px solid #7030A0; outline-offset: 6px; }
+    .reveal .mem .cell.byte { width: var(--b); background-color: #FF0000; color: #000000; }
+    .reveal .mem .cell.name {
+      width: calc(32 * var(--b));
+      background: repeating-linear-gradient(90deg, #FF0000 0, #FF0000 calc(var(--b) - 2px), #1F3864 calc(var(--b) - 2px), #1F3864 var(--b));
+    }
+    .reveal .mem .cell.short { width: calc(2 * var(--b)); background-color: #FFFF00; }
+    .reveal .mem .cell.float { width: calc(8 * var(--b)); background-color: #33CC33; }
+    .reveal .mem .cell.float2 { width: calc(8 * var(--b)); background-color: #0070C0; }
+    .reveal .mem.index .cell.name,
+    .reveal .mem.index .cell.short,
+    .reveal .mem.index .cell.float,
+    .reveal .mem.index .cell.float2 { background: none; font-weight: bold; text-align: left; overflow: visible; }
+
+    .reveal table.plain { margin: 0 0 0 300px; font-size: 1em; }
+    .reveal table.plain td { border: none; padding: 0.1em 0.8em 0.1em 0; vertical-align: middle; }
+    .reveal .func-box {
+      display: inline-block;
+      background-color: #4F81BD;
+      border: 2px solid #1F3864;
+      border-radius: 0 16px 0 16px;
+      padding: 0.1em 1.2em;
+    }
+    .reveal .brace-right {
+      border: 3px solid #000000;
+      border-left: none;
+      border-radius: 0 24px 24px 0;
+      width: 30px;
+      align-self: stretch;
+    }
+  </style>
+</head>
+
+<body>
+  <img id="logo-hearc" src="./medias/logo_he-arc.png" alt="Logo HE-ARC">
+  <img id="logo-hesso" src="./medias/logo_hes-so.png" alt="Logo HES-SO">
+  <p id="course-infos">1242.1 Langage C - 2026-2027</p>
+
+  <!----------          CONTENT          ---------->
+  <div class="reveal">
+    <div class="slides">
+
+      <!----------          TITLE          ---------->
+      <section>
+        <h1>
+          Chapitre 8
+        </h1>
+        <h2>
+          Tableaux et structures
+        </h2>
+        <p class="tight">1. Tableaux</p>
+        <p class="tight">2. Chaînes de caractères</p>
+        <p class="tight">3. <span class="mono">struct</span></p>
+        <p class="tight">4. <span class="mono">typedef</span></p>
+      </section>
+
+      <!----------          TABLEAUX          ---------->
+      <section>
+
+        <section>
+          <h2>8.1 Occupation mémoire d’un tableau</h2>
+          <div style="display: flex; justify-content: center; align-items: flex-start; gap: 70px; margin-top: 20px;">
+            <div class="memblock" style="margin: 0;">
+              <p class="centered tight"><b>Un</b> nombre réel</p>
+              <p class="tight flush" style="white-space: nowrap;"><highlight><i>nom de variable</i></highlight> <span class="mono blue" style="font-weight: normal;">grade</span></p>
+              <div class="mem"><span class="cell gap">…</span><span class="cell free"></span><span class="cell">4.1</span><span class="cell free"></span></div>
+            </div>
+            <div class="memblock" style="margin: 0;">
+              <p class="centered tight">Un tableau de <b>huit</b> nombres réels</p>
+              <p class="tight flush" style="padding-left: 190px;"><span class="mono blue" style="font-weight: normal;">grades</span></p>
+              <div class="mem"><span class="cell gap">…</span><span class="cell free"></span><span class="cell">5.4</span><span class="cell">3.5</span><span class="cell">4.4</span><span class="cell">5.1</span><span class="cell">5.8</span><span class="cell">4.7</span><span class="cell">4.6</span><span class="cell">6.0</span><span class="cell free"></span><span class="cell gap"></span><span class="cell free"></span></div>
+              <div class="mem index"><span class="cell gap"></span><span class="cell lbl">Indice</span><span class="cell blue">0</span><span class="cell blue">1</span><span class="cell blue">2</span><span class="cell blue">3</span><span class="cell blue">4</span><span class="cell blue">5</span><span class="cell blue">6</span><span class="cell blue">7</span></div>
+            </div>
+          </div>
+          <br>
+          <p class="centered">Un seul <span class="mono blue">nom de variable</span> pour plusieurs valeurs</p>
+          <p class="centered">Chaque valeur est accessible par <highlight>un indice entier</highlight></p>
+          <p class="centered">Ce tableau contient 8 valeurs qui sont indicées de 0 à 7</p>
+        </section>
+
+        <section>
+          <h2>8.1 Tableaux (<i>arrays</i>)</h2>
+          <p class="tight"><b>Un tableau est un ensemble d’éléments contigus en mémoire</b></p>
+          <p class="tight indent-1">Tous les éléments d’un tableau sont <b>du même type</b></p>
+          <p class="tight indent-1">Un tableau de taille N est indicé de <highlight>0 à N-1</highlight></p>
+          <p class="tight indent-1"><error>L’accès</error> à un élément individuel se fait avec un <error>indice, un entier</error></p>
+          <br>
+          <p>Par exemple <span class="mono blue">grades[2]</span> correspond à la valeur 4.4</p>
+          <div class="memblock">
+            <p class="mem-label blue">grades</p>
+            <div class="mem"><span class="cell other"></span><span class="cell">5.4</span><span class="cell">3.5</span><span class="cell red">4.4</span><span class="cell">5.1</span><span class="cell">5.8</span><span class="cell">4.7</span><span class="cell">4.6</span><span class="cell">6.0</span><span class="cell other"></span></div>
+            <div class="mem index"><span class="cell"></span><span class="cell blue">0</span><span class="cell blue">1</span><span class="cell blue mark">2</span><span class="cell blue">3</span><span class="cell blue">4</span><span class="cell blue">5</span><span class="cell blue">6</span><span class="cell blue">7</span></div>
+          </div>
+        </section>
+
+        <section>
+          <h2>8.1 Déclaration de tableaux</h2>
+          <p class="centered"><span class="syntax">&lt;Type&gt; &lt;Nom du tableau&gt; <span class="blue">[</span>&lt;Taille&gt;<span class="blue">]</span>, ...;</span></p>
+          <p class="tight"><b>On déclare une variable de type tableau en spécifiant</b></p>
+          <p class="tight indent-1">Le <highlight>type</highlight> des éléments du tableau</p>
+          <p class="tight indent-2">Types primitifs, structure ou tableau...</p>
+          <p class="tight indent-1">Le <highlight>nom du tableau</highlight></p>
+          <p class="tight indent-1">La <highlight>taille</highlight> du tableau, c’est-à-dire le <b>nombre maximum</b> d'éléments que peut contenir le tableau</p>
+          <br>
+          <div style="display: flex; align-items: center; gap: 60px; padding-left: 400px;">
+            <p class="flush"><b>Exemple</b></p>
+            <pre style="width: 600px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              double grades[8];
+            </code></pre>
+          </div>
+        </section>
+
+        <section>
+          <h2>8.1 Déclaration de tableaux</h2>
+          <p><b>Diverses manières de définir la taille d’un tableau</b></p>
+          <div style="display: grid; grid-template-columns: 200px 800px 700px; align-items: center; justify-content: center; row-gap: 50px; column-gap: 30px; margin-top: 30px;">
+            <div></div>
+            <pre style="width: 100%; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.8em;">
+
+              #define NMAX 32
+              double price[NMAX];
+            </code></pre>
+            <p class="flush">La taille du tableau est définie <b>lors de la compilation</b></p>
+
+            <p class="flush mono green" style="font-size: 1.3em;">≥C99</p>
+            <div>
+              <pre style="width: 100%; margin: 0 0 10px 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                const int NMAX=32;
+                double price[NMAX];
+              </code></pre>
+              <pre style="width: 100%; margin: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                int nMax;
+                scanf("%d",&amp;nMax);
+                double price[nMax];
+              </code></pre>
+            </div>
+            <div style="display: flex; align-items: center; gap: 30px; height: 100%;">
+              <div class="brace-right"></div>
+              <p class="flush">La taille du tableau est définie <b>à l’exécution</b></p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>8.1 Initialisation d'un tableau</h2>
+          <p class="tight"><b>On peut</b></p>
+          <p class="tight indent-1">Initialiser les éléments d'un tableau directement à sa déclaration</p>
+          <p class="tight indent-1">Faire une initialisation partielle à la déclaration</p>
+          <p class="tight"><b>Avec les accolades, on peut aussi</b></p>
+          <p class="tight indent-1">Omettre la taille du tableau</p>
+          <p class="tight"><b>Après la déclaration</b>, affecter une valeur à un élément particulier d'un tableau</p>
+          <p class="tight"><b>Exemples</b></p>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 50px;">
+            <pre style="width: 900px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.4em;">
+
+              int values[5] = {-12,9,5,47,66};
+
+              int numbers[5] = {1,4,9};
+
+              numbers[3] = 11;
+
+              double data[] = {1.3,2.6,-8.4,0.1};
+            </code></pre>
+            <div class="memblock" style="margin: 0; --ch: 70px;">
+              <p class="mem-label">values</p>
+              <div class="mem"><span class="cell">-12</span><span class="cell">9</span><span class="cell">5</span><span class="cell">47</span><span class="cell">66</span></div>
+              <p class="mem-label">numbers</p>
+              <div class="mem"><span class="cell">1</span><span class="cell">4</span><span class="cell">9</span><span class="cell red">11</span><span class="cell">0</span></div>
+              <p class="mem-label">data</p>
+              <div class="mem"><span class="cell">1.3</span><span class="cell">2.6</span><span class="cell">-8.4</span><span class="cell">0.1</span></div>
+            </div>
+          </div>
+          <aside class="notes">Note: les éléments de tab non définis valent 0, si la classe d'allocation est statique (variable globale p.ex).</aside>
+        </section>
+
+        <section>
+          <h2>8.1 Initialisation d'un tableau</h2>
+          <div class="container">
+            <div class="col-left" style="flex: 2;">
+              <p class="tight"><b>Pas d’initialisation</b></p>
+              <p class="tight" style="padding-left: 50px;">Tableau static ou global</p>
+              <p class="tight" style="padding-left: 100px;">→ tout à 0</p>
+              <p class="tight" style="padding-left: 50px;">Sinon</p>
+              <p class="tight" style="padding-left: 100px;">→ Valeurs indéfinies</p>
+              <br>
+              <p class="tight"><b>Initialisation partielle</b></p>
+              <p class="tight" style="padding-left: 50px;">Toutes les valeurs restantes sont initialisées à 0</p>
+            </div>
+            <div class="col-right" style="flex: 3;">
+              <pre style="width: 1080px; margin: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.6em;">
+
+                int global_array[4];
+
+                int main(void)
+                {
+                    int local_array[4];
+                    int local_array1[4] = {99};
+                    int local_array2[4] = {[1] = 99, [3] = 99};
+                    static int static_array[4];
+
+                    return 0;
+                }
+              </code></pre>
+            </div>
+          </div>
+          <aside class="notes">-981468704 21 -981468696 21<br>99 0 0 0<br>0 99 0 99<br>0 0 0 0</aside>
+        </section>
+
+        <section>
+          <h2>8.1 Parcourir un tableau</h2>
+          <p class="tight">Une boucle <inline-code>for</inline-code> dont l'indice va de <highlight>0 à taille - 1</highlight></p>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 50px; margin-top: 20px;">
+            <div>
+              <p class="tight flush"><b>Afficher</b> toutes les valeurs</p>
+              <pre style="width: 860px; margin: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.5em;">
+
+                #define SIZE 5
+
+                int values[SIZE] = {-12, 9, 5, 47, 66};
+
+                for (int i = 0; <span class="blue">i &lt; SIZE</span>; i++)
+                {
+                    printf("%d\n", <span class="blue">values[i]</span>);
+                }
+              </code></pre>
+            </div>
+            <div>
+              <p class="tight flush"><b>Initialiser</b> les valeurs dans une boucle</p>
+              <pre style="width: 760px; margin: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.5em;">
+
+                const int size = 5;
+
+                int squares[size];
+
+                for (int i = 0; <span class="blue">i &lt; size</span>; i++)
+                {
+                    <span class="blue">squares[i]</span> = i * i;
+                }
+              </code></pre>
+              <div class="memblock" style="margin: 20px 0 0 0; --ch: 66px;">
+                <p class="mem-label">squares</p>
+                <div class="mem"><span class="cell">0</span><span class="cell">1</span><span class="cell">4</span><span class="cell">9</span><span class="cell">16</span></div>
+                <div class="mem index"><span class="cell blue">0</span><span class="cell blue">1</span><span class="cell blue">2</span><span class="cell blue">3</span><span class="cell blue">4</span></div>
+              </div>
+            </div>
+          </div>
+          <p class="tight"><warning>⚠</warning> Condition <inline-code>i &lt; SIZE</inline-code>, jamais <inline-code>i &lt;= SIZE</inline-code> : le dernier indice est <inline-code>SIZE - 1</inline-code></p>
+          <p class="tight"><warning>⚠</warning> Taille <inline-code>const int</inline-code> : pas d'initialisation avec des accolades</p>
+        </section>
+
+        <section>
+          <h2>8.1 Utilisation d'un tableau</h2>
+          <p class="tight"><span class="mono green">≥C99</span> La taille du tableau peut être une expression quelconque. Si elle n'est pas constante, le tableau ne peut pas être initialisé à sa déclaration.</p>
+          <pre style="width: 1150px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            int size = inputSize();
+            double x = 1.23;
+            int tab[size]; <span class="green">✔</span>
+            double values[3] = {2.4, 1.2, x}; <span class="green">✔</span>
+            <span class="red">double val[size] = {1.1, 2.2, 3.3}; ✘</span>
+          </code></pre>
+          <p class="tight"><span class="red">⚠ Il n'est <b>pas possible</b> d'affecter globalement (de recopier) tout le contenu d'un tableau à un autre avec un opérateur <b>=</b></span></p>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 50px;">
+            <pre style="width: 860px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              double data[3] = {2.4, 1.2, 0.9};
+              double copy[3];
+              <span class="red">copy = data; ✘</span>
+            </code></pre>
+            <div style="--cw: 96px; --ch: 70px;">
+              <div class="mem" style="align-items: center; margin-bottom: 12px;"><span style="width: 120px; font-weight: normal;">data</span><span class="cell">2.4</span><span class="cell">1.2</span><span class="cell">0.9</span></div>
+              <div class="mem" style="align-items: center;"><span style="width: 120px; font-weight: normal;">copy</span><span class="cell red">?</span><span class="cell red">?</span><span class="cell red">?</span></div>
+            </div>
+          </div>
+          <p class="tight">⇒ Copier <highlight>élément par élément</highlight>, avec une boucle (voir « Parcourir un tableau »)</p>
+          <aside class="notes">(constante avant C99)</aside>
+        </section>
+
+        <section>
+          <h2 style="font-size: 1.35em;">8.1 Tableaux, effets de bord, accès hors-limites</h2>
+          <h3 class="plain"><error>⚠ Attention</error></h3>
+          <p class="tight">Le compilateur ne vérifie pas si les indices utilisés sont dans les limites autorisées !</p>
+          <br>
+          <pre style="width: 1400px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            int monthLength[12] = {31,28,31,30,31,30,31,31,30,31,30,31};
+          </code></pre>
+          <br>
+          <div class="memblock">
+            <p class="mem-label">monthLength</p>
+            <div class="mem"><span class="cell free red">?</span><span class="cell free red">?</span><span class="cell">31</span><span class="cell">28</span><span class="cell">31</span><span class="cell">30</span><span class="cell">31</span><span class="cell">30</span><span class="cell">31</span><span class="cell">31</span><span class="cell">30</span><span class="cell">31</span><span class="cell">30</span><span class="cell">31</span><span class="cell free red">?</span></div>
+            <div class="mem index"><span class="cell"></span><span class="cell"></span><span class="cell">0</span><span class="cell">1</span><span class="cell">2</span><span class="cell">3</span><span class="cell">4</span><span class="cell">5</span><span class="cell">6</span><span class="cell">7</span><span class="cell">8</span><span class="cell">9</span><span class="cell">10</span><span class="cell">11</span><span class="cell red"><b>↑</b></span></div>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: flex-end; gap: 40px; padding-right: 230px;">
+            <p class="flush mono red" style="text-align: right; font-size: 0.85em;">Accès hors tableau [0…11],<br>le compilateur ne dit rien!!</p>
+            <pre style="width: 740px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.5em;">
+
+              int daysNb = monthLength<span class="red">[12]</span>;
+            </code></pre>
+          </div>
+          <aside class="notes">Il n’y a pas de contrôle d’indice en C car cela impliquerait l’ajout d’instructions de contrôles vérifiant la validité à l’exécution (calcul des expressions, notation pointeur, …)</aside>
+        </section>
+
+        <section>
+          <h2 style="font-size: 1.4em;">8.1 Tableaux : tableau de valeurs constantes</h2>
+          <p>Il est permis de déclarer des <b>tableaux de valeurs constantes</b> en qualifiant le type des éléments par <span class="mono blue">const</span><b>.</b></p>
+          <br>
+          <p><b>Exemple</b></p>
+          <pre style="width: 1700px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            <span class="blue">const</span> double sinus[91] = {0.000, 0.017, 0.035, 0.052, 0.070, 0.087, … };
+
+            double s = sinus[4]; <span class="box-black">vaut 0.070 = sin(4°)</span>
+            <span class="red">sinus[0] = 1.0; ✘</span>
+                            <span class="box-black"><span class="red">interdit car les valeurs sont</span> <span class="blue">const</span></span>
+          </code></pre>
+        </section>
+
+        <section>
+          <h2 style="font-size: 1.4em;">8.1 Tableaux : comment connaître leur taille ?</h2>
+          <p class="tight">Grâce à l’opérateur <span class="mono blue">sizeof</span> on peut <b>connaître la taille</b> en bytes</p>
+          <p class="tight indent-1"><b>d’une variable</b> simple ou tableau</p>
+          <p class="tight indent-1"><b>d’un type</b></p>
+          <br>
+          <p><b>Exemple</b></p>
+          <pre style="width: 1250px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            int data[100]= {1, 2, 3, 4, 5, 6, 7};
+            char vowels[] = {'a', 'e', 'i', 'o', 'u', 'y'};
+            sizeof(data)      // <span class="blue">400</span>
+            sizeof(int)       // <span class="blue">4</span>
+            sizeof(vowels)    // <span class="blue">6</span>     (6 * 1 byte)
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>📝 8.1 Nombre d'éléments d'un tableau</h2>
+          <p>Comment obtenir le <highlight>nombre d'éléments</highlight> de ces tableaux, sans les compter à la main ?</p>
+          <pre style="width: 1250px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            int data[100] = {1, 2, 3, 4, 5, 6, 7};
+            double grades[] = {5.4, 3.5, 4.4, 5.1};
+            char vowels[] = {'a', 'e', 'i', 'o', 'u', 'y'};
+          </code></pre>
+          <br>
+          <p class="tight">Indice : <inline-code>sizeof</inline-code> donne la taille en bytes du tableau entier, et celle d'un seul élément</p>
+          <br>
+          <p class="tight">La solution doit rester correcte si le type des éléments change</p>
+          <aside class="notes">sizeof(data) / sizeof(data[0]) : 100, 4 et 6. Plutôt que sizeof(data) / sizeof(int), qui devient faux si le type change. Ne fonctionne pas dans une fonction qui reçoit le tableau en paramètre (voir les slides suivantes).</aside>
+        </section>
+
+        <section>
+          <h2 style="font-size: 1.4em;">8.1 Nombre d'éléments d'un tableau : solution</h2>
+          <p class="centered"><span class="syntax">sizeof(&lt;tableau&gt;) / sizeof(&lt;tableau&gt;[0])</span></p>
+          <p class="centered tight" style="font-size: 0.85em;">taille du tableau entier / taille d'un élément</p>
+          <pre style="width: 1500px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            int data[100] = {1, 2, 3, 4, 5, 6, 7};
+            double grades[] = {5.4, 3.5, 4.4, 5.1};
+            char vowels[] = {'a', 'e', 'i', 'o', 'u', 'y'};
+
+            sizeof(data) / sizeof(data[0])      // 400 / 4 = <span class="blue">100</span>
+            sizeof(grades) / sizeof(grades[0])  //  32 / 8 = <span class="blue">4</span>
+            sizeof(vowels) / sizeof(vowels[0])  //   6 / 1 = <span class="blue">6</span>
+          </code></pre>
+          <p class="tight"><success>✅</success> <inline-code>sizeof(data[0])</inline-code> plutôt que <inline-code>sizeof(int)</inline-code> : reste correct si le type change</p>
+          <p class="tight"><warning>⚠</warning> <inline-code>data</inline-code> contient 100 éléments, même si 7 seulement sont initialisés</p>
+        </section>
+
+        <section>
+          <h2>8.1 Tableaux : passage à une fonction</h2>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <pre style="width: 880px; margin: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.65em;">
+
+                void display( <span class="red">int tab[]</span> )
+                {
+                  int i;
+                  for(i=0; i &lt; <span class="red">??</span> ; i++)
+                  {
+                    printf("%d\n",tab[i]);
+                  }
+                }
+
+                int main(void)
+                { …
+                  int data[10]={7,2,5};
+                  display(<span class="red">data</span>);
+
+                  return 0;
+                }
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <p class="tight"><error>Problème</error></p>
+              <p class="tight">La fonction <inline-code>display()</inline-code> ne connaît pas le nombre de valeurs effectivement dans le tableau, ni sa taille.</p>
+              <br>
+              <p class="tight"><error>Pourquoi ?</error></p>
+              <p class="tight">Un tableau passé à une fonction est <error>dégénéré en pointeur</error></p>
+              <p class="tight">⇒ la fonction ne reçoit que l'<highlight>adresse</highlight> du tableau, pas sa taille</p>
+              <p class="tight">⇒ <inline-code>sizeof(tab)</inline-code> donne la taille d'une adresse</p>
+              <br>
+              <p class="tight" style="font-size: 0.8em;">Pointeurs : voir chapitre 9</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>8.1 Tableaux : passage à une fonction</h2>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <pre style="width: 880px; margin: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.65em;">
+
+                void display( <span class="blue">int tab[], int nb</span> )
+                {
+                  int i;
+                  for(i=0; i &lt; <span class="blue">nb</span> ; i++)
+                  {
+                    printf("%d\n",tab[i]);
+                  }
+                }
+
+                int main(void)
+                { …
+                  int data[10]={7,2,5};
+                  display(<span class="blue">data,3</span>);
+
+                  return 0;
+                }
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <p class="tight"><highlight>Solution</highlight></p>
+              <p class="tight">On passe en second paramètre le nombre d’éléments à traiter.</p>
+              <br>
+              <div class="memblock" style="margin: 0; --cw: 86px; --ch: 76px;">
+                <div class="mem index" style="font-family: 'Roboto', Helvetica, sans-serif;"><span class="cell">tab</span><span class="cell gap" style="width: 20px;"></span><span class="cell">nb</span></div>
+                <div class="mem"><span class="cell">*</span><span class="cell gap" style="width: 20px;"></span><span class="cell">3</span></div>
+                <p class="mem-label" style="font-family: 'Roboto', Helvetica, sans-serif; font-weight: normal; margin-top: 20px;">data</p>
+                <div class="mem"><span class="cell">7</span><span class="cell">2</span><span class="cell">5</span><span class="cell">0</span><span class="cell">0</span><span class="cell">0</span><span class="cell">0</span><span class="cell">0</span><span class="cell">0</span><span class="cell">0</span></div>
+                <div class="mem index" style="font-family: 'Roboto', Helvetica, sans-serif;"><span class="cell">[0]</span><span class="cell">[1]</span><span class="cell">[2]</span><span class="cell">[3]</span><span class="cell">[4]</span><span class="cell">[5]</span><span class="cell">[6]</span><span class="cell">[7]</span><span class="cell">[8]</span><span class="cell">[9]</span></div>
+              </div>
+              <p class="tight"><inline-code>tab</inline-code> est l'<highlight>adresse</highlight> de <inline-code>data</inline-code>, pas une copie</p>
+              <p class="tight">⇒ la fonction peut <error>modifier</error> les éléments de <inline-code>data</inline-code></p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>8.1 Tableaux multi-dimensionnels</h2>
+          <p class="tight">Un tableau peut avoir plusieurs dimensions</p>
+          <div style="display: grid; grid-template-columns: 400px 1250px; align-items: center; justify-content: center; row-gap: 40px; margin-top: 10px;">
+            <div></div>
+            <p class="centered tight"><span class="syntax">&lt;Type&gt; &lt;Nom de var&gt; [N1][N2]…[Ni];</span></p>
+
+            <p class="flush tight">Déclaration</p>
+            <pre style="width: 100%; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.7em;">
+
+              int values [20][40];
+              double volume [10][10][10];
+            </code></pre>
+
+            <p class="flush tight">Initialisation</p>
+            <pre style="width: 100%; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.7em;">
+
+              int matrix[2][4] = {{10,20,30,40}, {15,25,35,45}};
+            </code></pre>
+
+            <p class="flush tight">Accès aux éléments<br>du tableau</p>
+            <pre style="width: 100%; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.7em;">
+
+              first = <span class="blue">values[0][0]</span>;
+              <span class="blue">volume[9][9][0] =</span> 3.2;
+            </code></pre>
+          </div>
+        </section>
+
+        <section>
+          <h2 style="font-size: 1.4em;">8.1 Parcourir un tableau à deux dimensions</h2>
+          <p class="tight">Deux boucles imbriquées : premier indice = <highlight>ligne</highlight>, second indice = <error>colonne</error></p>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 60px; margin-top: 20px;">
+            <pre style="width: 1060px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.4em;">
+
+              #define ROWS 2
+              #define COLS 4
+
+              int matrix[ROWS][COLS] = {{10,20,30,40}, {15,25,35,45}};
+
+              for (int <span class="blue">i</span> = 0; <span class="blue">i</span> &lt; ROWS; <span class="blue">i</span>++)
+              {
+                  for (int <span class="red">j</span> = 0; <span class="red">j</span> &lt; COLS; <span class="red">j</span>++)
+                  {
+                      printf("%d ", matrix[<span class="blue">i</span>][<span class="red">j</span>]);
+                  }
+                  printf("\n");
+              }
+            </code></pre>
+            <div>
+              <div class="memblock" style="margin: 0; --cw: 110px; --ch: 76px;">
+                <p class="mem-label">matrix</p>
+                <div class="mem index"><span class="cell"></span><span class="cell red"><b>j=0</b></span><span class="cell red"><b>1</b></span><span class="cell red"><b>2</b></span><span class="cell red"><b>3</b></span></div>
+                <div class="mem"><span class="cell gap blue">i=0</span><span class="cell">10</span><span class="cell">20</span><span class="cell">30</span><span class="cell">40</span></div>
+                <div class="mem" style="margin-top: -2px;"><span class="cell gap blue">1</span><span class="cell">15</span><span class="cell">25</span><span class="cell">35</span><span class="cell">45</span></div>
+              </div>
+              <pre class="terminal" style="width: 550px; margin: 40px 0 0 0;"><code
+                class="nohighlight"
+                data-trim
+                style="font-size: 1.4em;">
+
+                10 20 30 40
+                15 25 35 45
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+      </section>
+
+      <!----------          CHAINES DE CARACTERES          ---------->
+      <section>
+
+        <section>
+          <h2>8.2 Chaînes de caractères (string)</h2>
+          <p class="tight"><b>Définition</b></p>
+          <p class="tight syntax" style="font-family: inherit; font-weight: normal; margin-left: 300px; width: 1250px;">Tableau à une dimension, dont chaque élément est un caractère, <highlight>char</highlight>, et terminé par le caractère nul, soit <span class="red">0x00</span> ou <span class="red">0</span> ou <span class="red">'\0'</span>.</p>
+          <p class="tight"><b>Exemple</b></p>
+          <pre style="width: 1300px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            <span class="blue">char</span> greeting[6]={'s','a','l','u','t',<span class="red">'\0'</span>};
+          </code></pre>
+          <p class="tight"><b>Remarque</b>&nbsp;&nbsp;Lors de sa déclaration, une chaîne de caractères peut faire l'objet d'une affectation par une chaîne de caractères constante <span class="red">entre guillemets</span>.</p>
+          <pre style="width: 800px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            char greeting[<span class="red">6</span>] = <span class="red">"salut"</span>;
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>8.2 Chaînes de caractères</h2>
+          <div style="display: flex; align-items: flex-start; gap: 150px;">
+            <p>Exemple</p>
+            <div>
+              <pre style="width: 900px; margin: 15px 0 0 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.8em;">
+
+                char filename[<b>10</b>] = "test.c";
+              </code></pre>
+              <div class="blue" style="font-family: monospace; font-size: 1.8em; line-height: 1;"><div style="font-size: 41.58px; margin-left: calc(10px + 21ch); width: 6ch; border: 2px solid #1F497D; border-top: none; text-align: center; padding-top: 6px;"><span style="font-family: 'Roboto', Helvetica, sans-serif; font-size: 28px;">6</span></div></div>
+            </div>
+          </div>
+          <p class="tight"><error>⚠ Attention</error></p>
+          <p class="tight">Il faut toujours tenir compte du <b>caractère de fin</b> qui termine <b>obligatoirement</b> toute chaîne, <error>chaîne à zéro terminal</error>.</p>
+          <p class="tight">La taille du tableau de l'exemple doit donc être au moins de 6+'\0', soit 7.</p>
+          <br>
+          <div class="memblock" style="--cw: 80px; --ch: 70px;">
+            <div class="mem"><span class="cell other"></span><span class="cell">t</span><span class="cell">e</span><span class="cell">s</span><span class="cell">t</span><span class="cell">.</span><span class="cell">c</span><span class="cell red">\0</span><span class="cell" style="font-weight: normal;">\0</span><span class="cell" style="font-weight: normal;">\0</span><span class="cell" style="font-weight: normal;">\0</span><span class="cell other"></span></div>
+            <div class="mem index"><span class="cell"></span><span class="cell">0</span><span class="cell">1</span><span class="cell">2</span><span class="cell">3</span><span class="cell">4</span><span class="cell">5</span><span class="cell">6</span><span class="cell">7</span><span class="cell">8</span><span class="cell">9</span></div>
+          </div>
+        </section>
+
+        <section>
+          <h2>8.2 Déclaration et initialisation</h2>
+          <h3 class="plain">Comme les tableaux</h3>
+          <br>
+          <pre style="width: 1550px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.8em;">
+
+            char filename[] = "test.c";      <span class="green">✔</span>
+            char address[] = "";             <span class="green">✔</span>
+            char city[12] = "Saint-Imier";   <span class="green">✔</span>
+            char name[10]; <span class="green">✔</span>
+
+            char firstname[]; <span class="red">✘  // Erreur de compilation</span>
+            char rue[5]="rue de la serre 17"; <span class="red">✘  // Warning en C23</span>
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>8.2 E/S et chaînes de caractères</h2>
+          <p><span class="mono blue">printf</span> et <span class="mono blue">scanf</span>, supportent la saisie et l'affichage des chaînes de caractères avec la spécification de format <span class="mono blue">%s</span>.</p>
+          <br>
+          <p><span class="mono blue">printf</span> affichera tous les caractères de la chaîne donnée en paramètre jusqu'au caractère de fin, exclu.</p>
+          <br>
+          <div style="display: flex; align-items: center; gap: 120px;">
+            <p><b>Exemple</b></p>
+            <pre style="width: 1150px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.7em;">
+
+              char fileName[<b>16</b>] = "test.c";
+              char word[]={'H','e','l','l','o'<span class="red">}</span>;
+
+              printf("<span class="blue">%s</span>", fileName);  // test.c
+              printf("<span class="blue">%s</span>", word); <span class="red">// Hello.... pas de '\0' : UB</span>
+            </code></pre>
+          </div>
+        </section>
+
+        <section>
+          <h2>8.2 E/S et chaînes de caractères</h2>
+          <p class="tight"><span class="mono blue">scanf("%s",...)</span> récupère tous les caractères saisis jusqu'au <error>premier séparateur</error>. <error>Ne pas mettre</error> l’opérateur <error>&amp;</error> <i>(adresse de)</i> devant le nom de la chaîne.</p>
+          <div style="display: flex; align-items: flex-start; gap: 40px; margin-top: 15px;">
+            <p class="tight"><b>Exemple</b></p>
+            <pre style="width: 760px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.5em;">
+
+              char chaine[256];
+              char mini[4];
+              scanf("%s", chaine);
+              scanf("%s", mini);
+              printf("%s\n", chaine);
+              printf("%s\n", mini);
+            </code></pre>
+            <pre class="terminal" style="width: 460px; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.5em;">
+
+              Vive HE-Arc <span style="color: #00B050;">↵</span>
+              <span style="color: #FAC090;">rc</span>
+              <span style="color: #FAC090;">HE-Arc</span>
+            </code></pre>
+            <div>
+              <p class="flush tight"><b>Entrée utilisateur</b></p>
+              <p class="flush tight"><b>Sorties des<br>deux printf()</b></p>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 30px; margin-top: 10px;">
+            <p class="flush red" style="white-space: nowrap; font-size: 0.8em;"><b>⚠ UB</b> : dépend de la<br>disposition des<br>variables en mémoire</p>
+            <div class="memblock" style="margin: 0; --cw: 84px; --ch: 70px;">
+              <div class="mem index" style="font-weight: normal;"><span class="cell"></span><span class="cell" style="width: calc(4 * var(--cw) - 8px); text-align: left;">mini</span><span class="cell" style="width: calc(4 * var(--cw)); text-align: left;">chaine</span></div>
+              <div class="mem"><span class="cell free"></span><span class="cell" style="background-color: #00B050;">H</span><span class="cell" style="background-color: #00B050;">E</span><span class="cell" style="background-color: #00B050;">-</span><span class="cell" style="background-color: #00B050;">A</span><span class="cell">V</span><span class="cell">i</span><span class="cell">v</span><span class="cell">e</span><span class="cell red">\0</span><span class="cell" style="font-weight: normal;">?</span><span class="cell" style="font-weight: normal;">?</span><span class="cell" style="font-weight: normal;">?</span><span class="cell" style="font-weight: normal;">?</span><span class="cell" style="font-weight: normal;">?</span><span class="cell free"></span></div>
+              <div class="mem index" style="--ch: 40px;"><span class="cell"></span><span class="cell">0</span><span class="cell">1</span><span class="cell">2</span><span class="cell">3</span><span class="cell">0</span><span class="cell">1</span><span class="cell">2</span><span class="cell">3</span><span class="cell">4</span><span class="cell">5</span><span class="cell">6</span><span class="cell">7</span><span class="cell">8</span><span class="cell">...</span></div>
+              <div class="mem index"><span class="cell"></span><span class="cell blue"><b>⇧</b></span><span class="cell"></span><span class="cell"></span><span class="cell blue"><b>⇧</b></span><span class="cell red"><b>⇧</b></span><span class="cell"></span><span class="cell red"><b>⇧</b></span></div>
+              <div class="mem index"><span class="cell"></span><span class="cell"><b>H</b></span><span class="cell"><b>E</b></span><span class="cell"><b>-</b></span><span class="cell"><b>A</b></span><span class="cell"><b>r</b></span><span class="cell"><b>c</b></span><span class="cell red"><b>\0</b></span></div>
+            </div>
+          </div>
+          <aside class="notes"><b>Remarques </b><br>Il n'y a pas de symbole &amp; devant le nom de la variable chaine du scanf<br>La spécification de format %s ajoute automatiquement un caractère nul (fin de chaine) dans le tableau de char pour en faire une chaine de caractères ;<br>Les caractères mémorisés dans le tableau chaine ne sont que ceux du premier mot ;<br>Il vaut mieux utiliser fgets(chaine,256,stdin) pour ce genre de saisie de plusieurs mots.</aside>
+        </section>
+
+        <section>
+          <h2>8.2 E/S et chaînes de caractères</h2>
+          <p><b>Remarques sur <span class="mono blue">scanf</span></b></p>
+          <br>
+          <p>Pas de <inline-code class="blue">&amp;</inline-code> devant la variable chaine lors de l'appel de <inline-code>scanf</inline-code>, car <error>un nom de tableau est déjà une adresse.</error></p>
+          <br>
+          <p><b><span class="mono">%s</span> ajoute automatiquement un caractère nul</b> (<inline-code>'\0'</inline-code>) à la fin du tableau de char pour en faire une chaîne de caractères valide.</p>
+          <br>
+          <p>Pas de contrôle du nombre de caractères récupéré → <span class="red">risque de débordement de capacité</span>, autres variables écrasées !</p>
+          <p>⇒ Limiter la largeur : <inline-code>scanf("%255s", chaine);</inline-code> (chapitre 4)</p>
+        </section>
+
+        <section>
+          <h2>8.2 E/S et chaînes de caractères</h2>
+          <p><b>Remarques sur <span class="mono blue">scanf</span></b></p>
+          <br>
+          <p>L'espace est considéré comme <error>séparateur</error> donc seules les 4 premières lettres de "<inline-code>Vive HE-Arc</inline-code>" sont récupérées</p>
+          <br>
+          <p class="tight"><b>Solution</b></p>
+          <p class="tight">Pour récupérer une ligne de texte avec des espaces, utiliser la fonction <inline-code>fgets</inline-code></p>
+          <pre style="width: 1000px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            fgets(&lt;varChaine&gt;, &lt;Nmax&gt;, stdin);
+          </code></pre>
+          <p class="tight"><b>Exemple</b></p>
+          <pre style="width: 1000px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            fgets(chaine, sizeof(chaine), stdin);
+          </code></pre>
+          <p class="tight"><warning>⚠</warning> <inline-code>fgets</inline-code> garde le <inline-code>'\n'</inline-code> de fin de ligne dans la chaîne</p>
+          <aside class="notes">Les retours de lignes sont aussi saisis dans la chaîne !</aside>
+        </section>
+
+        <section>
+          <h2 style="font-size: 1.4em;">8.2 Manipulation de chaînes de caractères</h2>
+          <p>Les chaînes de caractères ne peuvent pas être manipulées par les opérateurs conventionnels</p>
+          <table class="plain">
+            <tr><td style="text-align: right;"><span class="mono red">=</span></td><td>n'est pas autorisé pour l’affectation.</td></tr>
+            <tr><td style="text-align: right;"><span class="mono blue">=</span></td><td><span class="blue">est autorisé uniquement pour l’initialisation.</span></td></tr>
+            <tr><td style="text-align: right;"><span class="mono red">==,+,&gt;,&lt;, …</span></td><td>n’ont pas le sens souhaité.</td></tr>
+          </table>
+          <br>
+          <p>Les manipulations de chaînes de caractères se font au moyen de fonctions spéciales de la bibliothèque <span class="mono blue">string.h</span></p>
+        </section>
+
+        <section>
+          <h2>8.2 Bibliothèque <span class="mono blue">string.h</span></h2>
+          <p class="tight"><b>Contient beaucoup de fonctions utiles aux chaînes de caractères :</b></p>
+          <p class="tight"><highlight>information, comparaison, copie, manipulation, recherche</highlight></p>
+          <br>
+          <table class="plain">
+            <tr><td>▪ Taille de la chaîne de caractères</td><td><span class="mono">strlen</span></td></tr>
+            <tr><td>▪ Comparaison de chaînes de caractères</td><td><span class="mono">strcmp</span></td></tr>
+            <tr><td>▪ Copie à une chaîne de caractères</td><td><span class="mono">strcpy</span>, <span class="mono">strncpy</span></td></tr>
+            <tr><td>▪ Concaténation de chaînes de caractères</td><td><span class="mono">strcat</span></td></tr>
+            <tr><td>▪ Recherche dans une chaîne de caractères</td><td><span class="mono">strstr</span>, <span class="mono">strchr</span></td></tr>
+            <tr><td>▪ Extraction de sous-chaînes (<i>tokens</i>)</td><td><span class="mono">strtok</span></td></tr>
+          </table>
+          <br>
+          <p style="font-size: 0.8em; padding-left: 300px;">[Référence]: <a href="http://www.cplusplus.com/reference/cstring/">http://www.cplusplus.com/reference/cstring/</a></p>
+        </section>
+
+        <section>
+          <h2>8.2 Bibliothèque <span class="mono blue">string.h</span></h2>
+          <p class="tight"><span class="mono" style="font-size: 1.1em;"><span class="blue">size_t</span> strlen(<span class="blue">char</span> texte<span class="blue">[]</span>)</span> <span style="font-size: 0.8em;">← nombre de caractères de <span class="mono" style="font-weight: normal;">texte</span></span></p>
+          <p class="tight" style="font-size: 0.8em;"><span class="mono" style="font-weight: normal;">int length = strlen("Hello"); // length ← 5</span></p>
+          <br>
+          <p class="tight"><span class="mono" style="font-size: 1.1em;"><span class="blue">int</span> strcmp(<span class="blue">char</span> chaine1<span class="blue">[]</span>, <span class="blue">char</span> chaine2<span class="blue">[]</span>)</span></p>
+          <table class="plain" style="margin-left: 240px; font-size: 0.8em;">
+            <tr><td>// renvoie</td><td>&lt; 0</td><td>si</td><td>chaine1 &lt; chaine2</td><td>p.ex</td><td><span class="mono" style="font-weight: normal;"><i>strcmp("ABC", "ABCD")</i></span></td></tr>
+            <tr><td>// renvoie</td><td>0</td><td>si</td><td>chaine1 == chaine2</td><td>p.ex</td><td><span class="mono" style="font-weight: normal;"><i>strcmp("A", "A")</i></span></td></tr>
+            <tr><td>// renvoie</td><td>&gt; 0</td><td>si</td><td>chaine1 &gt; chaine2</td><td>p.ex</td><td><span class="mono" style="font-weight: normal;"><i>strcmp("B", "A")</i></span></td></tr>
+          </table>
+          <br>
+          <p class="tight"><span class="mono" style="font-size: 1.1em;">strcpy(<span class="blue">char</span> destination<span class="blue">[], const char</span> source<span class="blue">[]</span>)</span></p>
+          <p class="tight blue" style="font-size: 0.8em;">// copie le contenu de source → destination</p>
+          <br>
+          <p class="tight">Autres fonctions utiles, celles de conversion d'une chaîne de caractères à un type numérique&nbsp;: <span class="mono">atof, atoi, atol.</span></p>
+        </section>
+
+        <section>
+          <h2 style="font-size: 1.4em;">8.2 Opérations sur les chaînes de caractères</h2>
+          <pre style="width: 1100px; margin-bottom: 15px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            char s1[10] = "toto";
+            char s2[10];
+            <span class="blue">strcpy(s2, s1);</span>
+            printf("%s %s", s1, s2);
+          </code></pre>
+          <pre style="width: 1100px; margin-bottom: 15px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            char s1[10] = "toto";
+            char s2[10] = "toto";
+            <span class="blue">strcat(s2, s1);</span>
+            printf("%s \n %s", s1, s2);
+          </code></pre>
+          <pre style="width: 1100px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            char s1[] = "toto";
+            char s2[] = "toto";
+            if (<span class="blue">strcmp(s1,s2) == 0</span>)
+            {
+              printf("s1 et s2 sont identiques\n");
+            }
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>📝 8.2 Revue</h2>
+          <p>Comment les deux variables suivantes sont représentées en mémoire ?</p>
+          <pre style="width: 1100px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.7em;">
+
+            char letter   = 'a';
+            char chaine[] = "a";
+          </code></pre>
+          <br>
+          <p>Que dit le compilateur avec le code suivant ? Que va-t-il se passer ?</p>
+          <pre style="width: 1100px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.7em;">
+
+            char temp [] = "";
+            char text [] = "Blablabla";
+
+            int i=0;
+            for (  ; i&lt; strlen(text)+1 ; i++)
+                temp[i] = text[i];
+          </code></pre>
+          <aside class="notes">1)   character only has 0x61 (97) in memory; string[] has {0x61, 0x0} in memory<br><br>2) No complaint, but temp was declared with size  1; it will not be big enough to accept the values from text[]. Some memory will be overwritten</aside>
+        </section>
+
+        <section>
+          <h2>8.2 Revue : solution</h2>
+          <div style="display: flex; align-items: center; gap: 80px; padding-left: 200px; --cw: 96px; --ch: 76px;">
+            <pre style="width: 700px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.7em;">
+
+              char letter   = 'a';
+              char chaine[] = "a";
+            </code></pre>
+            <div>
+              <div class="mem" style="align-items: center; margin-bottom: 12px;"><span style="width: 170px; font-weight: normal;">letter</span><span class="cell">a</span><span style="font-family: 'Roboto', Helvetica, sans-serif; font-weight: normal; padding-left: 30px;">1 octet</span></div>
+              <div class="mem" style="align-items: center;"><span style="width: 170px; font-weight: normal;">chaine</span><span class="cell">a</span><span class="cell red">\0</span><span style="font-family: 'Roboto', Helvetica, sans-serif; font-weight: normal; padding-left: 30px;">2 octets</span></div>
+            </div>
+          </div>
+          <br>
+          <p class="tight">Le compilateur <error>ne signale pas</error> le débordement</p>
+          <p class="tight"><inline-code>temp</inline-code> ne contient qu'<highlight>un seul</highlight> caractère : le <inline-code>'\0'</inline-code></p>
+          <p class="tight">La boucle écrit 10 caractères, dont <error>9 hors du tableau</error></p>
+          <div class="memblock" style="margin-top: 25px; --cw: 96px; --ch: 76px;">
+            <div class="mem index" style="font-weight: normal;"><span class="cell" style="text-align: left; overflow: visible;">temp</span></div>
+            <div class="mem"><span class="cell">B</span><span class="cell free red">l</span><span class="cell free red">a</span><span class="cell free red">b</span><span class="cell free red">l</span><span class="cell free red">a</span><span class="cell free red">b</span><span class="cell free red">l</span><span class="cell free red">a</span><span class="cell free red">\0</span></div>
+            <div class="mem index"><span class="cell">0</span><span class="cell red">1</span><span class="cell red">2</span><span class="cell red">3</span><span class="cell red">4</span><span class="cell red">5</span><span class="cell red">6</span><span class="cell red">7</span><span class="cell red">8</span><span class="cell red">9</span></div>
+          </div>
+          <p class="centered tight"><error>⚠ Comportement indéfini (UB)</error> : la mémoire voisine est écrasée</p>
+          <aside class="notes">Avec la commande du cours, gcc s'arrête sur autre chose : comparaison entre int et size_t (-Wsign-compare) dans la condition de la boucle. Il ne dit rien du débordement.</aside>
+        </section>
+
+      </section>
+
+      <!----------          STRUCT          ---------->
+      <section>
+
+        <section>
+          <h2>8.3 Types</h2>
+          <div style="display: flex; align-items: center; gap: 40px;">
+            <div>
+              <h3 class="plain">Types de base</h3>
+              <table class="plain">
+                <tr><td style="width: 520px;">Entiers anonymes</td><td><span class="mono">int, short, …</span></td></tr>
+                <tr><td>Entiers nommés</td><td><inline-code>enum</inline-code></td></tr>
+                <tr><td>Nombres flottants</td><td><span class="mono">float, double</span></td></tr>
+              </table>
+              <h3 class="plain">Types dérivés</h3>
+              <table class="plain">
+                <tr><td style="width: 520px;"><highlight>Tableaux</highlight></td><td><span class="mono blue">[ ]</span></td></tr>
+                <tr><td>Fonctions</td><td><inline-code>( )</inline-code></td></tr>
+                <tr><td>Pointeurs</td><td><inline-code>*</inline-code></td></tr>
+                <tr><td><highlight>Structures</highlight></td><td><span class="mono blue">struct</span></td></tr>
+                <tr><td>Unions</td><td><inline-code>union</inline-code></td></tr>
+              </table>
+            </div>
+            <div class="brace-right"></div>
+            <p class="flush mono blue">typedef</p>
+          </div>
+        </section>
+
+        <section>
+          <h2>8.3 Occupation mémoire d’une structure</h2>
+          <div style="display: grid; grid-template-columns: 330px 900px 560px; align-items: center; justify-content: center; row-gap: 25px; column-gap: 25px; --cw: 90px; --ch: 66px;">
+            <p class="flush tight"><b>Type de base</b></p>
+            <pre style="width: 100%; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              double grade = 4.1;
+            </code></pre>
+            <div>
+              <p class="mem-label blue" style="padding-left: 90px;">grade</p>
+              <div class="mem"><span class="cell free"></span><span class="cell">4.1</span><span class="cell free"></span></div>
+            </div>
+
+            <p class="flush tight"><b>Types dérivés (Tableaux)</b></p>
+            <pre style="width: 100%; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              double grades[4]={5.4, 3.5, 4.4, 5.1};
+            </code></pre>
+            <div>
+              <p class="mem-label" style="padding-left: 90px;"><span class="blue">grades</span> <span style="font-family: 'Roboto', Helvetica, sans-serif; font-weight: normal;">&nbsp;Même type</span></p>
+              <div class="mem"><span class="cell free"></span><span class="cell">5.4</span><span class="cell">3.5</span><span class="cell">4.4</span><span class="cell">5.1</span><span class="cell free"></span></div>
+            </div>
+
+            <p class="flush tight blue"><b>Types dérivés (Structures)</b></p>
+            <div style="grid-column: 2 / 4; display: flex; align-items: center; gap: 40px; background-color: #B8CCE4; padding: 20px;">
+              <pre style="width: 470px; margin: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.6em;">
+
+                struct
+                {
+                 short  <b>s</b>;
+                 char   <b>c</b>;
+                 float  <b>f</b>;
+                }<span class="blue">test,</span><span class="green">toto</span>;
+              </code></pre>
+              <div style="--b: 60px;">
+                <div class="mem index"><span class="cell blue" style="width: calc(7 * var(--b) + 30px); text-align: left; padding-left: 30px;"><b>test</b></span><span class="cell green" style="text-align: left;"><b>toto</b></span></div>
+                <div class="mem"><span class="cell free" style="width: 30px;"></span><span class="cell" style="width: calc(2 * var(--b));">?</span><span class="cell" style="width: var(--b);">' '</span><span class="cell" style="width: calc(4 * var(--b));">?</span><span class="cell alt" style="width: calc(2 * var(--b));">?</span><span class="cell alt" style="width: var(--b);">' '</span><span class="cell alt" style="width: calc(4 * var(--b));">?</span></div>
+                <div class="mem index"><span class="cell" style="width: 30px;"></span><span class="cell blue" style="width: calc(2 * var(--b));"><b>s</b></span><span class="cell blue" style="width: var(--b);"><b>c</b></span><span class="cell blue" style="width: calc(4 * var(--b));"><b>f</b></span><span class="cell green" style="width: calc(2 * var(--b));"><b>s</b></span><span class="cell green" style="width: var(--b);"><b>c</b></span><span class="cell green" style="width: calc(4 * var(--b));"><b>f</b></span></div>
+                <p class="flush" style="font-size: 0.85em;">Regroupe des éléments de types différents</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>8.3 Structures : déclaration de type</h2>
+          <p>La <highlight>structure</highlight> permet de désigner <b>sous un seul nom</b> un <b>ensemble de valeurs</b> pouvant être de types différents*</p>
+          <br>
+          <p><b>Syntaxe</b> de la <b>déclaration</b> d'un type structure</p>
+          <pre style="width: 1500px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.4em; background-color: #ffff99;">
+
+            <span class="blue">struct</span> <span class="gray">[</span><span class="purple">identificateur</span><span class="gray">]</span>  ◄──┐
+            <span class="blue">{</span>                           │
+                type1     membre1;      │
+                type2     membre2;      │
+                …                       │
+                typeN     membreN;      │
+            <span class="blue">}</span><span class="gray">[var1, ...]</span><span class="blue">;</span>  ◄────────────┴─ <span class="note">L'un des deux est optionnel</span>
+          </code></pre>
+          <aside class="notes"><b>* ~Généralisation du tableau =&gt; ensemble de valeurs du même type</b><br><br><b>Déclaration de structures</b><br>Pour pouvoir manipuler une donnée de type structure, il faut construire d'abord un <b>nouveau type</b> de données, auquel on donne un nom, puis déclarer une variable de ce type.<br>Les différents éléments composant la structure sont appelés les <b>membres</b> de la structure.</aside>
+        </section>
+
+        <section>
+          <h2>8.3 Structures : déclaration de type</h2>
+          <p class="tight">Exemple &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>déclaration d’un type</b> <inline-code>struct PatientFile</inline-code></p>
+          <pre style="width: 1150px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            struct <span class="purple">PatientFile</span>  // déclaration du type
+            {
+              // déclaration des membres
+              char  <b>name</b>[32];
+              short <b>age</b>;
+              double <b>height</b>, <b>weight</b>;
+            };
+          </code></pre>
+          <div class="memblock struct" style="margin-top: 40px;">
+            <div class="mem frame"><span class="cell name"></span><span class="cell short"></span><span class="cell float"></span><span class="cell float2"></span></div>
+            <div class="mem index" style="margin-top: 8px;"><span class="cell name" style="width: calc(32 * var(--b) - 60px);">name</span><span class="cell short" style="width: calc(2 * var(--b) + 50px);">age</span><span class="cell float">height</span><span class="cell float2">&nbsp;weight</span></div>
+          </div>
+        </section>
+
+        <section>
+          <h2 style="font-size: 1.4em;">8.3 Structures : déclaration de variables (1)</h2>
+          <p class="tight"><b>Déclaration</b> d’une variable <inline-code>client</inline-code> de type :</p>
+          <p class="tight mono purple indent-1">struct PatientFile</p>
+          <pre style="width: 1200px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.45em;">
+
+            <span class="box-black" style="border-color: #1F3864; background-color: #B8CCE4;"><span class="blue">struct</span> <span class="purple">PatientFile</span></span> client;
+          </code></pre>
+          <p class="tight"><b>Déclaration <u>et initialisation</u></b> de variables <inline-code>c1</inline-code>, <inline-code>c2</inline-code>, <inline-code>c3</inline-code>, de type <span class="mono"><span class="blue">struct</span> <span class="purple">PatientFile</span></span> :</p>
+          <div style="display: flex; align-items: flex-end; justify-content: center; gap: 20px;">
+            <pre style="width: 1300px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.45em;">
+
+              <span class="blue">struct</span> <span class="purple">PatientFile</span> c1 = {"Jules",25,176,72},
+                                 c2 = {"Eva",18},
+                                 c3 = {"Ed",<span class="red">.height=</span>145,59};
+            </code></pre>
+            <p class="flush blue">≥C99</p>
+          </div>
+          <div style="display: flex; justify-content: center; gap: 30px; margin-top: 25px;">
+            <div class="memblock struct mini" style="margin: 0;"><p class="mem-label" style="font-family: 'Roboto', Helvetica, sans-serif; font-weight: normal;">c1</p><div class="mem frame"><span class="cell name"></span><span class="cell short"></span><span class="cell float"></span><span class="cell float2"></span></div></div>
+            <div class="memblock struct mini" style="margin: 0;"><p class="mem-label" style="font-family: 'Roboto', Helvetica, sans-serif; font-weight: normal;">c2</p><div class="mem frame"><span class="cell name"></span><span class="cell short"></span><span class="cell float"></span><span class="cell float2"></span></div></div>
+            <div class="memblock struct mini" style="margin: 0;"><p class="mem-label" style="font-family: 'Roboto', Helvetica, sans-serif; font-weight: normal;">c3</p><div class="mem frame"><span class="cell name"></span><span class="cell short"></span><span class="cell float"></span><span class="cell float2"></span></div></div>
+          </div>
+          <aside class="notes">Avec C99, il est possible de nommer des champs que l'on souhaite initialiser à la déclaration (entre accolades). Les éventuelles valeurs suivantes seront les champs suivants (selon l'ordre de déclaration de la structure).</aside>
+        </section>
+
+        <section>
+          <h2 style="font-size: 1.4em;">8.3 Structures : déclaration de variables (2)</h2>
+          <p>À la déclaration d'un type structure, il est permis de <span class="blue">déclarer directement</span> une ou plusieurs variables de ce type. On peut même le faire sans nommer le type structure:</p>
+          <pre style="width: 1300px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            <span class="blue">struct</span>          <span class="purple">◄────────── <span class="note">type anonyme</span></span>
+            {
+              double x,y;
+            } <span class="blue">point1, point2</span>;
+          </code></pre>
+          <br>
+          <p><span class="mono blue">point1</span> et <span class="mono blue">point2</span> sont des variables de type structure</p>
+          <aside class="notes">On parle alors d'un type anonyme (utilisable une seule fois)<br>Note: il est permis d'initialiser point à sa déclaration</aside>
+        </section>
+
+        <section>
+          <h2>8.3 Structures : accès aux membres</h2>
+          <p class="tight"><b>Variable de type structure, accès par <highlight>l'opérateur point</highlight> <span class="mono">‘<span class="blue">.</span>’</span></b></p>
+          <p class="centered"><span class="syntax" style="font-size: 1.2em;">&lt;variable&gt;<span class="red">.</span>&lt;membre&gt;</span></p>
+          <div style="display: flex; align-items: center; gap: 120px;">
+            <p class="tight"><b>Exemple</b></p>
+            <pre style="width: 1050px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.45em;">
+
+              struct PatientFile myPatient;
+              myPatient.height = 190.0;
+              strcpy(myPatient<span class="red">.</span>name, "Edgar");
+            </code></pre>
+          </div>
+          <div style="display: flex; align-items: center; gap: 60px; margin-top: 30px;">
+            <p class="tight" style="visibility: hidden;"><b>Exemple</b></p>
+            <div class="memblock struct" style="margin: 0;">
+              <p class="mem-label" style="font-family: 'Roboto', Helvetica, sans-serif; font-weight: normal; margin-bottom: 8px;">myPatient</p>
+              <div class="mem frame"><span class="cell byte">E</span><span class="cell byte">d</span><span class="cell byte">g</span><span class="cell byte">a</span><span class="cell byte">r</span><span class="cell byte" style="color: #FFFFFF; font-weight: normal; font-size: 22px;">\0</span><span class="cell name" style="width: calc(26 * var(--b));"></span><span class="cell short"></span><span class="cell float">190.0</span><span class="cell float2"></span></div>
+              <div class="mem index" style="margin-top: 8px; font-weight: normal;"><span class="cell name" style="width: calc(32 * var(--b) - 60px); font-weight: normal;">name</span><span class="cell short" style="width: calc(2 * var(--b) + 50px); font-weight: normal;">age</span><span class="cell float" style="font-weight: normal;">height</span><span class="cell float2" style="font-weight: normal;">&nbsp;weight</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>8.3 Structures imbriquées : déclaration</h2>
+          <div class="container">
+            <div class="col-left" style="flex: 1;">
+              <pre style="width: 880px; margin: 0;"><code
+                class="c"
+                data-trim
+                data-noescape
+                style="font-size: 1.55em;">
+
+                <span class="blue">struct</span> <span class="hl-yellow">Date</span>
+                {
+                  <b>short</b> day, month, year;
+                };
+
+                <span class="blue">struct</span> <span class="purple">PatientFileB</span>
+                {
+                  char   name[32];
+                  <span class="blue">struct</span> <span class="hl-yellow">Date</span> birthDate;
+                  double height;
+                };
+              </code></pre>
+            </div>
+            <div class="col-right" style="flex: 1;">
+              <div class="memblock struct" style="margin: 0 0 0 40px; --b: 18px; --ch: 100px;">
+                <p class="mem-label">struct Date</p>
+                <div class="mem" style="margin: 10px 0 60px 60px;"><span class="cell short"></span><span class="cell short"></span><span class="cell short"></span></div>
+                <p class="mem-label" style="margin-bottom: 12px;">struct PatientFileB</p>
+                <div class="mem frame"><span class="cell name"></span><span class="cell short"></span><span class="cell short"></span><span class="cell short"></span><span class="cell float"></span></div>
+                <p class="mem-label" style="font-weight: normal; margin-top: 12px;">misterDurand</p>
+              </div>
+            </div>
+          </div>
+          <pre style="width: 1750px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.55em;">
+
+            <span class="blue">struct</span> <span class="purple">PatientFileB</span> misterDurand ={"Durand", <span class="hl-yellow">{13,2,1976}</span>, 190.0};
+          </code></pre>
+        </section>
+
+        <section>
+          <h2 style="font-size: 1.4em;">8.3 Structures imbriquées : accès membres</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 40px;">
+            <pre style="width: 780px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.3em;">
+
+              struct <span class="purple">PatientFileB</span>
+              {
+                char   name[32];
+                struct <span class="hl-yellow">Date</span> birthDate;
+                double height;
+              };
+            </code></pre>
+            <pre style="width: 480px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.3em;">
+
+              struct <span class="hl-yellow">Date</span>
+              {
+                short day,
+                      month,
+                      year;
+              };
+            </code></pre>
+          </div>
+          <pre style="width: 1000px; margin-top: 25px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.45em;">
+
+            struct PatientFileB clientX;
+            clientX<span class="blue">.</span>height = 190.0;
+            clientX<span class="hl-yellow">.</span>birthDate<span class="hl-yellow">.</span>year = 1976;
+          </code></pre>
+          <div class="memblock struct" style="margin-top: 20px; --ch: 80px;">
+            <div class="mem frame"><span class="cell name"></span><span class="cell short"></span><span class="cell short"></span><span class="cell short" style="font-size: 22px;">1976</span><span class="cell float2">190.0</span></div>
+            <div class="mem index" style="margin-top: 8px; font-weight: normal;"><span class="cell name" style="font-family: 'Roboto', Helvetica, sans-serif; font-weight: normal;">clientX</span><span class="cell" style="width: calc(6 * var(--b)); text-align: center; line-height: 1.1;">birthDate<br><span style="padding-left: calc(4 * var(--b));">year</span></span></div>
+          </div>
+        </section>
+
+        <section>
+          <h2>8.3 Structures : affectation</h2>
+          <p>Possible entre deux variables du même type <inline-code>struct</inline-code></p>
+          <br>
+          <pre style="width: 1500px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.7em;">
+
+            struct PatientFileB patientX = {"Jean",… };
+            struct PatientFileB patientY;
+
+            <b>patientY = patientX;</b><span class="blue" style="font-weight: normal;">// Tout le contenu est recopié</span>
+            patientY.height = patientX.height;
+          </code></pre>
+          <br>
+          <p>Contrairement aux tableaux, <inline-code>=</inline-code> <highlight>copie toute la structure</highlight></p>
+        </section>
+
+        <section>
+          <h2>8.3 Tableau de structures</h2>
+          <p class="tight">Chaque élément du tableau est une structure</p>
+          <pre style="width: 1300px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            #define SIZE 3
+
+            struct PatientFile patients[SIZE] = {
+                {"Jules", 25, 176, 72},
+                {"Eva", 18, 165, 58},
+                {"Ed", 31, 145, 59}
+            };
+
+            <span class="blue">patients[0].age</span> = 26;
+
+            for (int i = 0; i &lt; SIZE; i++)
+            {
+                printf("%s : %d ans\n", <span class="blue">patients[i].name</span>, <span class="blue">patients[i].age</span>);
+            }
+          </code></pre>
+          <p class="tight centered"><span class="syntax">&lt;tableau&gt;[&lt;indice&gt;]<span class="red">.</span>&lt;membre&gt;</span></p>
+        </section>
+
+        <section>
+          <h2>8.3 Structures et fonctions</h2>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 40px;">
+            <pre style="width: 460px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.3em;">
+
+              struct MyStruct
+              {
+                  ...
+              };
+            </code></pre>
+            <div class="memblock struct mini" style="margin: 0;"><div class="mem frame"><span class="cell name"></span><span class="cell short"></span><span class="cell float"></span><span class="cell float2"></span></div></div>
+          </div>
+          <p class="tight">Une fonction peut retourner un résultat de type structure</p>
+          <p class="centered tight mono"><span class="purple">struct MyStruct</span> getData(…);</p>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 30px; margin: 15px 0;">
+            <div class="memblock struct mini" style="margin: 0; --b: 6px;"><div class="mem frame"><span class="cell name"></span><span class="cell short"></span><span class="cell float"></span><span class="cell float2"></span></div></div>
+            <span style="font-size: 1.6em; color: #1F3864;">⇦</span>
+            <span class="func-box">getData</span>
+          </div>
+          <p class="tight">Une structure peut être passée comme paramètre à une fonction</p>
+          <p class="centered tight mono">void showData(<span class="purple">struct MyStruct</span> s);</p>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 30px; margin: 15px 0;">
+            <div class="memblock struct mini" style="margin: 0; --b: 6px;"><div class="mem frame"><span class="cell name"></span><span class="cell short"></span><span class="cell float"></span><span class="cell float2"></span></div></div>
+            <span style="font-size: 1.6em; color: #1F3864;">⇨</span>
+            <span class="func-box">showData</span>
+          </div>
+        </section>
+
+      </section>
+
+      <!----------          TYPEDEF          ---------->
+      <section>
+
+        <section>
+          <h2>8.4 <span class="mono blue">typedef</span> (types synonymes)</h2>
+          <p>Le langage C permet de renommer des types en leur donnant un synonyme</p>
+          <br>
+          <p>L'intérêt est de <highlight>simplifier</highlight> l'écriture et la lecture du code</p>
+          <br>
+          <p>La déclaration d'un nouveau type se fait avec le mot-clé <span class="mono blue">typedef</span></p>
+          <br>
+          <p class="tight">Offre un outil <highlight>favorisant la portabilité du code</highlight></p>
+          <pre style="width: 900px; margin-left: 300px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em; background-color: transparent; font-weight: bold;">
+
+            <span class="blue">typedef</span> unsigned char <span class="blue">Uint8</span>;
+            <span class="blue">typedef</span> double        <span class="blue">Sfp64</span>;
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>8.4 <span class="mono blue">typedef</span> (types synonymes)</h2>
+          <h3 class="plain">Syntaxe</h3>
+          <p class="centered"><span class="syntax"><span class="blue">typedef</span>&nbsp; &lt;Type standard&gt; &lt;<span class="purple">Nom de type</span>&gt;;</span></p>
+          <br>
+          <br>
+          <h3 class="plain">Exemple</h3>
+          <pre style="width: 1250px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            <span class="blue">typedef</span>  int  <span class="purple">Entier</span>;
+            <span class="purple">Entier</span>  <span class="blue">v1;</span>    // équivalent à int v1
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>8.4 <span class="mono blue">typedef</span> (types synonymes)</h2>
+          <h3 class="plain">Syntaxe</h3>
+          <p class="centered"><span class="syntax"><span class="blue">typedef</span>&nbsp; &lt;Type std&gt; &lt;<span class="purple">Nom de type</span>&gt;[&lt;N&gt;];</span></p>
+          <br>
+          <br>
+          <h3 class="plain">Exemple</h3>
+          <pre style="width: 1250px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            <span class="blue">typedef</span> char <span class="purple">Chaine</span>[80];
+            <span class="purple">Chaine</span> <b>v2;</b> // équivalent à <span class="blue">char</span> v2<b>[80]</b>
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>8.4 <span class="mono blue">typedef</span> (types synonymes)</h2>
+          <h3 class="plain">Syntaxe</h3>
+          <p class="centered"><span class="syntax"><span class="blue">typedef</span> &lt;Déf struct&gt; &lt;<span class="purple">Nom de type</span>&gt;;</span></p>
+          <br>
+          <div style="display: flex; align-items: flex-start; gap: 60px;">
+            <h3 class="plain">Exemple</h3>
+            <pre style="width: 1150px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.5em;">
+
+              <span class="blue">typedef</span> struct
+              {
+                  char  <b>name</b>[32];
+                  short <b>age</b>;
+                  double <b>height</b>, <b>weight</b>;
+              } <span class="purple">PatientTy</span>;
+              <span class="purple">PatientTy</span> v4;
+            </code></pre>
+          </div>
+          <aside class="notes">Structure anonyme afin de ne pas confondre avec le nom du typedef</aside>
+        </section>
+
+        <section>
+          <h2>8.4 Remarque</h2>
+          <p class="tight">Quelle est la différence entre <span class="mono blue">struct</span> et <span class="mono blue">typedef struct</span> ?</p>
+          <pre style="width: 1100px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            <span class="blue">struct</span> <span class="purple">t1</span> { ... };          //1.
+            <span class="blue">typedef struct</span> { ... } <span class="purple">T2</span>;  //2.
+          </code></pre>
+          <p class="tight"><span class="mono">1. t1</span> est un identificateur de structure</p>
+          <p class="tight" style="padding-left: 290px;">Le type associé est &nbsp;<span class="mono">struct t1</span></p>
+          <p class="tight">2.&nbsp; Déclare un nouveau type nommé <span class="mono">T2</span></p>
+          <br>
+          <p class="tight">La seconde écriture permet <b>plus d'abstraction</b> de type</p>
+          <pre style="width: 1100px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            <span class="blue">struct</span> <span class="purple">t1</span> v1; <span class="red">// struct traîne</span>
+            <span class="purple">T2</span> v2;        <span class="green">// Abstraction</span>
+          </code></pre>
+          <aside class="notes">Voir exemple du cours avec tableau de pointeurs sur de structures!!</aside>
+        </section>
+
+      </section>
+
+      <!----------          EXERCICES          ---------->
+      <section>
+        <h2>📝 Exercices</h2>
+        <p style="text-align: center; padding-left: 0;">
+          <a href="https://he-arc.github.io/1242.1-Langage_C/docs/cours/chapitre08cours/">Exercices du chapitre 08</a>
+        </p>
+      </section>
+
+    </div>
+  </div>
+
+  <!----------          CONTENT          ---------->
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/notes/notes.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      hash: true,
+      width: 1920,
+      height: 1080,
+      transition: "none",
+      center: false,
+      slideNumber: 'c/t',
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+    });
+  </script>
+</body>
+
+</html>
