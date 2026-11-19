@@ -1,0 +1,1341 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>HE-Arc - 1242.1 Langage C - Chapitre 10 - Allocation dynamique</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/hearc.css" id="theme">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="https://www.he-arc.ch/wp-content/uploads/2021/12/cropped-hearc-icon-192x192.png"
+    type="image/vnd.microsoft.icon" />
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/vs.css" id="highlight-theme">
+
+  <style>
+    .reveal .container p,
+    .reveal .container h3,
+    .reveal .container h4 { padding-left: 0; }
+    .reveal .container .col-left { text-align: left; }
+
+    .reveal .indent-1 { padding-left: 300px; }
+    .reveal .indent-2 { padding-left: 400px; }
+    .reveal .centered { text-align: center; padding-left: 0; }
+    .reveal p.tight { margin: 8px 0; }
+    .reveal p.flush { padding-left: 0; }
+    .reveal i { font-style: italic; }
+    .reveal h3.plain { text-transform: none; }
+    .reveal h2 .mono { text-transform: none; }
+    .reveal h2.long-title { font-size: 1.4em; }
+
+    .reveal pre.terminal code.hljs,
+    .reveal pre.terminal code {
+      background-color: #000000;
+      color: #FFFFFF;
+    }
+    .reveal pre.terminal code .hl-yellow { color: #FFFF00; font-weight: bold; }
+
+    .reveal .mono { font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+    .reveal code .red { color: #FF0000; font-weight: bold; }
+    .reveal code .blue { color: #0000FF; font-weight: bold; }
+    .reveal code .green { color: #00B050; font-weight: bold; }
+    .reveal code .note { font-family: "Roboto", Helvetica, sans-serif; font-weight: normal; }
+    .reveal code .red *, .reveal code .blue *, .reveal code .green * { color: inherit; }
+
+    .reveal .red { color: #FF0000; }
+    .reveal .blue { color: #0000FF; }
+    .reveal .green { color: #00B050; }
+    .reveal .lightblue { color: #548DD4; }
+
+    .reveal .syntax {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      background-color: #ffff99;
+      border: 2px solid #000;
+      padding: 0.1em 0.5em;
+    }
+    .reveal .frame-blue {
+      border: 4px solid #0000FF;
+      padding: 10px 30px;
+      display: table;
+      margin: 0 auto;
+    }
+    .reveal .frame-blue p { padding-left: 0; }
+    .reveal .frame-black {
+      border: 2px solid #000000;
+      padding: 6px 20px;
+    }
+    .reveal .frame-black p { padding-left: 0; margin: 0; }
+
+    /* memory cells: one flex row per memory strip, same cell width in the value, label and address rows */
+    .reveal .memblock { display: table; margin: 0 auto; --cw: 200px; --ch: 76px; }
+    .reveal .mem {
+      display: flex;
+      justify-content: flex-start;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      font-size: 34px;
+    }
+    .reveal .mem .cell {
+      box-sizing: border-box;
+      flex: none;
+      width: var(--cw);
+      height: var(--ch);
+      line-height: calc(var(--ch) - 4px);
+      margin-left: -2px;
+      border: 2px solid #000000;
+      background-color: #4F81BD;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .reveal .mem .cell.var { background-color: #376092; color: #FFFFFF; }
+    .reveal .mem .cell.arr { background-color: #00B0F0; }
+    .reveal .mem .cell.w2 { width: calc(2 * var(--cw)); }
+    .reveal .mem .cell.w4 { width: calc(4 * var(--cw)); }
+    .reveal .mem .cell.half { width: calc(var(--cw) / 2); }
+    .reveal .mem .cell.brk { background: linear-gradient(90deg, #4F81BD 0 25%, #FFFFFF 25% 75%, #4F81BD 75%); }
+    .reveal .mem .cell.gap { border-color: transparent; background: none; }
+    .reveal .mem .cell.mark { position: relative; outline: 5px solid #FF0000; outline-offset: -4px; }
+    .reveal .mem.index .cell,
+    .reveal .mem.addr .cell {
+      height: 50px;
+      line-height: 50px;
+      border-color: transparent;
+      background: none;
+      overflow: visible;
+    }
+    .reveal .mem.addr .cell { height: 42px; line-height: 42px; font-size: 28px; text-align: left; }
+    .reveal .mem .rowlabel {
+      flex: none;
+      box-sizing: border-box;
+      padding-right: 30px;
+      text-align: right;
+      align-self: center;
+    }
+    .reveal .mem .rowlabel.text { font-family: "Roboto", Helvetica, sans-serif; }
+    .reveal .mem .over { flex: none; text-align: center; margin-left: -2px; }
+    .reveal .mem .over .bracket {
+      height: 14px;
+      margin: 0 6px;
+      border: 3px solid #000000;
+      border-bottom: none;
+      border-radius: 12px 12px 0 0;
+    }
+    .reveal .brace-under {
+      height: 16px;
+      border: 3px solid #000000;
+      border-top: none;
+      border-radius: 0 0 14px 14px;
+    }
+
+    .reveal svg.diagram text { font-family: "Roboto", Helvetica, sans-serif; font-size: 34px; fill: #000000; }
+    .reveal svg.diagram text.mono { font-family: 'Courier New', Courier, monospace; }
+    .reveal svg.diagram text.b { font-weight: bold; }
+    .reveal svg.diagram text.blue { fill: #0000FF; }
+    .reveal svg.diagram text.red { fill: #FF0000; }
+    .reveal svg.diagram text.white { fill: #FFFFFF; }
+    .reveal svg.diagram .box { fill: #FFFFFF; stroke: #000000; stroke-width: 3; }
+    .reveal svg.diagram .main { fill: #02D038; stroke: #000000; stroke-width: 2; }
+    .reveal svg.diagram .callee { fill: #FFFF00; stroke: #000000; stroke-width: 2; }
+    .reveal svg.diagram .memcell { fill: #4F81BD; stroke: #385D8A; stroke-width: 3; }
+    .reveal svg.diagram .rule { stroke: #4F81BD; stroke-width: 2; }
+    .reveal svg.diagram .arrow { fill: none; stroke: #000000; stroke-width: 3; }
+    .reveal svg.diagram .arrow.red { stroke: #FF0000; stroke-width: 5; }
+    .reveal svg.diagram .step { fill: #0070C0; }
+
+    /* call-by-value walkthrough: one gutter character per code line, coloured by the function it belongs to */
+    .reveal code .bar { display: inline-block; width: 1ch; }
+    .reveal code .bar.callee { background-color: #FFFF00; }
+    .reveal code .bar.main { background-color: #00B050; }
+    .reveal code .step { display: inline-block; width: 2ch; text-align: center; color: #0070C0; font-weight: bold; font-size: 1.25em; line-height: 0.8; }
+    .reveal .verdict {
+      border: 2px solid currentColor;
+      padding: 10px 24px;
+      font-weight: bold;
+      text-align: center;
+    }
+    .reveal .verdict p { padding-left: 0; margin: 0; }
+
+    .reveal code .ring { border: 4px solid currentColor; border-radius: 50%; padding: 0 6px; }
+    .reveal code .ring * { color: #000000; }
+
+    .reveal table.plain { margin: 0 0 0 300px; font-size: 1em; }
+    .reveal table.plain td { border: none; padding: 0.1em 0.8em 0.1em 0; vertical-align: middle; }
+
+    .reveal table.equiv { margin: 0 auto; font-size: 1em; }
+    .reveal table.equiv td {
+      border: 2px solid #000000;
+      padding: 0.15em 0.6em;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+    }
+    .reveal table.equiv tr:last-child td { border-bottom: 2px solid #000000; }
+    .reveal table.equiv td.eq { text-align: center; width: 90px; font-weight: normal; }
+
+    .reveal table.priority { font-size: 0.75em; width: 1700px; margin: 0 auto; white-space: nowrap; }
+    .reveal table.priority th,
+    .reveal table.priority td { border: 2px solid #222; padding: 0.1em 0.8em; height: 1.4em; text-align: center; }
+    .reveal table.priority th { background-color: #dddddd; text-align: center; }
+    .reveal table.priority tr:last-child td { border-bottom: 2px solid #222; }
+    .reveal table.priority td.op { font-family: 'Courier New', Courier, monospace; text-align: center; }
+    .reveal table.priority td.op i { font-weight: normal; }
+    .reveal table.priority td.op .blue { font-weight: bold; }
+    .reveal table.priority td.dir { text-align: center; }
+    .reveal table.priority td.dir.rtl { color: #FF0000; }
+    .reveal table.priority td.level { text-align: left; }
+
+    .reveal .bar-row { display: flex; align-items: center; justify-content: flex-end; gap: 16px; height: 62px; }
+    .reveal .bar {
+      box-sizing: border-box;
+      height: 46px;
+      background-color: #4F81BD;
+      border: 2px solid #385D8A;
+      color: #FFFFFF;
+      font-weight: bold;
+      font-size: 26px;
+      text-align: center;
+      line-height: 42px;
+      white-space: nowrap;
+    }
+    .reveal .bar-count { width: 110px; font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 38px; text-align: left; }
+    .reveal .scale { display: flex; justify-content: flex-end; padding-right: 126px; font-size: 24px; color: #1F3864; }
+    .reveal .scale span { width: 55px; text-align: left; border-left: 2px solid #1F3864; padding-left: 2px; }
+
+    .reveal .seg { display: flex; align-items: stretch; }
+    .reveal .seg .left { width: 230px; padding-right: 14px; box-sizing: border-box; text-align: right; font-size: 28px; align-self: center; }
+    .reveal .seg .cellv {
+      box-sizing: border-box;
+      width: 340px;
+      border-left: 4px solid #000000;
+      border-right: 4px solid #000000;
+      text-align: center;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      font-size: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .reveal .seg .right { width: 220px; padding-left: 14px; box-sizing: border-box; font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 38px; align-self: center; }
+    .reveal .seg .cellv.top { border-top: 4px solid #000000; }
+    .reveal .seg .cellv.bottom { border-bottom: 4px solid #000000; }
+    .reveal .seg .cellv.stackvar { background-color: #4F81BD; outline: 2px solid #385D8A; outline-offset: -3px; }
+    .reveal .seg .cellv.heapvar { background-color: #00B0F0; outline: 2px solid #385D8A; outline-offset: -3px; }
+    .reveal .seg .cellv.free { background-color: #00CC33; }
+    .reveal .seg .cellv.bss { background-color: #FFC000; border-top: 2px solid #000; }
+    .reveal .seg .cellv.data { background-color: #FFFF00; border-top: 2px solid #000; }
+    .reveal .seg .cellv.text { background-color: #FFFF99; border-top: 2px solid #000; font-family: "Roboto", Helvetica, sans-serif; font-size: 34px; }
+    .reveal .seg .cellv.mark { outline: 4px solid #FF0000; outline-offset: -4px; }
+    .reveal code .gutter { display: inline-block; width: 2ch; }
+    .reveal code .here { color: #0000FF; font-weight: bold; }
+    .reveal .seg .left.stacklbl { align-self: flex-start; padding-top: 6px; }
+
+    .reveal .orgmap { display: grid; margin: 0 auto; width: max-content; }
+    .reveal .orgmap .box {
+      box-sizing: border-box;
+      border-left: 4px solid #000;
+      border-right: 4px solid #000;
+      border-top: 2px solid #000;
+      text-align: center;
+      font-size: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .reveal .box-cell { box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+    .reveal .orgmap .lbl { font-size: 32px; padding-left: 14px; display: flex; align-items: center; }
+    .reveal .orgmap .side { font-size: 28px; color: #0000FF; display: flex; align-items: center; justify-content: center; text-align: center; }
+
+    .reveal .chars { display: flex; align-items: center; font-size: 30px; }
+    .reveal .chars .ptr {
+      box-sizing: border-box;
+      width: 52px; height: 48px;
+      border: 3px solid #000;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: -3px;
+    }
+    .reveal .chars .ptr::after { content: ""; width: 22px; height: 22px; border-radius: 50%; background: #000; }
+    .reveal .chars .arrow { width: 90px; text-align: center; font-size: 36px; line-height: 1; }
+    .reveal .chars .c {
+      box-sizing: border-box;
+      width: 52px; height: 48px;
+      border: 2px solid #000;
+      margin-left: -2px;
+      margin-top: -3px;
+      text-align: center;
+      line-height: 44px;
+    }
+    .reveal .chars .addr { width: 200px; text-align: right; padding-right: 12px; font-size: 30px; }
+
+    .reveal .callout {
+      background-color: #4F81BD;
+      color: #FFFFFF;
+      border: 2px solid #385D8A;
+      padding: 8px 24px;
+      font-size: 32px;
+    }
+    .reveal .callout p { padding-left: 0; margin: 0; }
+  </style>
+</head>
+
+<body>
+  <img id="logo-hearc" src="./medias/logo_he-arc.png" alt="Logo HE-ARC">
+  <img id="logo-hesso" src="./medias/logo_hes-so.png" alt="Logo HES-SO">
+  <p id="course-infos">1242.1 Langage C - 2026-2027</p>
+
+  <!----------          CONTENT          ---------->
+  <div class="reveal">
+    <div class="slides">
+
+      <!----------          TITLE          ---------->
+      <section>
+        <h1>
+          Chapitre 10
+        </h1>
+        <h2>
+          Allocation dynamique
+        </h2>
+        <p class="tight">1. Allocation statique vs dynamique</p>
+        <p class="tight">2. Allocation de variables en mémoire</p>
+        <p class="tight">3. Allocation de tableaux</p>
+        <p class="tight">4. Tableaux de pointeurs</p>
+        <aside class="notes">Référence:<br>http://fr.wikibooks.org/wiki/Programmation_C/Tableaux<br>intéressant  . P.ex. la possibilité d'écrire   T[i]    ou i[T]   (à éviter!!)</aside>
+      </section>
+
+      <!----------          ALLOCATION STATIQUE VS DYNAMIQUE          ---------->
+      <section>
+
+        <section>
+          <h2 class="long-title">10.1 Allocation de mémoire statique</h2>
+          <p class="tight flush" style="padding-left: 80px; font-size: 1.3em;">Taille en octets ?</p>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 30px;">
+            <pre style="width: 1060px; margin: 0; flex: none;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.45em;">
+
+            <span class="note">1)</span> char f[][10] = {"one","two","three","four"};
+
+            <span class="note">2)</span> short d[10][9];
+
+            <span class="note">3)</span> float e[] = {2.1,1.1,9.22,-7.1,8.992};
+
+            <span class="note">4)</span> double a, b, c;
+
+            <span class="note">5)</span> double *g;
+
+            <span class="note">6)</span> char *h;
+
+            <span class="note">7)</span> float *i[10];
+          </code></pre>
+            <div style="width: 600px;">
+              <div class="bar-row fragment"><div class="bar" style="width: 55px;">char</div><div class="bar-count">x40</div></div>
+              <div class="bar-row fragment"><div class="bar" style="width: 110px;">short</div><div class="bar-count">x90</div></div>
+              <div class="bar-row fragment"><div class="bar" style="width: 220px;">int, float</div><div class="bar-count">x5</div></div>
+              <div class="bar-row fragment"><div class="bar" style="width: 440px;">double</div><div class="bar-count">x3</div></div>
+              <div class="scale"><span>8</span><span></span><span></span><span></span><span>4</span><span></span><span>2</span><span>1</span></div>
+              <div class="bar-row fragment"><div class="bar" style="width: 440px;">Pointeur – sous win64</div><div class="bar-count">x1</div></div>
+              <div class="bar-row fragment"><div class="bar" style="width: 440px;">Pointeur – sous win64</div><div class="bar-count">x1</div></div>
+              <div class="bar-row fragment"><div class="bar" style="width: 440px;">Pointeur – sous win64</div><div class="bar-count">x10</div></div>
+            </div>
+          </div>
+          <aside class="notes"><b>Short char: 1 octet</b><br><b>Int               2 octets</b><br><b>Float         : 4 octets</b><br><b>Double      : 8 octets</b><br><b>(En DOS : p = 2 -&gt; Adressage de 65535 octets</b><br><b>               p = 4, -&gt; Adressage de 4294967296 octets = 4 Gigaoctets = 4096 MegaOctets</b><br><b>en Win32 : p = 4) .</b><br>Système 64: 18446744073709551616 bytes = 18014398509481984 kB = 17592186044416 MB = 17179869184 GB = 16777216 TB =16384 PB =<br>float A, B, C;        			/* réservation de 12  octets */<br>short D[10][20];      		/* réservation de 400 octets */<br>char E[] = {"Hello !"};	/* réservation de 8  octets */<br>char F[][10] = {"un", "deux", "trois", "quatre"};	/* réservation de 40  octets */<br><b>double *G;      // réservation de p octets</b><br><b>char *H;        	// réservation de p octets, la taille ne dépend pas du type pointé (un pointeur contient une adresse)</b><br><b>float *I[10];   	/* réservation de 10*p octets */</b></aside>
+        </section>
+
+        <section>
+          <h2 class="long-title">10.1 L'opérateur unaire et fonction : <span class="mono blue">sizeof</span>()</h2>
+          <p>L’opérateur <span class="mono blue">sizeof</span> donne, en octets :</p>
+          <br>
+          <div style="display: grid; grid-template-columns: 900px 500px; row-gap: 20px; align-items: center; padding-left: 200px;">
+            <p class="flush tight">La taille d’une variable <span class="mono">&lt;var&gt;</span></p>
+            <p class="flush tight"><span class="syntax"><span class="blue">sizeof</span> &lt;var&gt;</span></p>
+            <p class="flush tight">La taille d’une constante <span class="mono">&lt;const&gt;</span></p>
+            <p class="flush tight"><span class="syntax"><span class="blue">sizeof</span> &lt;const&gt;</span></p>
+            <p class="flush tight">La taille d’un type <span class="mono">&lt;type&gt;</span></p>
+            <p class="flush tight"><span class="syntax"><span class="blue">sizeof(</span>&lt;type&gt;<span class="blue">)</span></span></p>
+          </div>
+          <br>
+          <p class="tight">⚠ Les parenthèses sont obligatoires pour un type</p>
+          <p class="tight indent-1"><span class="mono blue">sizeof(</span><span class="mono">int</span><span class="mono blue">)</span></p>
+        </section>
+
+        <section>
+          <h2 class="long-title">10.1 L'opérateur unaire et fonction : <span class="mono blue">sizeof</span>()</h2>
+          <pre style="width: 1100px; font-weight: bold;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.7em;">
+
+            short tabA[10];
+            char  tabB[5][10];
+
+            sizeof tabA; // 20 bytes
+            sizeof tabB; // 50 bytes
+            sizeof 4.25; // 8 bytes
+            sizeof "Hello !"; // 8 bytes
+            sizeof(float); // 4 bytes
+            sizeof(double);   // 8 bytes
+          </code></pre>
+          <aside class="notes"><b>sizeof tabA</b> 		-&gt; 20 octets<br><b>sizeof tabB</b> 		-&gt; 50 octets<br><b>sizeof 4.25</b> 		-&gt; 8 octets<br><b>sizeof "Hello !"</b> 	  	-&gt; 10 octets<br><b>sizeof(float)</b> 		-&gt; 4 octets<br><b>sizeof(double)</b> 		-&gt; 8 octets</aside>
+        </section>
+
+        <section>
+          <h2>10.1 Allocation dynamique</h2>
+          <p class="tight"><error>Problème</error></p>
+          <p class="tight indent-1">Si la <b>taille</b> des données est <b>inconnue avant l’exécution</b>, on peut gaspiller de la mémoire en en réservant toujours "assez"</p>
+          <br>
+          <p class="tight indent-1">Par exemple, mémoriser 4 phrases de longueurs inconnues</p>
+          <pre style="width: 640px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            #define <span class="red">MAXSPACE</span> 500
+            char texte[4][<span class="red">MAXSPACE</span>];
+          </code></pre>
+          <p class="tight"><highlight>Solution</highlight></p>
+          <p class="tight indent-1">Gérer la mémoire en fonction du besoin, à l'exécution, grâce à l'allocation dynamique</p>
+        </section>
+
+        <section>
+          <h2>10.1 Allocation dynamique</h2>
+          <p>Nous voulons lire <b>4 phrases </b>au clavier et mémoriser les phrases en utilisant un <span class="blue">tableau de pointeurs sur </span><span class="mono blue">char</span></p>
+          <div style="display: flex; align-items: center; gap: 50px; padding-left: 200px;">
+            <p class="flush tight">Nous déclarons ce tableau de 4 pointeurs par</p>
+            <pre style="width: 460px; margin: 0;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            <span class="blue">char *texte[4]</span>;
+          </code></pre>
+          </div>
+          <p class="tight">Les pointeurs occuperont <span class="red">4*8 </span>octets en mémoire</p>
+          <p class="tight">La mémoire pour stocker les phrases sera obtenue dynamiquement à l'exécution selon les besoins exacts</p>
+          <svg class="diagram" width="1500" height="150" viewBox="0 0 1500 150" style="display: block; margin: 20px auto 0 auto;">
+            <defs>
+              <marker id="tip7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" /></marker>
+            </defs>
+            <line class="rule" x1="0" y1="80" x2="1500" y2="80" style="stroke: #1F3864;" /><line class="rule" x1="0" y1="130" x2="1500" y2="130" style="stroke: #1F3864;" />
+            <rect class="memcell" x="60" y="80" width="45" height="50" /><rect class="memcell" x="105" y="80" width="45" height="50" /><rect class="memcell" x="150" y="80" width="45" height="50" /><rect class="memcell" x="195" y="80" width="45" height="50" />
+            <circle cx="82" cy="105" r="9" /><circle cx="127" cy="105" r="9" /><circle cx="172" cy="105" r="9" /><circle cx="217" cy="105" r="9" />
+            <rect class="memcell" x="290" y="80" width="430" height="50" /><rect class="memcell" x="725" y="80" width="170" height="50" /><rect class="memcell" x="900" y="80" width="140" height="50" /><rect class="memcell" x="1045" y="80" width="220" height="50" />
+            <text class="mono white" x="505" y="115" text-anchor="middle">"Bonjour Monsieur\0"</text>
+            <text class="mono white" x="810" y="115" text-anchor="middle">"ABC\0"</text>
+            <text class="mono white" x="970" y="115" text-anchor="middle">"x\0"</text>
+            <text class="mono white" x="1155" y="115" text-anchor="middle">" byby\0"</text>
+            <path class="arrow" d="M 82 105 V 10 H 1155 V 76" marker-end="url(#tip7)" />
+            <path class="arrow" d="M 127 105 V 28 H 970 V 76" marker-end="url(#tip7)" />
+            <path class="arrow" d="M 172 105 V 46 H 810 V 76" marker-end="url(#tip7)" />
+            <path class="arrow" d="M 217 105 V 64 H 300 V 76" marker-end="url(#tip7)" />
+          </svg>
+        </section>
+
+        <section>
+          <h2>10.1 La fonction <span class="mono blue">malloc()</span></h2>
+          <p class="tight">La fonction <span class="mono blue">malloc</span> réserve/alloue <b>dynamiquement</b> de la mémoire lors de l’exécution du programme</p>
+          <p class="tight"><b>Syntaxe </b>&nbsp;&nbsp;&nbsp;&nbsp;<span class="syntax"><span class="blue">void* </span>malloc(int <span class="red">N</span>)</span></p>
+          <p class="tight"><b>Paramètre  </b><span class="mono red">N</span> le nombre de bytes à réserver</p>
+          <p class="tight"><b>Retour </b></p>
+          <p class="tight indent-1"><span class="blue">l'adresse</span> de type <span class="mono blue">void*</span> d'un bloc en mémoire de <span class="mono red">N</span> octets</p>
+          <p class="tight indent-1">ou <span class="mono blue">NULL</span> s'il n'y a pas assez de mémoire.</p>
+          <br>
+          <p class="tight"><b>Notes </b></p>
+          <p class="tight">L’allocation dynamique se fait sur le tas</p>
+          <p class="tight">Il faut ajouter <span class="mono blue">#include &lt;stdlib.h&gt;</span></p>
+          <aside class="notes">Puisque l’allocation est faite sur le tas, les données sont nulles? Apparemment pas  avec gcc sous Windows.<br>Notion de “dynamique” par rapport à statique ou automatique (autres classes d’allocation)</aside>
+        </section>
+
+        <section>
+          <h2>10.1 La fonction <span class="mono blue">malloc()</span></h2>
+          <p class="tight"><b>Exemple</b></p>
+          <p class="tight">Allocation d’un bloc en mémoire pour un texte</p>
+          <pre style="width: 1000px; font-weight: bold; margin-left: 500px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            char *ptr = malloc(4000*sizeof(char));
+            char *ptr2 = malloc(4000000000);
+          </code></pre>
+          <p class="tight">Fournit <b>l'adresse</b> d'un bloc de 4000 octets libres et l'affecte à <span class="mono">ptr</span></p>
+          <p class="tight">Si plus assez de mémoire, <span class="mono">malloc</span> retourne la valeur <span class="mono">NULL</span></p>
+          <br>
+          <p class="tight red">À éviter : transtyper / caster le retour de <span class="mono">malloc</span></p>
+          <pre style="width: 800px; font-weight: bold; margin-left: 500px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            ptr  = <span class="red">(char *) </span>malloc(4000);
+          </code></pre>
+          <aside class="notes">[ Référence] http://c.developpez.com/faq/?page=bonnes_pratiques]*<br>Contrairement aux idées reçues, le cast du malloc / calloc / realloc n'est pas obligatoire en C.<br><br>Dans les premières versions du C, le pointeur générique (void *) n'existait pas. La fonction malloc renvoyait un pointeur de type char *, ce qui rendait le cast obligatoire lorsque le pointeur utilisé pour stocker cette valeur retournée est de type différent.<br><br>Le C ANSI a cependant introduit le type "pointeur générique" (void *) qui, au vu des conversions implicites, peut être assigné, sans cast, à un pointeur de n'importe quel type (de même, un pointeur de n'importe quel type peut être assigné, sans cast, à un pointeur générique). Depuis, il n'était donc plus nécessaire de caster malloc.<br><br>Si votre compilateur refuse de compiler votre code tant que vous ne castez pas malloc, alors :<br>soit vous utilisez un compilateur non conforme (ce qui est très peu probable de nos jours à moins que vous utilisiez un compilateur datant de l'avant-normalisation, c'est-à-dire un compilateur des années 70 ou 80 ...).<br><br>soit vous compilez en mode "C++", c'est-à-dire que votre compilateur (qui est donc apparemment capable de compiler aussi bien du code C que du code C++) pense que votre code est écrit en C++ (dans lequel le cast de void * vers un autre type pointeur est obligatoire) et non en C (dans lequel caster malloc est non seulement inutile mais aussi de mauvais style). Généralement les fichiers sources C++ portent l'extension .cpp et les fichiers sources C l'extension .c, mais cela peut changer d'un compilateur à un autre. Il faut donc faire bien attention sur ce point là.</aside>
+        </section>
+
+        <section>
+          <h2>10.1 La fonction <span class="mono blue">free()</span></h2>
+          <p class="tight">La fonction <span class="mono blue">free</span> libère la mémoire réservée avec <span class="mono blue">malloc</span></p>
+          <p class="tight"><b>Syntaxe </b>&nbsp;&nbsp;&nbsp;&nbsp;<span class="syntax"><span class="blue">free(</span> <span class="red">&lt;adresse&gt; </span><span class="blue">)</span></span></p>
+          <br>
+          <p class="tight">Libère le bloc de mémoire désigné par <span class="mono red">&lt;adresse&gt;</span></p>
+          <p class="tight">N'a pas d'effet si le pointeur a la valeur <span class="mono blue">NULL</span></p>
+          <br>
+          <p class="tight">La mémoire est <span class="blue">libérée automatiquement </span>à la fin du programme, même si <span class="mono blue">free</span> n’a pas été utilisée</p>
+          <br>
+          <p class="tight"><error>Ne pas oublier <span class="mono">#include &lt;stdlib.h&gt;</span></error></p>
+          <aside class="notes">https://stackoverflow.com/questions/1957099/how-do-free-and-malloc-work-in-c</aside>
+        </section>
+
+        <section>
+          <h2>10.1 Attention !</h2>
+          <p>Si on perd l'adresse d'un bloc de mémoire alloué avec <span class="mono blue">malloc</span>, sans au préalable l'avoir libéré avec <span class="mono blue">free</span> → <highlight>fuite mémoire</highlight></p>
+          <br>
+          <p>Attention à ne pas utiliser un bloc de mémoire déjà libéré par <span class="mono blue">free</span></p>
+          <br>
+          <div style="border: 2px solid #92D050; border-radius: 16px; padding: 10px 20px; margin: 0 100px 0 200px;">
+            <p class="flush tight"><b style="color: #00CC00;">Bonne pratique : affecter la valeur NULL au pointeur immédiatement après avoir libéré le bloc de mémoire concerné.</b></p>
+          </div>
+          <br>
+          <p><span class="mono blue">free</span> ne doit être utilisée que pour libérer de la mémoire allouée par <span class="mono blue">malloc</span></p>
+        </section>
+
+      </section>
+
+      <!----------          ALLOCATION DE VARIABLES EN MEMOIRE          ---------->
+      <section>
+
+        <section>
+          <h2>6.3 Organisation mémoire</h2>
+          <p class="tight" style="text-align: right; padding: 0 60px 0 0; font-size: 0.8em; margin-top: -40px;"><i><b>Schéma théorique</b> : Dépend des OS et de la plateforme HW</i></p>
+          <div class="orgmap" style="grid-template-columns: 300px 330px 430px 230px 170px; grid-template-rows: 60px 80px 150px 52px 52px 52px 40px 90px;">
+            <div class="side" style="grid-column: 1; grid-row: 1; color: #000; justify-content: flex-start;"><b>haute</b></div>
+            <div class="side" style="grid-column: 1; grid-row: 2 / 7; flex-direction: column; gap: 20px;"><span>⇩ Adresses mémoire (Windows) ⇩</span><span>RAM</span><span>Mémoire du programme</span></div>
+            <div class="side" style="grid-column: 1; grid-row: 8; flex-direction: column; align-items: flex-start;"><span>kernel</span><b style="color: #000;">basse</b></div>
+            <div class="box" style="grid-column: 2; grid-row: 1; border-top: 4px solid #000;">…</div>
+            <div class="box" style="grid-column: 2; grid-row: 2; background: #00CC33; color: #0000FF; font-size: 44px;">⬇</div>
+            <div class="box" style="grid-column: 2; grid-row: 3; background: #00CC33; color: #FF0000; font-size: 44px; outline: 4px solid #FF0000; outline-offset: -4px; align-items: flex-end;">⬆</div>
+            <div class="box" style="grid-column: 2; grid-row: 4; background: #FFC000;">bss segment</div>
+            <div class="box" style="grid-column: 2; grid-row: 5; background: #FFFF00;">data segment</div>
+            <div class="box" style="grid-column: 2; grid-row: 6; background: #D7E4BD;">text segment</div>
+            <div class="box" style="grid-column: 2; grid-row: 7;">…</div>
+            <div class="box" style="grid-column: 2; grid-row: 8; background: #FFFF99; border-bottom: 4px solid #000; font-weight: bold;">OS kernel</div>
+            <div class="lbl" style="grid-column: 3; grid-row: 2; align-items: flex-start;">Pile (stack)</div>
+            <div class="lbl" style="grid-column: 3; grid-row: 3; align-items: flex-end;"><b class="red">Tas (heap)</b></div>
+            <div class="lbl" style="grid-column: 3; grid-row: 4;">Données non initialisées</div>
+            <div class="lbl" style="grid-column: 3; grid-row: 5;">Données initialisées</div>
+            <div class="lbl" style="grid-column: 3; grid-row: 6;">Instructions du   prog.</div>
+            <div class="side" style="grid-column: 4; grid-row: 2 / 4; border-left: 3px solid #0000FF;">Allocation<br>dynamique</div>
+            <div class="side" style="grid-column: 4; grid-row: 4 / 7; border-left: 3px solid #0000FF;">Allocation<br>statique</div>
+            <div class="side" style="grid-column: 5; grid-row: 2 / 6; border-left: 3px solid #0000FF;">Données</div>
+            <div class="side" style="grid-column: 5; grid-row: 6; border-left: 3px solid #0000FF;">Code</div>
+          </div>
+          <aside class="notes">https://stackoverflow.com/questions/79923/what-and-where-are-the-stack-and-heap</aside>
+        </section>
+
+        <section>
+          <h2 class="long-title">10.2 Allocation mémoire<br>variable locale, globale</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 60px; margin-top: -20px;">
+            <pre style="width: 700px; margin: 0; flex: none;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.9em;">
+
+            <span class="gutter"> </span>int gx;
+            <span class="gutter"> </span>int gy=10;
+            <span class="gutter here">➡</span>int main(void)
+            <span class="gutter"> </span>{
+            <span class="gutter"> </span> int x=3;
+            <span class="gutter"> </span> int i;
+            <span class="gutter"> </span> int *k=malloc(<span class="red">8</span>);
+            <span class="gutter"> </span> *(k+1)=20;
+            <span class="gutter"> </span> free(k);
+            <span class="gutter"> </span> k=NULL;
+            <span class="gutter"> </span> return 0;
+            <span class="gutter"> </span>}
+          </code></pre>
+            <div>
+              <div class="seg" style="height: 374px;"><div class="left stacklbl">stack</div><div class="cellv free top"></div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv free"></div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left">heap</div><div class="cellv free"></div><div class="right"></div></div>
+              <div class="seg" style="height: 46px;"><div class="left">bss segment</div><div class="cellv bss">0</div><div class="right">gx</div></div>
+              <div class="seg" style="height: 46px;"><div class="left">data segment</div><div class="cellv data">10</div><div class="right">gy</div></div>
+              <div class="seg" style="height: 100px;"><div class="left"></div><div class="cellv text bottom"><b>Instructions</b></div><div class="right"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="long-title">10.2 Allocation mémoire<br>variable locale, globale</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 60px; margin-top: -20px;">
+            <pre style="width: 700px; margin: 0; flex: none;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.9em;">
+
+            <span class="gutter"> </span>int gx;
+            <span class="gutter"> </span>int gy=10;
+            <span class="gutter"> </span>int main(void)
+            <span class="gutter"> </span>{
+            <span class="gutter here">➡</span> int x=3;
+            <span class="gutter"> </span> int i;
+            <span class="gutter"> </span> int *k=malloc(8);
+            <span class="gutter"> </span> *(k+1)=20;
+            <span class="gutter"> </span> free(k);
+            <span class="gutter"> </span> k=NULL;
+            <span class="gutter"> </span> return 0;
+            <span class="gutter"> </span>}
+          </code></pre>
+            <div>
+              <div class="seg" style="height: 48px;"><div class="left stacklbl">stack</div><div class="cellv stackvar top"><span class="red">?</span></div><div class="right">return</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar"><span class="red">3</span></div><div class="right">x</div></div>
+              <div class="seg" style="height: 278px;"><div class="left"></div><div class="cellv free"></div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv free"></div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left">heap</div><div class="cellv free"></div><div class="right"></div></div>
+              <div class="seg" style="height: 46px;"><div class="left">bss segment</div><div class="cellv bss">0</div><div class="right">gx</div></div>
+              <div class="seg" style="height: 46px;"><div class="left">data segment</div><div class="cellv data">10</div><div class="right">gy</div></div>
+              <div class="seg" style="height: 100px;"><div class="left"></div><div class="cellv text bottom"><b>Instructions</b></div><div class="right"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="long-title">10.2 Allocation mémoire<br>variable locale, globale</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 60px; margin-top: -20px;">
+            <pre style="width: 700px; margin: 0; flex: none;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.9em;">
+
+            <span class="gutter"> </span>int gx;
+            <span class="gutter"> </span>int gy=10;
+            <span class="gutter"> </span>int main(void)
+            <span class="gutter"> </span>{
+            <span class="gutter"> </span> int x=3;
+            <span class="gutter here">➡</span> int i;
+            <span class="gutter"> </span> int *k=malloc(8);
+            <span class="gutter"> </span> *(k+1)=20;
+            <span class="gutter"> </span> free(k);
+            <span class="gutter"> </span> k=NULL;
+            <span class="gutter"> </span> return 0;
+            <span class="gutter"> </span>}
+          </code></pre>
+            <div>
+              <div class="seg" style="height: 48px;"><div class="left stacklbl">stack</div><div class="cellv stackvar top">?</div><div class="right">return</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar">3</div><div class="right">x</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar"><span class="red">?</span></div><div class="right">i</div></div>
+              <div class="seg" style="height: 230px;"><div class="left"></div><div class="cellv free"></div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv free"></div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left">heap</div><div class="cellv free"></div><div class="right"></div></div>
+              <div class="seg" style="height: 46px;"><div class="left">bss segment</div><div class="cellv bss">0</div><div class="right">gx</div></div>
+              <div class="seg" style="height: 46px;"><div class="left">data segment</div><div class="cellv data">10</div><div class="right">gy</div></div>
+              <div class="seg" style="height: 100px;"><div class="left"></div><div class="cellv text bottom"><b>Instructions</b></div><div class="right"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="long-title">10.2 Allocation mémoire<br>variable locale, globale</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 60px; margin-top: -20px;">
+            <pre style="width: 700px; margin: 0; flex: none;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.9em;">
+
+            <span class="gutter"> </span>int gx;
+            <span class="gutter"> </span>int gy=10;
+            <span class="gutter"> </span>int main(void)
+            <span class="gutter"> </span>{
+            <span class="gutter"> </span> int x=3;
+            <span class="gutter"> </span> int i;
+            <span class="gutter here">➡</span> int *k=malloc(8);
+            <span class="gutter"> </span> *(k+1)=20;
+            <span class="gutter"> </span> free(k);
+            <span class="gutter"> </span> k=NULL;
+            <span class="gutter"> </span> return 0;
+            <span class="gutter"> </span>}
+          </code></pre>
+            <div>
+              <div class="seg" style="height: 48px;"><div class="left stacklbl">stack</div><div class="cellv stackvar top">?</div><div class="right">return</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar">3</div><div class="right">x</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar">?</div><div class="right">i</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar mark"><span class="red">?</span></div><div class="right">k</div></div>
+              <div class="seg" style="height: 182px;"><div class="left"></div><div class="cellv free"></div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv free"></div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left">heap</div><div class="cellv free"></div><div class="right"></div></div>
+              <div class="seg" style="height: 46px;"><div class="left">bss segment</div><div class="cellv bss">0</div><div class="right">gx</div></div>
+              <div class="seg" style="height: 46px;"><div class="left">data segment</div><div class="cellv data">10</div><div class="right">gy</div></div>
+              <div class="seg" style="height: 100px;"><div class="left"></div><div class="cellv text bottom"><b>Instructions</b></div><div class="right"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="long-title">10.2 Allocation mémoire<br>variable locale, globale</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 60px; margin-top: -20px;">
+            <pre style="width: 700px; margin: 0; flex: none;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.9em;">
+
+            <span class="gutter"> </span>int gx;
+            <span class="gutter"> </span>int gy=10;
+            <span class="gutter"> </span>int main(void)
+            <span class="gutter"> </span>{
+            <span class="gutter"> </span> int x=3;
+            <span class="gutter"> </span> int i;
+            <span class="gutter here">➡</span> int *k=malloc(8);
+            <span class="gutter"> </span> *(k+1)=20;
+            <span class="gutter"> </span> free(k);
+            <span class="gutter"> </span> k=NULL;
+            <span class="gutter"> </span> return 0;
+            <span class="gutter"> </span>}
+          </code></pre>
+            <div>
+              <div class="seg" style="height: 48px;"><div class="left stacklbl">stack</div><div class="cellv stackvar top">?</div><div class="right">return</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar">3</div><div class="right">x</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar">?</div><div class="right">i</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar"><span class="red">0xF0</span></div><div class="right">k</div></div>
+              <div class="seg" style="height: 182px;"><div class="left"></div><div class="cellv free"></div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv heapvar mark">?</div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left">heap</div><div class="cellv heapvar mark">?</div><div class="right">0xF0</div></div>
+              <div class="seg" style="height: 46px;"><div class="left">bss segment</div><div class="cellv bss">0</div><div class="right">gx</div></div>
+              <div class="seg" style="height: 46px;"><div class="left">data segment</div><div class="cellv data">10</div><div class="right">gy</div></div>
+              <div class="seg" style="height: 100px;"><div class="left"></div><div class="cellv text bottom"><b>Instructions</b></div><div class="right"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="long-title">10.2 Allocation mémoire<br>variable locale, globale</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 60px; margin-top: -20px;">
+            <pre style="width: 700px; margin: 0; flex: none;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.9em;">
+
+            <span class="gutter"> </span>int gx;
+            <span class="gutter"> </span>int gy=10;
+            <span class="gutter"> </span>int main(void)
+            <span class="gutter"> </span>{
+            <span class="gutter"> </span> int x=3;
+            <span class="gutter"> </span> int i;
+            <span class="gutter"> </span> int *k=malloc(8);
+            <span class="gutter here">➡</span> *(k+1)=20;
+            <span class="gutter"> </span> free(k);
+            <span class="gutter"> </span> k=NULL;
+            <span class="gutter"> </span> return 0;
+            <span class="gutter"> </span>}
+          </code></pre>
+            <div>
+              <div class="seg" style="height: 48px;"><div class="left stacklbl">stack</div><div class="cellv stackvar top">?</div><div class="right">return</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar">3</div><div class="right">x</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar">?</div><div class="right">i</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar">0xF0</div><div class="right">k</div></div>
+              <div class="seg" style="height: 182px;"><div class="left"></div><div class="cellv free"></div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv heapvar"><span class="red">20</span></div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left">heap</div><div class="cellv heapvar">?</div><div class="right">0xF0</div></div>
+              <div class="seg" style="height: 46px;"><div class="left">bss segment</div><div class="cellv bss">0</div><div class="right">gx</div></div>
+              <div class="seg" style="height: 46px;"><div class="left">data segment</div><div class="cellv data">10</div><div class="right">gy</div></div>
+              <div class="seg" style="height: 100px;"><div class="left"></div><div class="cellv text bottom"><b>Instructions</b></div><div class="right"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="long-title">10.2 Allocation mémoire<br>variable locale, globale</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 60px; margin-top: -20px;">
+            <pre style="width: 700px; margin: 0; flex: none;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.9em;">
+
+            <span class="gutter"> </span>int gx;
+            <span class="gutter"> </span>int gy=10;
+            <span class="gutter"> </span>int main(void)
+            <span class="gutter"> </span>{
+            <span class="gutter"> </span> int x=3;
+            <span class="gutter"> </span> int i;
+            <span class="gutter"> </span> int *k=malloc(8);
+            <span class="gutter"> </span> *(k+1)=20;
+            <span class="gutter here">➡</span> free(k);
+            <span class="gutter"> </span> k=NULL;
+            <span class="gutter"> </span> return 0;
+            <span class="gutter"> </span>}
+          </code></pre>
+            <div>
+              <div class="seg" style="height: 48px;"><div class="left stacklbl">stack</div><div class="cellv stackvar top">?</div><div class="right">return</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar">3</div><div class="right">x</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar">?</div><div class="right">i</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar">0xF0</div><div class="right">k</div></div>
+              <div class="seg" style="height: 182px;"><div class="left"></div><div class="cellv free"></div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv free">20</div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left">heap</div><div class="cellv free"></div><div class="right">0xF0</div></div>
+              <div class="seg" style="height: 46px;"><div class="left">bss segment</div><div class="cellv bss">0</div><div class="right">gx</div></div>
+              <div class="seg" style="height: 46px;"><div class="left">data segment</div><div class="cellv data">10</div><div class="right">gy</div></div>
+              <div class="seg" style="height: 100px;"><div class="left"></div><div class="cellv text bottom"><b>Instructions</b></div><div class="right"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="long-title">10.2 Allocation mémoire<br>variable locale, globale</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 60px; margin-top: -20px;">
+            <pre style="width: 700px; margin: 0; flex: none;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.9em;">
+
+            <span class="gutter"> </span>int gx;
+            <span class="gutter"> </span>int gy=10;
+            <span class="gutter"> </span>int main(void)
+            <span class="gutter"> </span>{
+            <span class="gutter"> </span> int x=3;
+            <span class="gutter"> </span> int i;
+            <span class="gutter"> </span> int *k=malloc(8);
+            <span class="gutter"> </span> *(k+1)=20;
+            <span class="gutter"> </span> free(k);
+            <span class="gutter here">➡</span> k=NULL;
+            <span class="gutter"> </span> return 0;
+            <span class="gutter"> </span>}
+          </code></pre>
+            <div>
+              <div class="seg" style="height: 48px;"><div class="left stacklbl">stack</div><div class="cellv stackvar top">?</div><div class="right">return</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar">3</div><div class="right">x</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar">?</div><div class="right">i</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv stackvar"><span class="red">NULL</span></div><div class="right">k</div></div>
+              <div class="seg" style="height: 182px;"><div class="left"></div><div class="cellv free"></div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv free">20</div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left">heap</div><div class="cellv free"></div><div class="right">0xF0</div></div>
+              <div class="seg" style="height: 46px;"><div class="left">bss segment</div><div class="cellv bss">0</div><div class="right">gx</div></div>
+              <div class="seg" style="height: 46px;"><div class="left">data segment</div><div class="cellv data">10</div><div class="right">gy</div></div>
+              <div class="seg" style="height: 100px;"><div class="left"></div><div class="cellv text bottom"><b>Instructions</b></div><div class="right"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="long-title">10.2 Allocation mémoire<br>variable locale, globale</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 60px; margin-top: -20px;">
+            <pre style="width: 700px; margin: 0; flex: none;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.9em;">
+
+            <span class="gutter"> </span>int gx;
+            <span class="gutter"> </span>int gy=10;
+            <span class="gutter"> </span>int main(void)
+            <span class="gutter"> </span>{
+            <span class="gutter"> </span> int x=3;
+            <span class="gutter"> </span> int i;
+            <span class="gutter"> </span> int *k=malloc(8);
+            <span class="gutter"> </span> *(k+1)=20;
+            <span class="gutter"> </span> free(k);
+            <span class="gutter"> </span> k=NULL;
+            <span class="gutter here">➡</span> return 0;
+            <span class="gutter"> </span>}
+          </code></pre>
+            <div>
+              <div class="seg" style="height: 48px;"><div class="left stacklbl">stack</div><div class="cellv stackvar top"><span class="red">0</span></div><div class="right">return</div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv free">3</div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv free">?</div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv free">NULL</div><div class="right"></div></div>
+              <div class="seg" style="height: 182px;"><div class="left"></div><div class="cellv free"></div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left"></div><div class="cellv free">20</div><div class="right"></div></div>
+              <div class="seg" style="height: 48px;"><div class="left">heap</div><div class="cellv free"></div><div class="right">0xF0</div></div>
+              <div class="seg" style="height: 46px;"><div class="left">bss segment</div><div class="cellv bss">0</div><div class="right">gx</div></div>
+              <div class="seg" style="height: 46px;"><div class="left">data segment</div><div class="cellv data">10</div><div class="right">gy</div></div>
+              <div class="seg" style="height: 100px;"><div class="left"></div><div class="cellv text bottom"><b>Instructions</b></div><div class="right"></div></div>
+            </div>
+          </div>
+        </section>
+
+      </section>
+
+      <!----------          ALLOCATION DE TABLEAUX          ---------->
+      <section>
+
+        <section>
+          <h2>10.3 Allocation dynamique d’un tableau</h2>
+          <p class="tight">Allocation dynamique d’un tableau de 3 entiers</p>
+          <pre style="width: 1100px; font-weight: bold;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            int *ptr_ti = <span class="blue">malloc(</span>3*sizeof(int)<span class="blue">)</span>;
+
+            *(ptr_ti+1)= 19;
+            ptr_ti[2]  = 18;
+
+            free(ptr_ti);
+            ptr_ti = NULL;
+          </code></pre>
+          <div class="memblock" style="--cw: 180px; --ch: 70px;">
+            <div class="mem index" style="font-family: 'Roboto', Helvetica, sans-serif; font-weight: normal; font-size: 32px;"><span class="cell w2 blue" style="text-align: right; margin-left: -60px;">32/64 bits alloués statiquement</span><span class="cell"></span><span class="cell" style="width: calc(3 * var(--cw)); text-align: center;" class="blue"><span class="blue">12 bytes alloués dynamiquement</span></span></div>
+            <div class="mem index"><span class="cell"></span><span class="cell">ptr_ti</span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span></div>
+            <div class="mem"><span class="cell"></span><span class="cell">0xF000</span><span class="cell"></span><span class="cell" style="outline: 4px solid #0000FF; outline-offset: -4px;"></span><span class="cell" style="font-family: 'Roboto', Helvetica, sans-serif; font-weight: normal;">19</span><span class="cell" style="font-family: 'Roboto', Helvetica, sans-serif; font-weight: normal;">18</span></div>
+            <div class="mem addr" style="font-weight: normal;"><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell">0xF000</span><span class="cell">0xF004</span><span class="cell">0xF008</span></div>
+            <div class="mem addr" style="font-family: 'Roboto', Helvetica, sans-serif; font-weight: normal;"><span class="cell"></span><span class="cell" style="text-align: center;">← Stack →</span><span class="cell"></span><span class="cell" style="width: calc(3 * var(--cw)); text-align: center;">←―――――― Heap ――――――→</span></div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="long-title"><span style="font-size: 0.85em;">10.3 Allocation dynamique de tableau à plusieurs dimensions</span></h2>
+          <p class="tight">Déclaration de tableaux <span class="blue">statiques </span>à plusieurs dimensions</p>
+          <pre style="width: 400px; margin-left: 300px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            int m[3][5];
+          </code></pre>
+          <p class="tight">Déclaration de tableaux <span class="blue">dynamiques </span>à plusieurs dimensions ; on déclare des pointeurs sur des pointeurs (etc.) sur des types</p>
+          <p class="tight"><i>E.g.</i> tableau dynamique d'entiers à <span class="blue">2 dimensions</span></p>
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; padding: 0 150px 0 300px;">
+            <pre style="width: 400px; margin: 0;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            int **matrix;
+          </code></pre>
+            <img src="./medias/ch10_matrix.png" alt="Tableau dynamique à deux dimensions" style="width: 760px;">
+          </div>
+        </section>
+
+        <section>
+          <h2>10.3 Tableaux statiques à deux dimensions</h2>
+          <pre style="width: 1000px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            int m[2][3] = {{0,1,2}, {10,11,12}};
+          </code></pre>
+          <p class="tight">Représentation en mémoire du tableau</p>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 70px; margin-top: 20px;">
+            <div>
+            <div class="memblock" style="margin: 0; --cw: 140px; --ch: 64px;">
+              <div class="mem index"><span class="cell half"></span><span class="cell" style="font-size: 26px;">m[0][0]</span><span class="cell" style="font-size: 26px;">m[0][1]</span><span class="cell" style="font-size: 26px;">m[0][2]</span><span class="cell" style="font-size: 26px;">m[1][0]</span><span class="cell" style="font-size: 26px;">m[1][1]</span><span class="cell" style="font-size: 26px;">m[1][2]</span></div>
+              <div class="mem"><span class="cell half"></span><span class="cell arr">0</span><span class="cell arr">1</span><span class="cell arr">2</span><span class="cell" style="background-color: #92D050;">10</span><span class="cell" style="background-color: #92D050;">11</span><span class="cell" style="background-color: #92D050;">12</span><span class="cell half"></span></div>
+              <div class="mem addr"><span class="cell half"></span><span class="cell red" style="font-size: 26px;">0xFF18</span><span class="cell" style="font-size: 26px;">0xFF1C</span><span class="cell" style="font-size: 26px;">0xFF20</span><span class="cell" style="font-size: 26px; color: #0070C0;">0xFF24</span><span class="cell" style="font-size: 26px;">0xFF28</span><span class="cell" style="font-size: 26px;">0xFF2C</span></div>
+            </div>
+              <p class="centered tight" style="font-size: 0.8em;">↷ ↷ ↷ +4 bytes</p>
+            </div>
+            <table class="plain mono" style="margin: 0; font-size: 1em;">
+              <tr><td>m[0][0]</td><td>→ 0</td></tr>
+              <tr><td>&amp;m[0][0]</td><td>→ <span class="red">0xFF18</span></td></tr>
+              <tr><td>m</td><td>→ <span class="red">0xFF18</span></td></tr>
+              <tr><td>m[0]</td><td>→ <span class="red">0xFF18</span></td></tr>
+              <tr><td>m[1]</td><td>→ <span style="color: #0070C0;">0xFF24</span></td></tr>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="long-title">10.3 Tableaux statiques à deux dimensions (2)</h2>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 40px;">
+            <pre style="width: 1150px; margin: 0; flex: none; font-weight: bold;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            int m[2][3] = {{0,1,2}, {10,11,12}};
+            int *ptr = (int*)m;
+            for (int i=0; i<2*3; i++)
+            {
+             printf("%p %d ",(ptr+i), *(ptr+i) );
+            }
+          </code></pre>
+            <div class="callout" style="width: 480px;"><p>⬅ Transtypage, car m est de type int [2][3] ou int (*)[3]</p></div>
+          </div>
+          <aside class="notes">!! m n’est pas de type int** !!<br>Voir https://openclassrooms.com/courses/la-verite-sur-les-tableaux-et-pointeurs-en-c</aside>
+        </section>
+
+        <section>
+          <h2 class="long-title">10.3 Tableaux statiques à deux dimensions (3)</h2>
+          <p class="tight"><b>Résultat</b></p>
+          <pre class="terminal" style="width: 1500px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em; font-weight: bold;">
+
+            0x23FF18 ::  0
+            0x23FF1C ::  1
+            0x23FF20 ::  2
+            0x23FF24 :: 10
+            0x23FF28 :: 11
+            0x23FF2C :: 12
+          </code></pre>
+          <div style="display: flex; justify-content: center;">
+            <div class="memblock" style="margin: 0; --cw: 140px; --ch: 64px;">
+              <div class="mem index"><span class="cell half"></span><span class="cell" style="font-size: 26px;">m[0][0]</span><span class="cell" style="font-size: 26px;">m[0][1]</span><span class="cell" style="font-size: 26px;">m[0][2]</span><span class="cell" style="font-size: 26px;">m[1][0]</span><span class="cell" style="font-size: 26px;">m[1][1]</span><span class="cell" style="font-size: 26px;">m[1][2]</span></div>
+              <div class="mem"><span class="cell half"></span><span class="cell arr">0</span><span class="cell arr">1</span><span class="cell arr">2</span><span class="cell" style="background-color: #92D050;">10</span><span class="cell" style="background-color: #92D050;">11</span><span class="cell" style="background-color: #92D050;">12</span><span class="cell half"></span></div>
+              <div class="mem addr"><span class="cell half"></span><span class="cell red" style="font-size: 26px;">0xFF18</span><span class="cell" style="font-size: 26px;">0xFF1C</span><span class="cell" style="font-size: 26px;">0xFF20</span><span class="cell" style="font-size: 26px; color: #0070C0;">0xFF24</span><span class="cell" style="font-size: 26px;">0xFF28</span><span class="cell" style="font-size: 26px;">0xFF2C</span></div>
+            </div>
+          </div>
+          <aside class="notes">*(m[1]+0)   10<br>m[1][0]     10<br>*(m[1]+2)   12<br>m[1][2]     12<br>*(*(m+1)+2) 12</aside>
+        </section>
+
+        <section>
+          <h2>10.3 Quatre écritures équivalentes</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 100px;">
+            <pre style="width: 640px; margin: 0; flex: none; font-weight: bold;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.7em;">
+
+            <span class="red">m[1]</span><span class="blue">[2]</span> + 3
+
+
+            (<span class="red">*(m + 1)</span>)<span class="blue">[2]</span> + 3
+
+
+            <span class="blue">*(</span><span class="red">m[1]</span> <span class="blue">+ 2)</span> + 3
+
+
+            <span class="blue">*(</span><span class="red">*(m + 1)</span> <span class="blue">+ 2)</span> + 3
+          </code></pre>
+            <p class="flush">Rappel &nbsp; <span class="mono">m[i] = *(m+i)</span></p>
+          </div>
+        </section>
+
+        <section>
+          <h2>10.3 Allocation dynamique tableau 2D</h2>
+          <p class="tight">Allocation en <highlight>plusieurs étapes</highlight></p>
+          <p class="tight indent-1">1)&nbsp; On alloue l'espace pour le tableau de pointeurs vers les lignes d’entiers</p>
+          <p class="tight indent-1">2)&nbsp; On alloue pour chacun de ces pointeurs l'espace pour un tableau représentant une ligne d'entiers</p>
+          <div style="display: flex; justify-content: center; margin-top: 20px;">
+            <div style="position: relative;">
+              <img src="./medias/ch10_matrix.png" alt="Tableau dynamique à deux dimensions" style="width: 950px; max-width: none; max-height: none;">
+              <p class="flush tight" style="position: absolute; left: 110px; bottom: 10px; font-size: 0.8em;">Stack</p>
+              <p class="flush tight" style="position: absolute; left: 520px; bottom: 10px; font-size: 0.8em;">Heap</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>10.3 Allocation dynamique tableau 2D</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 30px;">
+            <pre style="width: 1150px; margin: 0; flex: none; font-weight: bold;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            #define LINES   3
+            #define COLUMNS 5
+            int main(void)
+            {
+              <span class="blue">int **matrix = </span><span class="red">malloc</span>(LINES*sizeof(int*));
+
+              for(int i = 0; i &lt; LINES; i++)
+              {
+                <span class="blue">matrix[i] </span>= <span class="red">malloc</span>(COLUMNS*sizeof(int));
+              }
+              return 0;
+            }
+          </code></pre>
+            <div style="width: 520px;">
+              <img src="./medias/ch10_matrix.png" alt="Tableau dynamique à deux dimensions" style="width: 520px;">
+              <div class="callout" style="margin-top: 30px;"><p>1) Allocation du tableau de pointeur</p></div>
+              <div class="callout" style="margin-top: 30px;"><p>2) Allocation des tableaux correspondant aux lignes</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>10.3 Libération dynamique tableau 2D</h2>
+          <p>Pour libérer l'espace alloué pour une telle structure, on procède de manière <highlight>inverse.</highlight> On commence par libérer chacune des lignes du tableau, puis le tableau lui-même :</p>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 80px;">
+            <pre style="width: 700px; margin: 0; flex: none; font-weight: bold;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            for(i = 0; i &lt; LINES; i++)
+            {
+                <span class="blue">free</span>(matrix[i]);
+            }
+            <span class="blue">free</span>(matrix);
+            matrix = NULL;
+          </code></pre>
+            <img src="./medias/ch10_matrix.png" alt="Tableau dynamique à deux dimensions" style="width: 680px;">
+          </div>
+        </section>
+
+        <section>
+          <h2>10.3 En cas de problème : <span class="mono blue">exit()</span></h2>
+          <pre style="width: 1200px; font-weight: bold;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            for(i = 0; i &lt; LINES; i++)
+            {
+              matrice[i] = <span class="blue">malloc</span>(COLUMNS * sizeof(int));
+
+              if (matrice[i] == NULL)
+              {
+                printf("Pas assez de mémoire\n");
+            <span class="blue">    exit(-1);</span>
+              }
+            }
+          </code></pre>
+        </section>
+
+      </section>
+
+      <!----------          TABLEAUX DE POINTEURS          ---------->
+      <section>
+
+        <section>
+          <h2>10.4 Tableau de pointeurs</h2>
+          <p>Ensemble de pointeurs du même type, réunis dans un tableau de pointeurs</p>
+          <p class="tight"><b>Déclaration d'un tableau de pointeurs</b></p>
+          <p class="centered"><span class="syntax">&lt;Type&gt; *&lt;NomTableau&gt;[&lt;N&gt;]</span></p>
+          <p class="tight indent-1">déclare un tableau <span class="mono blue">&lt;NomTableau&gt;</span> de <span class="mono blue">&lt;N&gt;</span> pointeurs sur des données du type <span class="mono blue">&lt;Type&gt;</span></p>
+          <br>
+          <p class="tight"><b>Exemples </b></p>
+          <pre style="width: 800px; font-weight: bold;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            double <span class="blue">*</span>pReels<span class="blue">[10]</span>;
+            int    n=10, <span class="blue">*</span>pEntiers<span class="blue">[n]</span>;
+          </code></pre>
+          <aside class="notes">déclare un tableau de 10 pointeurs sur des rationnels du type <b>double</b> dont les adresses et les valeurs ne sont pas encore définies.</aside>
+        </section>
+
+        <section>
+          <h2>10.4 Tableau de pointeurs</h2>
+          <p class="tight"><b>Initialisation</b></p>
+          <p class="tight">Nous pouvons initialiser les pointeurs d'un tableau sur <b>char</b> par les adresses de chaînes de caractères constantes.</p>
+          <br>
+          <p class="tight"><b>Exemple  </b></p>
+          <pre style="width: 900px; font-weight: bold;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            char *weekDay[ ] = {"Sunday",
+                                "Monday",
+                                "Tuesday",
+                                "Wednesday",
+                                "Thursday",
+                                "Friday",
+                                "Saturday"  };
+          </code></pre>
+          <aside class="notes">déclare un tableau <b>jour[]</b> de 7 pointeurs sur <b>char</b>. Chacun des pointeurs est initialisé avec l'adresse de l'une des 7 chaînes de caractères.</aside>
+        </section>
+
+        <section>
+          <h2>10.4 Tableau de pointeurs</h2>
+          <p class="mono" style="padding-left: 150px;">weekDay</p>
+          <div style="padding-left: 400px;">
+            <div class="chars"><span class="ptr"></span><span class="arrow">⟶</span><span class="c">S</span><span class="c">u</span><span class="c">n</span><span class="c">d</span><span class="c">a</span><span class="c">y</span><span class="c">\0</span></div>
+            <div class="chars"><span class="ptr"></span><span class="arrow">⟶</span><span class="c">M</span><span class="c">o</span><span class="c">n</span><span class="c">d</span><span class="c">a</span><span class="c">y</span><span class="c">\0</span></div>
+            <div class="chars"><span class="ptr"></span><span class="arrow">⟶</span><span class="c">T</span><span class="c">u</span><span class="c">e</span><span class="c">s</span><span class="c">d</span><span class="c">a</span><span class="c">y</span><span class="c">\0</span></div>
+            <div class="chars"><span class="ptr"></span><span class="arrow">⟶</span><span class="c">W</span><span class="c">e</span><span class="c">d</span><span class="c">n</span><span class="c">e</span><span class="c">s</span><span class="c">d</span><span class="c">a</span><span class="c">y</span><span class="c">\0</span></div>
+            <div class="chars"><span class="ptr"></span><span class="arrow">⟶</span><span class="c">T</span><span class="c">h</span><span class="c">u</span><span class="c">r</span><span class="c">s</span><span class="c">d</span><span class="c">a</span><span class="c">y</span><span class="c">\0</span></div>
+            <div class="chars"><span class="ptr"></span><span class="arrow">⟶</span><span class="c">F</span><span class="c">r</span><span class="c">i</span><span class="c">d</span><span class="c">a</span><span class="c">y</span><span class="c">\0</span></div>
+            <div class="chars"><span class="ptr"></span><span class="arrow">⟶</span><span class="c">S</span><span class="c">a</span><span class="c">t</span><span class="c">u</span><span class="c">r</span><span class="c">d</span><span class="c">a</span><span class="c">y</span><span class="c">\0</span></div>
+          </div>
+        </section>
+
+        <section>
+          <h2>10.4 Tableau de pointeurs</h2>
+          <div style="padding-left: 220px; margin-top: -20px;">
+            <div class="chars" style="height: 64px; font-size: 22px;"><span class="addr"></span><span style="width: 142px;"></span><span style="width: 156px; text-align: center; line-height: 1.1;">0x40427B<br>0x40427C<br>0x40427D</span><span style="width: 60px;"></span><span style="width: 156px; text-align: center; line-height: 1.1;">0x404282<br>0x404283<br>0x404284</span></div>
+            <div class="chars" style="height: 26px; font-size: 22px;"><span class="addr"></span><span style="width: 142px;"></span><span style="width: 156px; text-align: center;">S u n ↓</span><span style="width: 60px;"></span><span style="width: 156px; text-align: center;">M o n ↓↓</span></div>
+            <p class="mono flush tight" style="padding-left: 60px;">weekDay</p>
+            <div class="chars"><span class="addr">0x22FF20</span><span class="ptr"></span><span class="arrow">⟶</span><span class="c">S</span><span class="c">u</span><span class="c">n</span><span class="c">d</span><span class="c">a</span><span class="c">y</span><span class="c">\0</span></div>
+            <div class="chars"><span class="addr">0x22FF28</span><span class="ptr"></span><span class="arrow">⟶</span><span class="c">M</span><span class="c">o</span><span class="c">n</span><span class="c">d</span><span class="c">a</span><span class="c">y</span><span class="c">\0</span></div>
+            <div class="chars"><span class="addr">0x22FF30</span><span class="ptr"></span><span class="arrow">⟶</span><span class="c">T</span><span class="c">u</span><span class="c">e</span><span class="c">s</span><span class="c">d</span><span class="c">a</span><span class="c">y</span><span class="c">\0</span></div>
+            <div class="chars"><span class="addr">0x22FF38</span><span class="ptr"></span><span class="arrow">⟶</span><span class="c">W</span><span class="c">e</span><span class="c">d</span><span class="c">n</span><span class="c">e</span><span class="c">s</span><span class="c">d</span><span class="c">a</span><span class="c">y</span><span class="c">\0</span></div>
+            <div class="chars"><span class="addr">0x22FF40</span><span class="ptr"></span><span class="arrow">⟶</span><span class="c">T</span><span class="c">h</span><span class="c">u</span><span class="c">r</span><span class="c">s</span><span class="c">d</span><span class="c">a</span><span class="c">y</span><span class="c">\0</span></div>
+            <div class="chars"><span class="addr">0x22FF48</span><span class="ptr"></span><span class="arrow">⟶</span><span class="c">F</span><span class="c">r</span><span class="c">i</span><span class="c">d</span><span class="c">a</span><span class="c">y</span><span class="c">\0</span></div>
+            <div class="chars"><span class="addr">0x22FF50</span><span class="ptr"></span><span class="arrow">⟶</span><span class="c">S</span><span class="c">a</span><span class="c">t</span><span class="c">u</span><span class="c">r</span><span class="c">d</span><span class="c">a</span><span class="c">y</span><span class="c">\0</span></div>
+          </div>
+        </section>
+
+        <section>
+          <h2>10.4 Tableau de pointeurs – Exemple</h2>
+          <p class="tight">On peut afficher les 7 chaînes de caractères en fournissant les adresses contenues dans le tableau <span class="mono blue">weekDay</span> à <span class="mono blue">printf</span> ou <span class="mono blue">puts</span> :</p>
+          <pre style="width: 1100px; font-weight: bold;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            char *weekDay [] = {"Sunday","Mon...};
+            for (int i = 0; i &lt; 7; i++)
+                 printf("%s\n", <span class="blue">weekDay[i]</span>);
+          </code></pre>
+          <p class="tight"><b>Résultat</b></p>
+          <pre class="terminal" style="width: 1100px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em; font-weight: bold;">
+
+            Sunday
+            Monday
+            Tuesday
+            ...
+          </code></pre>
+          <aside class="notes">char *chaine=« bdebdb »<br>printf("%s ",chaine);<br>Chaine est un pointeur char, tout comme jour de [i] est un pointeur sur un char</aside>
+        </section>
+
+        <section>
+          <h2>10.4 Tableau de pointeurs – Exemple</h2>
+          <p class="tight">Comme <span class="mono">jour[i]</span> est un pointeur sur <span class="mono">char</span>, on peut afficher <b><u>la première lettre</u></b> des jours de la semaine en utilisant l'opérateur 'contenu de' :</p>
+          <pre style="width: 1100px; font-weight: bold;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            char *weekDay[] = {"Sunday","Mon...};
+            for (i=0; i&lt;7; i++)
+                 printf("<span class="blue">%c</span>\n", <span class="blue">*weekDay[i]</span>);
+          </code></pre>
+          <div style="display: flex; align-items: flex-start; gap: 40px; padding-left: 200px;">
+            <p class="flush"><b>Résultat</b></p>
+            <pre class="terminal" style="width: 220px; margin: 20px 0 0 0;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em; font-weight: bold;">
+
+            S
+            M
+            T
+            ...
+          </code></pre>
+            <p class="flush" style="font-size: 0.8em; margin-top: 20px;">Premières lettres de<br><b>S</b>unday<br><b>M</b>onday<br><b>T</b>uesday</p>
+          </div>
+        </section>
+
+        <section>
+          <h2>10.4 Tableau de pointeurs – Exemple</h2>
+          <p class="tight">L'expression <span class="mono">jour[i]+j </span>désigne la (j+1)<sup>ème</sup> lettre de la i<sup>ème</sup> chaîne. On peut afficher la 2<sup>ème</sup> lettre de chaque jour de la semaine par :</p>
+          <pre style="width: 1100px; font-weight: bold;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            char *weekDay[] = {"Sunday","Mon...};
+            for (i=0; i&lt;7; i++)
+                 printf("%c\n<span class="blue">",*(weekDay[i]</span><span class="red">+1</span><span class="blue">)</span>);
+          </code></pre>
+          <div style="display: flex; align-items: flex-start; gap: 40px; padding-left: 200px;">
+            <p class="flush"><b>Résultat</b></p>
+            <pre class="terminal" style="width: 220px; margin: 20px 0 0 0;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em; font-weight: bold;">
+
+            u
+            o
+            u
+            ...
+          </code></pre>
+            <p class="flush" style="font-size: 0.8em; margin-top: 20px;">Deuxièmes lettres de<br>S<b>u</b>nday<br>M<b>o</b>nday<br>T<b>u</b>esday</p>
+          </div>
+        </section>
+
+        <section>
+          <h2>📝 10.4 Tableau de pointeurs – Exemple</h2>
+          <p>Que signifient les expressions suivantes et les écrire sous format pointeur ?</p>
+          <br>
+          <p class="indent-1 mono">*weekDay[5]</p>
+          <p class="indent-2 mono">*(weekDay[5]+2)</p>
+          <aside class="notes">a[i] = * (a+i)<br>*weekDay[5] -&gt; weekDay [5][0]                    OK<br>*(weekDay[5]+2) -&gt; weekDay [5][2]            OK<br>*(weekDay[5]+2)-&gt; *(*(weekDay+5) +2)  OK<br>*(weekDay[5]+2)-&gt; *(weekDay+ 5 +2)  NOT OK<br>5 et 2 n’ont pas la même signification!!!<br>5*sizeof(weekDay) et 2 *sizeof(char) pas possible de les mélanger</aside>
+        </section>
+
+        <section>
+          <h2>10.4 Tableau de pointeurs – Résumé</h2>
+          <p class="tight"><span class="mono blue">int *D[20];</span> déclare <b><i>un tableau de 20 pointeurs</i></b> sur des <span class="mono">int</span></p>
+          <br>
+          <p class="tight"><span class="mono blue">D[i]</span> désigne le contenu de l'élément <span class="mono blue">i</span> de <span class="mono blue">D</span> (c'est une adresse)</p>
+          <p class="tight"><span class="mono blue">*D[i]</span> désigne le contenu de la mémoire pointée par <span class="mono blue">D[i]</span></p>
+          <br>
+          <p class="tight">Si <span class="mono blue">D[i]</span> pointe dans un tableau :</p>
+          <p class="tight indent-1"><span class="mono blue">D[i]</span> désigne l'adresse de sa première composante</p>
+          <p class="tight indent-1"><span class="mono blue">D[i]+j</span> désigne l'adresse de sa j-ième composante</p>
+          <p class="tight indent-1"><span class="mono blue">*(D[i]+j)</span> désigne le contenu de sa j-ième composante</p>
+        </section>
+
+      </section>
+
+      <!----------          EXERCICES          ---------->
+      <section>
+        <h2>📝 Exercices</h2>
+        <p style="text-align: center; padding-left: 0;">
+          <a href="https://he-arc.github.io/1242.1-Langage_C/docs/cours/chapitre10cours/">Exercices du chapitre 10</a>
+        </p>
+      </section>
+
+    </div>
+  </div>
+
+  <!----------          CONTENT          ---------->
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/notes/notes.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      hash: true,
+      width: 1920,
+      height: 1080,
+      transition: "none",
+      center: false,
+      slideNumber: 'c/t',
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+    });
+  </script>
+</body>
+
+</html>
