@@ -1,0 +1,900 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>HE-Arc - 1242.1 Langage C - Chapitre 11 - Pointeurs et fonctions II</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/hearc.css" id="theme">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="https://www.he-arc.ch/wp-content/uploads/2021/12/cropped-hearc-icon-192x192.png"
+    type="image/vnd.microsoft.icon" />
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/vs.css" id="highlight-theme">
+
+  <style>
+    .reveal .container p,
+    .reveal .container h3,
+    .reveal .container h4 { padding-left: 0; }
+    .reveal .container .col-left { text-align: left; }
+
+    .reveal .indent-1 { padding-left: 300px; }
+    .reveal .indent-2 { padding-left: 400px; }
+    .reveal .indent-3 { padding-left: 500px; }
+    .reveal .centered { text-align: center; padding-left: 0; }
+    .reveal p.tight { margin: 8px 0; }
+    .reveal p.flush { padding-left: 0; }
+    .reveal i { font-style: italic; }
+    .reveal h3.plain { text-transform: none; }
+    .reveal h2 .mono { text-transform: none; }
+    .reveal h2.long-title { font-size: 1.4em; }
+    .reveal h2.longer-title { font-size: 1.2em; }
+
+    .reveal pre.terminal code.hljs,
+    .reveal pre.terminal code {
+      background-color: #000000;
+      color: #FFFFFF;
+    }
+    .reveal pre.terminal code .lime { color: #92D050; }
+
+    .reveal .mono { font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+    .reveal code .red { color: #FF0000; font-weight: bold; }
+    .reveal code .blue { color: #0000FF; font-weight: bold; }
+    .reveal code .green { color: #00B050; font-weight: bold; }
+    .reveal code .purple { color: #8064A2; font-weight: bold; }
+    .reveal code .gray { color: #808080; }
+    .reveal code .note { font-family: "Roboto", Helvetica, sans-serif; font-weight: normal; }
+    .reveal code .red *, .reveal code .blue *, .reveal code .green * { color: inherit; }
+
+    .reveal .red { color: #FF0000; }
+    .reveal .blue { color: #0000FF; }
+    .reveal .green { color: #00B050; }
+    .reveal .lime { color: #00CC00; }
+
+    .reveal .syntax {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      background-color: #ffff99;
+      border: 2px solid #000;
+      padding: 0.1em 0.5em;
+    }
+    .reveal .frame-blue {
+      border: 4px solid #0000FF;
+      padding: 10px 30px;
+      display: table;
+      margin: 0 auto;
+    }
+    .reveal .frame-blue p { padding-left: 0; }
+    .reveal .frame-black {
+      border: 2px solid #000000;
+      padding: 10px 24px;
+    }
+    .reveal .frame-black p { padding-left: 0; margin: 4px 0; }
+    .reveal .frame-red {
+      border: 2px solid #FF0000;
+      padding: 10px 24px;
+      color: #FF0000;
+    }
+    .reveal .frame-red p { padding-left: 0; margin: 4px 0; }
+    .reveal .quote {
+      border: 2px solid #000000;
+      background-color: #F2F2F2;
+      padding: 10px 30px;
+      margin: 0 auto;
+      width: 1400px;
+    }
+    .reveal .quote p { padding-left: 0; margin: 6px 0; }
+
+    .reveal .label-under {
+      display: flex;
+      font-family: "Roboto", Helvetica, sans-serif;
+      font-weight: normal;
+    }
+
+    .reveal svg.diagram text { font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 36px; }
+    .reveal svg.diagram text.blue { fill: #0000FF; }
+    .reveal svg.diagram text.white { fill: #FFFFFF; }
+    .reveal svg.diagram text.red { fill: #FF0000; font-family: "Roboto", Helvetica, sans-serif; font-size: 52px; }
+    .reveal svg.diagram .memcell { fill: #4F81BD; stroke: #000000; stroke-width: 3; }
+    .reveal svg.diagram .arrow { fill: none; stroke: #000000; stroke-width: 4; }
+
+    .reveal table.plain { margin: 0 0 0 300px; font-size: 1em; }
+    .reveal table.plain td { border: none; padding: 0.1em 0.8em 0.1em 0; vertical-align: middle; }
+  </style>
+</head>
+
+<body>
+  <img id="logo-hearc" src="./medias/logo_he-arc.png" alt="Logo HE-ARC">
+  <img id="logo-hesso" src="./medias/logo_hes-so.png" alt="Logo HES-SO">
+  <p id="course-infos">1242.1 Langage C - 2026-2027</p>
+
+  <!----------          CONTENT          ---------->
+  <div class="reveal">
+    <div class="slides">
+
+      <!----------          TITLE          ---------->
+      <section>
+        <h1>
+          Chapitre 11
+        </h1>
+        <h2>
+          Pointeurs et fonctions II
+        </h2>
+        <p class="tight">1. Pointeurs de pointeurs et arithmétique</p>
+        <p class="tight">2. Interaction d’un programme avec l’OS</p>
+        <p class="tight">3. Passage de tableaux en paramètre</p>
+        <p class="tight">4. Valeur de retour d’une fonction</p>
+        <p class="tight">5. Pointeur sur des fonctions</p>
+        <p class="tight">6. Callback</p>
+        <aside class="notes">Référence:<br>http://fr.wikibooks.org/wiki/Programmation_C/Tableaux<br>intéressant  . P.ex. la possibilité d'écrire   T[i]    ou i[T]   (à éviter!!)</aside>
+      </section>
+
+      <!----------          POINTEURS DE POINTEURS ET ARITHMETIQUE          ---------->
+      <section>
+
+        <section>
+          <h2>11.1 Pointeur de pointeur</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 60px;">
+            <pre style="width: 760px; margin: 0; flex: none;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em; font-weight: bold; line-height: 1.6em;">
+
+              int myInt = 6;
+              int *<span class="blue">ptr_a</span> = &amp;myInt;
+
+              <span style="border: 4px solid #FF0000; border-radius: 16px; padding: 6px 14px;">int **<span class="blue">ptr_b</span> = &amp;<span class="blue">ptr_a</span>;</span>
+            </code></pre>
+            <svg class="diagram" width="900" height="240" viewBox="0 0 900 240" style="display: block; flex: none;">
+              <defs>
+                <marker id="tip" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" /></marker>
+              </defs>
+              <rect class="memcell" x="10" y="100" width="210" height="80" />
+              <rect class="memcell" x="345" y="100" width="210" height="80" />
+              <rect class="memcell" x="680" y="100" width="210" height="80" />
+              <text class="white" x="115" y="152" text-anchor="middle">&amp;ptr_a</text>
+              <text class="white" x="450" y="152" text-anchor="middle">&amp;myInt</text>
+              <text class="white" x="785" y="152" text-anchor="middle">6</text>
+              <text class="blue" x="115" y="225" text-anchor="middle">ptr_b</text>
+              <text class="blue" x="450" y="225" text-anchor="middle">ptr_a</text>
+              <text class="blue" x="785" y="225" text-anchor="middle">myInt</text>
+              <path class="arrow" d="M 220 140 H 342" marker-end="url(#tip)" />
+              <path class="arrow" d="M 555 140 H 677" marker-end="url(#tip)" />
+              <path class="arrow" d="M 115 100 V 50 H 785 V 97" marker-end="url(#tip)" />
+              <text class="red" x="280" y="132" text-anchor="middle">*</text>
+              <text class="red" x="615" y="132" text-anchor="middle">*</text>
+              <text class="red" x="450" y="42" text-anchor="middle">**</text>
+            </svg>
+          </div>
+          <br>
+          <p class="tight">La valeur <highlight>6</highlight> dans la variable <span class="mono blue">myInt</span> est <b>modifiable</b> par le programme</p>
+          <p class="tight">Le contenu de <span class="mono blue">ptr_a</span>, <highlight>adresse de la variable</highlight> <span class="mono blue">myInt</span>, est <b>modifiable</b> par le programme</p>
+          <p class="tight">Le contenu de <span class="mono blue">ptr_b</span>, <highlight>adresse du pointeur </highlight><span class="mono blue">ptr_a</span>, est <b>modifiable</b> par le programme</p>
+          <p class="tight">Les adresses de <span class="mono blue">myInt, ptr_a</span> et de <span class="mono blue">ptr_b</span> sont des <highlight>constantes</highlight> déterminées à la <b>compilation</b></p>
+        </section>
+
+        <section>
+          <h2>11.1 Arithmétique des pointeurs</h2>
+          <br>
+          <p class="indent-1"><highlight>a.&nbsp; Affectation</highlight> par un pointeur sur le même type</p>
+          <br>
+          <p class="indent-1"><highlight>b.&nbsp; Addition</highlight> et <highlight>soustraction</highlight> via 1 entier</p>
+          <br>
+          <p class="indent-1"><highlight>c.&nbsp; Incrémentation</highlight> et <highlight>décrémentation</highlight> d'un pointeur</p>
+          <br>
+          <p class="indent-1"><highlight>d.&nbsp; Soustraction</highlight> de deux pointeurs</p>
+        </section>
+
+        <section>
+          <h2>11.1 a. Affectation</h2>
+          <p>Soient <span class="mono blue">ptr1</span> et <span class="mono blue">ptr2</span> 2 pointeurs <b>sur le même type de données</b>, alors l'instruction</p>
+          <pre style="width: 460px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            ptr1 = ptr2;
+          </code></pre>
+          <p>fait pointer <span class="mono blue">ptr1</span> sur le même "objet" que <span class="mono blue">ptr2</span></p>
+          <br>
+          <p><b>Casting</b></p>
+          <pre style="width: 700px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            ptr1 = (double*) ptr2;
+          </code></pre>
+        </section>
+
+        <section>
+          <h2 class="long-title">11.1 b. Addition et soustraction via 1 entier</h2>
+          <br>
+          <p>Si <span class="mono blue">ptr</span> pointe sur l'élément <span class="mono blue">a[i]</span> d'un tableau, alors</p>
+          <br>
+          <p class="indent-1 tight"><span class="mono blue">ptr+n</span> pointe sur <span class="mono blue">a[i+n]</span></p>
+          <p class="indent-1 tight"><span class="mono blue">ptr-n</span> pointe sur <span class="mono blue">a[i-n]</span></p>
+        </section>
+
+        <section>
+          <h2 class="long-title">11.1 b. Addition et soustraction via 1 entier</h2>
+          <p><b>Exemple :</b> addition/soustraction d’un entier à un pointeur</p>
+          <pre style="width: 1300px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em; font-weight: bold; line-height: 1.5em;">
+
+            float* ptr = (float*)<span class="blue">0x100000</span>;
+
+            ptr+1 <span class="note">vaut</span>  0x100004
+            ptr+2 <span class="note">vaut</span>  0x100008
+            ptr-2 <span class="note">vaut</span>  0x0FFFF8 //(0x100000-2*4)
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>11.1 c. Incrémentation et décrémentation</h2>
+          <p class="tight">Si <span class="mono blue">ptr</span> pointe sur l'élément <span class="mono blue">a[i]</span> d'un tableau</p>
+          <p class="tight">alors après l'instruction :</p>
+          <br>
+          <table class="plain mono" style="font-size: 1.2em;">
+            <tr><td class="blue" style="width: 400px;">ptr++;</td><td><span class="blue">ptr</span> <span style="font-family: 'Roboto', Helvetica, sans-serif; font-weight: normal;">pointe sur</span> <span class="blue">a[i+1]</span></td></tr>
+            <tr><td class="blue">ptr += n;</td><td><span class="blue">ptr</span> <span style="font-family: 'Roboto', Helvetica, sans-serif; font-weight: normal;">pointe sur</span> <span class="blue">a[i+n]</span></td></tr>
+            <tr><td class="blue">ptr--;</td><td><span class="blue">ptr</span> <span style="font-family: 'Roboto', Helvetica, sans-serif; font-weight: normal;">pointe sur</span> <span class="blue">a[i-1]</span></td></tr>
+            <tr><td class="blue">ptr -= n;</td><td><span class="blue">ptr</span> <span style="font-family: 'Roboto', Helvetica, sans-serif; font-weight: normal;">pointe sur</span> <span class="blue">a[i-n]</span></td></tr>
+          </table>
+          <aside class="notes"><b><i>Domaine des opérations :</i></b><br>L'addition, la soustraction, l'incrémentation et la décrémentation sur les pointeurs sont seulement définies <b><i>à l'intérieur d'un tableau</i>.</b><br>Si l'adresse formée par le pointeur et l'indice sort du domaine du tableau, alors le résultat n'est pas défini.<br><b><i>Seule exception :</i></b><br>Il est permis de 'pointer' sur le premier octet derrière un tableau (à condition que cet octet se trouve dans le même segment de mémoire que le tableau). Cette règle, introduite avec le standard ANSI-C, légalise la définition de boucles qui incrémentent le pointeur <i>avant</i> l'évaluation de la condition d'arrêt.</aside>
+        </section>
+
+        <section>
+          <h2>11.1 d. Soustraction de 2 pointeurs</h2>
+          <p>Soit <span class="mono blue">ptr1</span> et <span class="mono blue">ptr2</span> deux pointeurs qui pointent sur le <highlight>même tableau</highlight></p>
+          <div class="frame-blue" style="margin: 0 0 0 200px;">
+            <table class="plain" style="margin: 0;">
+              <tr><td class="mono blue" style="width: 380px;">ptr2-ptr1</td><td>fournit le nombre <highlight>d’éléments</highlight></td></tr>
+              <tr><td></td><td>compris entre <span class="mono blue">ptr1</span> et <span class="mono blue">ptr2</span></td></tr>
+            </table>
+          </div>
+          <br>
+          <p class="tight">Le résultat de la soustraction <span class="mono blue">ptr2-ptr1</span> est :</p>
+          <table class="plain" style="margin-left: 300px;">
+            <tr><td style="width: 260px;"><highlight>positif</highlight>,</td><td>si <span class="mono blue">ptr1</span> précède <span class="mono blue">ptr2</span></td></tr>
+            <tr><td><highlight>zéro</highlight>,</td><td>si <span class="mono blue">ptr1</span> <span class="mono">==</span> <span class="mono blue">ptr2</span></td></tr>
+            <tr><td><highlight>négatif</highlight>,</td><td>si <span class="mono blue">ptr2</span> précède <span class="mono blue">ptr1</span></td></tr>
+            <tr><td><highlight>indéfini</highlight>,</td><td>si <span class="mono blue">ptr1</span> et <span class="mono blue">ptr2</span> ne pointent pas dans le même tableau</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>11.1 d. Soustraction de 2 pointeurs</h2>
+          <p><b>Exemple</b></p>
+          <pre style="width: 1000px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em; font-weight: bold; line-height: 1.5em;">
+
+            float *ptr1=(float*)0x100000;
+            float *ptr2=(float*)0x100004;
+
+            ptr2-ptr1 <span class="note">vaut</span> 1
+            ptr1-ptr2 <span class="note">vaut</span> -1
+            ptr2-ptr2 <span class="note">vaut</span> 0
+          </code></pre>
+        </section>
+
+      </section>
+
+      <!----------          INTERACTION AVEC L'OS          ---------->
+      <section>
+
+        <section>
+          <h2 class="long-title">11.2 Interaction d’un programme avec l’OS</h2>
+          <p>La fonction <span class="mono blue">main()</span></p>
+          <br>
+          <p class="indent-1 tight">Valeur <highlight>retournée</highlight> à l’OS avec <span class="mono blue">return</span></p>
+          <p class="indent-1 tight">Valeurs <highlight>reçues</highlight> de l’OS avec</p>
+          <p class="indent-2 tight">une <b>liste d’arguments </b></p>
+          <pre style="width: 1000px; margin: 10px 0 0 500px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em; font-weight: bold;">
+
+            int main(<span class="blue">int argc,  char *argv[]</span>);
+            int main(<span class="blue">int argc,  char **argv </span>);
+          </code></pre>
+          <p class="tight" style="padding-left: 860px;"><i>argument count</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>argument vector</i></p>
+          <br>
+          <p class="indent-2 tight">des <b>variables d’environnement</b></p>
+        </section>
+
+        <section>
+          <h2 class="long-title">11.2 Interaction d’un programme avec l’OS</h2>
+          <p class="centered">Valeur de <span style="font-family: 'Courier New', Courier, monospace;">return</span> récupérée par le système d'exploitation</p>
+          <br>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 30px;">
+            <div>
+              <p class="flush tight"><b>Programme C </b>: <highlight>prog.c</highlight></p>
+              <pre style="width: 640px; margin: 0;"><code
+                class="nohighlight"
+                data-trim
+                data-noescape
+                style="font-size: 1.6em; font-weight: bold; line-height: 1.4em;">
+
+                int main(void)
+                {
+                  …
+                  return <span class="red">-1</span>;
+                }
+              </code></pre>
+            </div>
+            <div>
+              <p class="flush tight"><b>Fichier batch </b>: <error>test.bat</error></p>
+              <pre style="width: 760px; margin: 0;"><code
+                class="nohighlight"
+                data-trim
+                data-noescape
+                style="font-size: 1.6em; font-weight: bold; line-height: 1.4em; background-color: #FBE5D6;">
+
+                ..
+                <span class="blue">prog.exe</span>
+                if <span class="red">errorlevel -1</span> goto err
+                goto ok
+                err: echo.....
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="long-title">11.2 Interaction d’un programme avec l’OS</h2>
+          <h3 class="plain" style="padding-left: 200px;">Valeurs transmises au lancement d’un programme</h3>
+          <pre style="width: 1000px; margin: 0 0 0 330px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em; font-weight: bold;">
+
+            int main(<span class="blue">int argc, char * argv[]</span>);
+          </code></pre>
+          <div style="display: flex; align-items: center; gap: 50px; padding-left: 200px; margin-top: 20px;">
+            <p class="flush tight"><b>Exemple</b></p>
+            <pre class="terminal" style="width: 800px; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em; font-weight: bold;">
+
+              C:\&gt; <span class="lime">myProgFind</span> Salut poem.txt
+            </code></pre>
+          </div>
+          <p class="tight" style="padding-left: 400px; white-space: pre;">Arguments          [0]              [1]           [2]</p>
+          <table class="plain" style="margin-left: 300px;">
+            <tr><td class="mono" colspan="2">argc = 3</td></tr>
+            <tr><td class="mono" style="width: 820px;">argv[0] = "myProgFind"</td><td>nom du programme</td></tr>
+            <tr><td class="mono">argv[1] = "Salut"</td><td>premier argument</td></tr>
+            <tr><td class="mono">argv[2] = "poem.txt"</td><td>deuxième argument</td></tr>
+            <tr><td class="mono">argv[3] = <span class="red">NULL</span></td><td>chaine vide</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2 class="long-title">11.2 Interaction d’un programme avec l’OS</h2>
+          <p class="tight"><b>Variables d’environnement</b></p>
+          <p class="tight">La fonction <span class="mono blue">main()</span> possède un <highlight>3<sup>ème</sup></highlight> argument <span class="mono blue">char *env[]</span>, qui est également un tableau de pointeurs sur des chaînes de caractères.</p>
+          <br>
+          <p class="mono">int main(int argc,char *argv[], <span class="blue">char *env[]</span>)</p>
+          <br>
+          <p class="tight">Chaque élément de <span class="mono blue">env</span> contient un <span class="mono blue">char*</span> de la forme : <span class="mono blue">envvar = valeur</span></p>
+          <p class="tight">Par exemple <span class="mono blue">PATH = C:\Windows\System32</span></p>
+        </section>
+
+      </section>
+
+      <!----------          PASSAGE DE TABLEAUX EN PARAMETRE          ---------->
+      <section>
+
+        <section>
+          <h2>11.3 Tableau 1D comme argument</h2>
+          <p class="tight"><b>Quand on passe un tableau en argument à une fonction, on passe une copie de son adresse</b></p>
+          <div style="display: flex; align-items: flex-start; gap: 60px; padding-left: 200px;">
+            <p class="flush tight">Exemple</p>
+            <pre style="width: 640px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              float tab[4]={1,2,3,4};
+              unefonction(tab);
+            </code></pre>
+          </div>
+          <p class="tight">L'argument de <span class="mono">unefonction()</span> est <highlight>un pointeur sur un <span class="mono">float</span></highlight></p>
+          <p class="tight mono">void unefonction(float* t) ou void unefonction(float t[])</p>
+          <br>
+          <p class="tight"><error>On ne peut pas récupérer la taille d’un tableau dans une fonction</error></p>
+          <p class="tight">→ on passe donc cette information en argument</p>
+          <p class="tight indent-1 mono">void unefonction(float *t, short size)</p>
+        </section>
+
+        <section>
+          <h2 class="long-title">11.3 Tableau 2D comme argument de fonction</h2>
+          <pre style="width: 1700px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            void print_vla_2d(int nb_rows, <b>int nb_cols</b>, int array[nb_rows]<b>[nb_cols]</b>)
+            {
+                for (int i = 0; i &lt; nb_rows; ++i)
+                {
+                    for (int j = 0; j &lt; nb_cols; ++j)
+                    {
+                        printf("%d\t", array[i][j]);
+                    }
+                    printf("\n");
+                }
+                printf("\n");
+            }
+          </code></pre>
+        </section>
+
+        <section>
+          <h2 class="long-title">11.3 Tableau 2D comme argument de fonction</h2>
+          <pre style="width: 1000px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            …
+
+            int main(void)
+            {
+              const int nb_rows = 2;
+              const int nb_cols = 3;
+              int arr[nb_rows][nb_cols];
+              … // Init values in arr
+              print_vla_2d(nb_rows, nb_cols, arr);
+
+              return 0;
+            }
+          </code></pre>
+        </section>
+
+        <section>
+          <h2 class="longer-title">11.3 Passage de chaîne de caractères en paramètre</h2>
+          <p class="tight"><highlight>Appel similaire à celui pour les tableaux. </highlight></p>
+          <p class="tight"><b>Exemple :</b></p>
+          <pre style="width: 700px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            char str[10]="Bonjour";
+            unefonction(str);
+          </code></pre>
+          <p class="tight">L'argument de <span class="mono">unefonction() </span>est un <highlight>pointeur sur une variable de type char</highlight>.</p>
+          <p class="tight mono">void unefonction(char* str)<span style="font-family: 'Roboto', Helvetica, sans-serif;"> ou </span>void unefonction(char str[])</p>
+          <br>
+          <p class="tight">Comme la longueur de la chaîne est connue par le caractère <span class="mono blue">'\0'</span>, il n’est pas nécessaire de passer cette information en argument.</p>
+        </section>
+
+        <section>
+          <h2>11.3 Arguments en nombre variable</h2>
+          <p>Appel de fonction avec un nombre variable d’arguments.</p>
+          <div style="display: flex; align-items: center; gap: 40px; padding-left: 200px;">
+            <p class="flush tight"><b>Appel de fonction :</b></p>
+            <pre style="width: 760px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              a = maxListe(3, 5, 10, -654);
+              c = maxListe(2, 3, 0);
+            </code></pre>
+          </div>
+          <br>
+          <p><b>Prototype :</b> les paramètres anonymes sont déclarés à la fin de l’entête par la syntaxe : <span class="mono blue">... </span></p>
+          <br>
+          <p class="mono" style="padding-left: 400px; margin-bottom: 0;">int maxListe(<span style="border-bottom: 3px solid #000;">short nb, int x1,</span> <span class="blue" style="border-bottom: 3px solid #000;">...</span>)</p>
+          <div class="label-under" style="padding-left: 640px; gap: 120px;">
+            <span>Paramètres nommés</span>
+            <span>Paramètres anonymes</span>
+          </div>
+          <aside class="notes"><b>Voir fonctions variadiques</b><br>https://fr.wikipedia.org/wiki/Fonction_variadique<br>Exemples:<br>Printf, scanf</aside>
+        </section>
+
+        <section>
+          <h2>11.3 Arguments en nombre variable</h2>
+          <p class="tight">Définition des macros dans <span class="mono blue">&lt;stdarg.h&gt;</span></p>
+          <p class="tight mono blue">va_list &lt;variable&gt;</p>
+          <p class="tight indent-1">Pointeur permettant l’accès aux arguments</p>
+          <p class="tight mono blue">va_start(&lt;variable&gt;, &lt;dernier_arg&gt;)</p>
+          <p class="tight indent-1">Initialisation de <span class="mono">&lt;variable&gt;</span><b>.</b> <span class="mono">&lt;dernier_arg&gt;</span> dernier des arguments explicitement nommés dans l'en-tête de la fonction.</p>
+          <p class="tight mono blue">va_arg(&lt;variable&gt;, &lt;type&gt;)</p>
+          <p class="tight indent-1">Parcours des arguments anonymes : le premier appel de cette macro donne le premier argument anonyme ; chaque appel suivant donne l'argument suivant. <span class="mono">&lt;type&gt;</span> décrit le type de l'argument.</p>
+        </section>
+
+        <section>
+          <h2 class="long-title">11.3 Arguments en nombre variable - Exemple</h2>
+          <p class="tight">Calcul du max d’un ensemble de nombres&nbsp; <span class="mono">m = maxListe(5, -1, 3 , 7, 7, 9);</span></p>
+          <pre style="width: 1300px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em; font-weight: bold;">
+
+            <span class="blue">#include &lt;</span><span class="red">stdarg.h</span><span class="blue">&gt;</span>
+
+            int maxListe(short n, int x1, ...) {
+               <span class="red">va_list</span> <span class="blue">liste</span>;
+               int x, i, max = x1;
+               <span class="red">va_start(</span><span class="blue">liste, x1</span><span class="red">)</span><span class="blue">;</span>     /*Initialisation*/
+               for (i = 2; i &lt;= n; i++){
+                  x = <span class="red">va_arg(</span><span class="blue">liste, int</span><span class="red">)</span>; /*Parcours */
+                  if (x &gt; max)
+                     max = x;
+               }
+               return max;
+            }
+          </code></pre>
+        </section>
+
+      </section>
+
+      <!----------          VALEUR DE RETOUR          ---------->
+      <section>
+
+        <section>
+          <h2>11.4 Types de retour</h2>
+          <p>Une fonction peut retourner des pointeurs, par exemple un pointeur sur des entiers</p>
+          <pre style="width: 640px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em; font-weight: bold;">
+
+            <span class="red">int*</span> mafonction(void);
+          </code></pre>
+          <p><b>Exemple :</b>&nbsp; écrire une fonction <span class="mono">init()</span> qui déclare et initialise une chaîne de caractères à « Bonjour ».</p>
+          <div style="display: flex; align-items: flex-end; gap: 30px; padding-left: 400px;">
+            <pre style="width: 500px; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em; font-weight: bold;">
+
+              char* s = NULL;
+              s = init();
+              printf("%s",s);
+            </code></pre>
+            <p class="flush tight">⟶&nbsp; Bonjour</p>
+          </div>
+        </section>
+
+        <section>
+          <h2>11.4 Types de retour</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 40px;">
+            <div style="width: 340px; text-align: center; margin-top: 60px;">
+              <p class="centered" style="font-size: 1.6em; font-weight: bold; color: #FF0000; line-height: 1.2;">⚠<br>À<br>NE SURTOUT<br>PAS<br>FAIRE&nbsp; !!!</p>
+            </div>
+            <pre style="width: 700px; margin: 0; flex: none;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em; font-weight: bold;">
+
+              char* initFALSE()
+              {
+                  char str[] = "Bonjour";
+                  return str;
+              }
+
+              int main(void)
+              {
+                  char *s = NULL;
+                  s = initFALSE();
+                  puts(s);
+                  return 0;
+              }
+            </code></pre>
+            <div style="width: 560px; display: flex; flex-direction: column; gap: 40px; margin-top: 60px;">
+              <div class="frame-red">
+                <p>⚠ Retourne un pointeur sur la variable locale (<span class="mono">str</span>) à la fonction <span class="mono">init()</span>, qui va disparaitre à la fin de la fonction</p>
+              </div>
+              <div class="frame-black">
+                <p><b>Compilation</b></p>
+                <p class="mono red">Warning: function returns address of a local variable</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>11.4 Types de retour</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 40px;">
+            <pre style="width: 1200px; margin: 0; flex: none;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.45em; font-weight: bold;">
+
+              Char *initOK()
+              {
+                  char *ptr = <span class="blue">malloc(</span>(strlen(str)+1)*sizeof(char)<span class="blue">)</span>;
+                  str[] = "Bonjour"; // 7 chars + ‘\0’
+                  strcpy(ptr,str);
+                  return ptr;
+              }
+              int main(void)
+              {
+                  char *s = initOK();
+                  puts(s);
+              <span class="blue">    free(s);</span>
+              <span class="blue">    s = NULL;</span>
+                  return 0;
+              }
+            </code></pre>
+            <div style="width: 500px; display: flex; flex-direction: column; gap: 60px; margin-top: 160px;">
+              <div class="frame-black">
+                <p class="blue">Retourne un pointeur sur le heap: OK</p>
+              </div>
+              <div class="frame-black">
+                <p><span class="mono blue">malloc()</span> <span class="blue">⇒</span> <span class="mono blue">free()</span> <span class="blue">⇒ mettre le pointeur à NULL</span></p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </section>
+
+      <!----------          POINTEUR SUR DES FONCTIONS          ---------->
+      <section>
+
+        <section>
+          <h2>11.5 Pointeur sur des fonctions</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 60px;">
+            <div style="display: flex; flex-direction: column; justify-content: space-between; height: 640px;">
+              <p class="flush">Adresse d’une fonction</p>
+              <pre style="width: 560px; margin: 0;"><code
+                class="nohighlight"
+                data-trim
+                data-noescape
+                style="font-size: 1.3em; border: 2px solid #000; background-color: #FFFFFF;">
+
+                <span class="blue">00401318</span> <span class="blue">00401322</span>
+                Process returned 0 (0x0)
+                execution time : 0.016 s
+                Press any key to continue.
+              </code></pre>
+            </div>
+            <pre style="width: 760px; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em; font-weight: bold;">
+
+              int <span class="blue">f1</span>(void){
+                return 0;
+              }
+
+              double <span class="blue">f2</span>(double x){
+                return x;
+              }
+
+              int main(void){
+                <span class="blue">printf("%p %p\n", f1, f2);</span>
+                return 0;
+              }
+            </code></pre>
+          </div>
+        </section>
+
+        <section>
+          <h2>11.5 Pointeur sur des fonctions</h2>
+          <p class="tight">Comment mémoriser cette adresse dans une variable (pointeur) ? Déclarer une <highlight>variable</highlight> (<span style="font-family: 'Courier New', Courier, monospace;">ptrFonction</span>) qui contient l’<b>adresse d’une fonction</b>.</p>
+          <p class="centered"><span class="syntax">&lt;type&gt; (* <span class="blue">ptrFonction</span>)( &lt;args&gt; );</span></p>
+          <p class="tight"><b>Rappel : </b>pointeur sur un double <span class="mono blue">double *ptrDouble;</span></p>
+          <p class="tight">Exemple d’un pointeur sur une fonction</p>
+          <p class="tight indent-1 mono blue">double (*ptrFunction)(int, double);</p>
+          <p class="tight indent-1"><span class="mono">ptrFunction</span> est une variable pointeur destinée à contenir l’adresse de fonctions à 2 arguments <span class="mono blue">(int, double)</span> retournant un <span class="mono blue">double</span>.</p>
+        </section>
+
+        <section>
+          <h2>11.5 Pointeur sur des fonctions</h2>
+          <p><b>Affectation d’un pointeur de fonction</b></p>
+          <pre style="width: 1000px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em; font-weight: bold; line-height: 1.4em;">
+
+            double <span class="red">myFunction</span>(int n, double x){
+              return n+x;
+            }
+
+            int main(void) {
+              double (*<span class="blue">ptrFunction</span>)(int, double);
+              <span class="blue">ptrFunction</span> = <span class="red">myFunction</span>;
+
+              return 0;
+            }
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>11.5 Pointeur sur des fonctions</h2>
+          <p class="tight">Comment appeler une fonction à partir d’un pointeur de fonction ? Par <highlight>déréférencement du pointeur de fonction</highlight></p>
+          <div style="display: flex; align-items: flex-end; justify-content: center; gap: 20px;">
+            <p class="centered tight" style="width: 300px; margin-bottom: 80px;">Opérateur<br>de<br>déréférencement</p>
+            <pre style="width: 1000px; margin: 0; flex: none;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em; font-weight: bold;">
+
+              double myFunction(int n, double x) {
+                return (double)n+x;
+              }
+
+              int main(void) {
+                double (*ptrFonction)(int, double);
+                ptrFonction = myFunction;
+                double x <span class="blue">=(<span style="color: #C00000;">*</span>ptrFonction)(4, 5.7);</span>
+                return 0;
+              }
+            </code></pre>
+            <p class="flush tight mono" style="margin-bottom: 70px;">≡ x=myFunction(4,5.7)</p>
+          </div>
+        </section>
+
+        <section>
+          <h2>11.5 Pointeur sur des fonctions</h2>
+          <p class="tight">Déclaration d’un <highlight>tableau de pointeurs de fonctions</highlight></p>
+          <p class="centered"><span class="syntax">&lt;type&gt; (* tabPtrFonction<span class="blue">[taille] </span>)( &lt;args&gt; );</span></p>
+          <p class="tight"><b>Exemple </b></p>
+          <pre style="width: 1300px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em; font-weight: bold;">
+
+            double add(double x, double y){ return x+y;}
+            double sub(double x, double y){ return x-y;}
+            ...
+            double (*tabFct[4])(double,double) =
+                                    {add,sub,mult,div};
+            tabFct[0]=sub; // => no more 'add' function!
+            x=(*tabFct[0])(2,3);
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>11.5 Résumé</h2>
+          <p class="tight"><b>Déclaration</b> d’un pointeur <span class="mono blue">ptrFct</span> sur une fonction qui :</p>
+          <p class="tight indent-1">reçoit deux <span class="mono blue">int</span> et renvoie un <span class="mono blue">int</span></p>
+          <p class="tight indent-3"><inline-code><span class="blue">int(*ptrFct)(int, int);</span></inline-code></p>
+          <p class="tight indent-1">ne reçoit aucun argument et ne retourne rien</p>
+          <p class="tight indent-3"><inline-code><span class="blue">void(*ptrFct)(void);</span></inline-code></p>
+          <p class="tight indent-1">reçoit un pointeur sur <span class="mono blue">int</span> et renvoie un pointeur sur un <span class="mono blue">int</span></p>
+          <p class="tight indent-3"><inline-code><span class="blue">int*(*ptrFct)(int*);</span></inline-code></p>
+          <p class="tight indent-1"><b>Déclaration </b>d’un tableau de fonctions qui reçoivent un <highlight>pointeur sur </highlight><span class="mono blue">int</span> et renvoient un <highlight>pointeur sur </highlight><span class="mono blue">int</span>.</p>
+          <p class="tight indent-3"><inline-code>int*(*<span class="blue">ptrFct[taille]</span>)( int* );</inline-code></p>
+        </section>
+
+        <section>
+          <h2>11.5 Résumé</h2>
+          <p class="tight"><b>Initialisation</b></p>
+          <p class="tight">D'un pointeur sur des fonctions <span class="mono blue">ptrFct</span> recevant deux <span class="mono blue">int</span> et renvoyant un <span class="mono blue">int</span></p>
+          <p class="tight indent-2"><inline-code><span class="blue">int(*ptrFct)(int, int) = mafct;</span></inline-code></p>
+          <p class="tight">D'un tableau de fonctions recevant un pointeur sur <span class="mono blue">int</span> et renvoyant un pointeur sur un <span class="mono blue">int</span>.</p>
+          <p class="tight indent-1"><inline-code>int*(*<span class="blue">tabPtrFct[taille]</span>)( int* )<span class="blue"> = {f1, f2, f3,…}</span>;</inline-code></p>
+          <p class="tight"><b>Affectation</b> d’un pointeur sur des fonctions <span class="mono blue">ptrFct</span> :</p>
+          <p class="tight indent-1"><inline-code><span class="blue">ptrFct = mafct;</span></inline-code>&nbsp;&nbsp;&nbsp;&nbsp; <inline-code><span class="blue">tabPtrFct[0] = maFct;</span></inline-code></p>
+        </section>
+
+      </section>
+
+      <!----------          CALLBACK          ---------->
+      <section>
+
+        <section>
+          <h2>11.6 Callback</h2>
+          <div class="quote">
+            <p><b>Callback </b></p>
+            <p><i>&nbsp;&nbsp;Une <b>fonction de rappel</b> "callback" est une <a href="http://fr.wikipedia.org/wiki/Fonction_informatique">fonction</a> qui est passée en argument à une autre fonction. Cette dernière peut alors faire usage de cette fonction de rappel comme de n'importe quelle autre fonction, alors qu'elle ne la connaît pas par avance.</i> [wikipédia]</p>
+          </div>
+          <br>
+          <p class="tight"><b>Exemples d’application</b></p>
+          <p class="tight"><highlight>Programmation événementielle</highlight></p>
+          <p class="tight">Associer une action (une fonction) à un événement, par exemple un click souris</p>
+          <p class="tight"><highlight>Fonction dont le comportement peut être modifié</highlight></p>
+          <p class="tight">Par exemple, tri croissant/décroissant ► Passer la fonction de comparaison en argument</p>
+        </section>
+
+        <section>
+          <h2>11.6 Callback</h2>
+          <div style="display: flex; align-items: flex-end; justify-content: center; gap: 30px;">
+            <pre style="width: 1100px; margin: 0; flex: none;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em; font-weight: bold;">
+
+              <span class="gray">#include &lt;math.h&gt;</span>
+              double <span class="red">zeroValue(</span><span class="blue">double (*ptrFct)(double)</span><span class="red">)</span>
+              {
+                return <span class="blue">(*ptrFct)(0.0)</span>;
+              }
+              int main(void)
+              {
+                 double x,y;
+                 x = <span class="red">zeroValue(</span><span class="blue">sin</span><span class="red">)</span><span class="blue">;</span>
+                 y = <span class="red">zeroValue(</span><span class="blue">cos</span><span class="red">)</span><span class="blue">;</span>
+                 <span class="purple">printf("%f,%f",x,y);</span>
+
+                 return 0;
+              }
+            </code></pre>
+            <pre class="terminal" style="width: 420px; margin: 0; flex: none;"><code
+              class="nohighlight"
+              data-trim
+              style="font-size: 1.6em; font-weight: bold;">
+
+              0.000000,1.000000
+            </code></pre>
+          </div>
+        </section>
+
+      </section>
+
+      <!----------          EXERCICES          ---------->
+      <section>
+        <h2>📝 Exercices</h2>
+        <p style="text-align: center; padding-left: 0;">
+          <a href="https://he-arc.github.io/1242.1-Langage_C/docs/cours/chapitre11cours/">Exercices du chapitre 11</a>
+        </p>
+      </section>
+
+    </div>
+  </div>
+
+  <!----------          CONTENT          ---------->
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/notes/notes.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      hash: true,
+      width: 1920,
+      height: 1080,
+      transition: "none",
+      center: false,
+      slideNumber: 'c/t',
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+    });
+  </script>
+</body>
+
+</html>
