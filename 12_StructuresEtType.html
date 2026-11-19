@@ -1,0 +1,1031 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>HE-Arc - 1242.1 Langage C - Chapitre 12 - Structures et types composés</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/hearc.css" id="theme">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="https://www.he-arc.ch/wp-content/uploads/2021/12/cropped-hearc-icon-192x192.png"
+    type="image/vnd.microsoft.icon" />
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/vs.css" id="highlight-theme">
+
+  <style>
+    .reveal .container p,
+    .reveal .container h3,
+    .reveal .container h4 { padding-left: 0; }
+    .reveal .container .col-left { text-align: left; }
+
+    .reveal .indent-1 { padding-left: 300px; }
+    .reveal .indent-2 { padding-left: 400px; }
+    .reveal .centered { text-align: center; padding-left: 0; }
+    .reveal p.tight { margin: 8px 0; }
+    .reveal p.flush { padding-left: 0; }
+    .reveal i { font-style: italic; }
+    .reveal h3.plain { text-transform: none; }
+    .reveal h2 .mono { text-transform: none; }
+    .reveal h2.long-title { font-size: 1.4em; }
+    .reveal section { position: relative; }
+
+    .reveal pre.terminal code.hljs,
+    .reveal pre.terminal code {
+      background-color: #000000;
+      color: #FFFFFF;
+    }
+
+    .reveal .mono { font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+    .reveal code .red { color: #FF0000; font-weight: bold; }
+    .reveal code .blue { color: #0000FF; font-weight: bold; }
+    .reveal code .purple { color: #7030A0; font-weight: bold; }
+    .reveal code .gray { color: #808080; font-weight: normal; }
+    .reveal code .dark-yellow { color: #B8860B; font-weight: bold; }
+    .reveal code .orange { color: #E36C09; font-weight: bold; }
+    .reveal code .green { color: #00B050; font-weight: bold; }
+    .reveal code .note { font-family: "Roboto", Helvetica, sans-serif; font-weight: normal; font-style: italic; }
+    .reveal code .strike { text-decoration: line-through; color: #FF3300; font-weight: bold; }
+    .reveal code .red *, .reveal code .blue *, .reveal code .purple * { color: inherit; }
+
+    .reveal .red { color: #FF0000; }
+    .reveal .blue { color: #0000FF; }
+    .reveal .purple { color: #7030A0; }
+    .reveal .green { color: #00B050; }
+    .reveal .gray { color: #808080; }
+
+    .reveal pre.syntax-box code { background-color: #F8F8BE; border: 2px solid #000000; }
+
+    .reveal .rappel {
+      position: absolute;
+      top: -20px;
+      right: 0;
+      background-color: #0000FF;
+      color: #FFFFFF;
+      font-size: 1.1em;
+      padding: 0 20px;
+    }
+    .reveal .button {
+      display: inline-block;
+      background-color: #0000FF;
+      color: #FFFFFF;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      padding: 4px 30px;
+    }
+    .reveal .frame-blue {
+      display: inline-block;
+      background-color: #0000FF;
+      color: #FFFFFF;
+      padding: 10px 24px;
+      line-height: 1.3;
+    }
+
+    /* structure layout: --b is the width of one byte */
+    .reveal .bytes {
+      display: inline-flex;
+      align-items: stretch;
+      --b: 18px;
+      height: 64px;
+      border: 2px solid #000000;
+      padding: 4px;
+      background-color: #FFFFFF;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      font-size: 26px;
+    }
+    .reveal .bytes.frame { outline: 3px solid #7030A0; outline-offset: 3px; }
+    .reveal .bytes .c { box-sizing: border-box; width: var(--b); border: 1px solid #1F3864; background-color: #FFFFFF; text-align: center; line-height: 54px; }
+    .reveal .bytes .c.r { background-color: #FF0000; }
+    .reveal .bytes .c.sh { width: calc(2 * var(--b)); background-color: #FFFF00; }
+    .reveal .bytes .c.fl { width: calc(4 * var(--b)); background-color: #33CC33; }
+    .reveal .bytes .c.fl2 { width: calc(4 * var(--b)); background-color: #0070C0; }
+    .reveal .bytes .c.date { width: calc(6 * var(--b)); background-color: #FFFF00; display: flex; }
+    .reveal .bytes .c.date span { flex: 1; border-right: 2px solid #000000; }
+    .reveal .bytes .c.date span:last-child { border-right: none; }
+    .reveal .labels { display: flex; font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 24px; }
+
+    /* bit tables */
+    .reveal table.bits { margin: 0 auto; font-size: 0.75em; border-collapse: collapse; }
+    .reveal table.bits td { border: 2px solid #000000; text-align: center; width: 62px; height: 1.3em; padding: 0.05em 0; }
+    .reveal table.bits tr.idx td { border: none; font-size: 0.9em; }
+    .reveal table.bits td.lbl { border: none; text-align: right; width: auto; padding-right: 20px; white-space: nowrap; }
+    .reveal table.bits td.unused { background-color: #D9D9D9; }
+    .reveal table.bits td.m { border-bottom: 4px solid #C0504D; }
+    .reveal table.bits td.k { border-bottom: 4px solid #9BBB59; }
+    .reveal table.bits td.u { border-bottom: 4px solid #4BACC6; }
+    .reveal table.bits td.j { border-bottom: 4px solid #F79646; }
+    .reveal table.bits td.i { border-bottom: 4px solid #1F3864; }
+    .reveal table.bits td.rd { background-color: #E6B9B8; }
+    .reveal table.bits td.gr { background-color: #D7E4BD; }
+    .reveal table.bits td.bl { background-color: #95B3D7; }
+    .reveal table.bits td.g1 { background-color: #D9D9D9; }
+    .reveal table.bits td.g2 { background-color: #F2F2F2; }
+
+    .reveal table.plain { margin: 0 0 0 300px; font-size: 1em; }
+    .reveal table.plain td { border: none; padding: 0.1em 0.8em 0.1em 0; vertical-align: middle; }
+    .reveal .brace-right {
+      border: 3px solid #000000;
+      border-left: none;
+      border-radius: 0 24px 24px 0;
+      width: 30px;
+      align-self: stretch;
+    }
+  </style>
+</head>
+
+<body>
+  <img id="logo-hearc" src="./medias/logo_he-arc.png" alt="Logo HE-ARC">
+  <img id="logo-hesso" src="./medias/logo_hes-so.png" alt="Logo HES-SO">
+  <p id="course-infos">1242.1 Langage C - 2026-2027</p>
+
+  <!----------          CONTENT          ---------->
+  <div class="reveal">
+    <div class="slides">
+
+      <!----------          TITLE          ---------->
+      <section>
+        <h1>
+          Chapitre 12
+        </h1>
+        <h2>
+          Structures et types composés
+        </h2>
+        <p class="tight">1. structures :  "<span class="mono">struct</span>"</p>
+        <p class="tight">2. structures : les champs de bits</p>
+        <p class="tight">3. <span class="mono">"union"</span></p>
+        <p class="tight">4. <span class="mono">"enum"</span></p>
+        <p class="tight">5. <span class="mono">"typedef"</span></p>
+        <aside class="notes">Référence:<br>http://fr.wikibooks.org/wiki/Programmation_C/Tableaux<br>intéressant  . P.ex. la possibilité d'écrire   T[i]    ou i[T]   (à éviter!!)</aside>
+      </section>
+
+      <!----------          TYPES          ---------->
+      <section>
+        <h2>12 Types</h2>
+        <div style="display: flex; align-items: center; gap: 40px;">
+          <div>
+            <h3 class="plain">Types de base</h3>
+            <p class="tight indent-1">Nombres entiers</p>
+            <table class="plain" style="margin-left: 400px;">
+              <tr><td style="width: 420px;">Anonymes</td><td><span class="mono">int, short, …</span></td></tr>
+              <tr><td><highlight>Nommés</highlight></td><td><span class="mono blue">enum</span></td></tr>
+            </table>
+            <table class="plain">
+              <tr><td style="width: 520px;">Nombres flottants</td><td><span class="mono">float, double, …</span></td></tr>
+            </table>
+            <h3 class="plain">Types dérivés</h3>
+            <table class="plain">
+              <tr><td style="width: 520px;">Tableaux</td><td><span class="mono" style="font-weight: normal;">[ ]</span></td></tr>
+              <tr><td>Fonctions</td><td><span class="mono" style="font-weight: normal;">( )</span></td></tr>
+              <tr><td>Pointeurs</td><td><span class="mono" style="font-weight: normal;">*</span></td></tr>
+              <tr><td><highlight>Structures</highlight></td><td><span class="mono blue">struct</span></td></tr>
+              <tr><td><highlight>Unions</highlight></td><td><span class="mono blue">union</span></td></tr>
+            </table>
+          </div>
+          <div class="brace-right"></div>
+          <p class="flush mono blue">typedef</p>
+        </div>
+      </section>
+
+      <!----------          STRUCT          ---------->
+      <section>
+
+        <section>
+          <span class="rappel">Rappel</span>
+          <h2>12.1 Structures : déclaration de type</h2>
+          <p>La <highlight>structure</highlight> permet de désigner <b>sous un seul nom</b> un <b>ensemble de valeurs</b>, pouvant être de types différents</p>
+          <p><b>Syntaxe </b>de la <b>déclaration </b>d'un type structure :</p>
+          <div style="display: flex; align-items: flex-end; gap: 30px; padding-left: 350px;">
+            <pre class="syntax-box" style="width: 860px; margin: 0; flex: none;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              <span class="blue">struct</span> <span class="gray">[</span><span class="purple">identificateur</span><span class="gray">]</span>  <span class="gray note">⟵</span>
+              <span class="blue">{</span>
+                  type1     membre1;
+                  type2     membre2;
+                  …
+                  typeN     membreN;
+              <span class="blue">}</span><span class="gray">[var1, ...]</span><span class="blue">;</span>  <span class="gray note">⟵</span>
+            </code></pre>
+            <p class="flush tight gray"><i>1x optionnel</i></p>
+          </div>
+          <aside class="notes"><b><i>* ~Généralisation du tableau  (ensemble de valeurs du même type)</i></b><br><b><i>Déclaration de structures</i></b><br>Pour pouvoir manipuler une donnée de type structure, il faut construire d'abord un <b>nouveau type</b> de données, auquel on donne un nom, puis déclarer une variable de ce type.<br>Les différents éléments composant la structure sont appelés les <b>membres</b> de la structure.</aside>
+        </section>
+
+        <section>
+          <span class="rappel">Rappel</span>
+          <h2>12.1 Structures : déclaration de type</h2>
+          <p>Exemple : <b>déclaration d’un type</b> <span class="mono" style="font-weight: normal;">struct PatientFile</span></p>
+          <pre style="width: 1000px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            <b>struct</b> <span class="purple">PatientFile</span> 	// déclaration du type
+            <b>{</b>
+            	// déclaration des membres
+              <span class="blue" style="font-weight: normal;">char</span>  <b>name</b>[32];
+              <span class="blue" style="font-weight: normal;">short</span> <b>age</b>;
+              <span class="blue" style="font-weight: normal;">float</span> <b>height</b>, <b>weight</b>;
+            <b>}</b>;
+          </code></pre>
+          <div style="display: table; margin: 20px auto 0 auto;">
+            <div class="bytes"><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c sh"></span><span class="c fl"></span><span class="c fl2"></span></div>
+            <div class="labels"><span style="width: 590px;">name</span><span style="width: 66px;">age</span><span style="width: 120px;">height</span><span>weight</span></div>
+          </div>
+        </section>
+
+        <section>
+          <span class="rappel">Rappel</span>
+          <h2 class="long-title">12.1 Structures : déclaration de variables (1)</h2>
+          <p class="tight"><b>Déclaration</b> d’une variable <span class="mono" style="font-weight: normal;">client</span> de type <span class="mono purple">struct PatientFile</span></p>
+          <pre style="width: 900px; margin: 10px 0 20px 350px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em; font-weight: bold;">
+
+            <span class="blue">struct</span> <span class="purple">PatientFile</span> client;
+          </code></pre>
+          <p class="tight"><b>Déclaration et initialisation </b>de variables <span class="mono" style="font-weight: normal;">c1</span>, <span class="mono" style="font-weight: normal;">c2</span>, <span class="mono" style="font-weight: normal;">c3</span>, de type <span class="mono blue">struct <span class="purple">PatientFile</span></span></p>
+          <div style="display: flex; align-items: flex-end; gap: 30px; padding-left: 350px;">
+            <pre style="width: 1150px; margin: 10px 0; flex: none;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em; font-weight: bold;">
+
+              <span class="blue">struct</span> <span class="purple">PatientFile</span> c1 = {"Jules",25,176.,72.},
+                                 c2 = {"Eva",18},
+                                 c3 = {"Ed",<span class="red">.height=</span>145,59.};
+            </code></pre>
+            <p class="flush tight red">≥C99</p>
+          </div>
+          <div style="display: flex; justify-content: center; gap: 40px; --b: 7px;">
+            <div><p class="flush tight">c1</p><div class="bytes" style="--b: 7px; height: 44px;"><span class="c" style="width: calc(32 * var(--b));"></span><span class="c sh"></span><span class="c fl"></span><span class="c fl2"></span></div></div>
+            <div><p class="flush tight">c2</p><div class="bytes" style="--b: 7px; height: 44px;"><span class="c" style="width: calc(32 * var(--b));"></span><span class="c sh"></span><span class="c fl"></span><span class="c fl2"></span></div></div>
+            <div><p class="flush tight">c3</p><div class="bytes" style="--b: 7px; height: 44px;"><span class="c" style="width: calc(32 * var(--b));"></span><span class="c sh"></span><span class="c fl"></span><span class="c fl2"></span></div></div>
+          </div>
+          <aside class="notes">Avec C99, il est possible de nommer des champs que l'on souhaite initialiser à la déclaration (entre accolades). Les éventuelles valeurs suivantes seront les champs suivants (selon l'ordre de déclaration de la structure).</aside>
+        </section>
+
+        <section>
+          <span class="rappel">Rappel</span>
+          <h2 class="long-title">12.1 Structures : déclaration de variables (2)</h2>
+          <p>À la déclaration d'un type structure, il est permis de <span class="blue">déclarer directement </span>une ou plusieurs variables de ce type. On peut même le faire sans nommer le type structure</p>
+          <div style="display: flex; align-items: flex-start; gap: 40px; padding-left: 350px;">
+            <pre style="width: 700px; margin: 0; flex: none;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              <span class="blue">struct</span>
+              <b>{</b>
+                float x,y;
+              <b>}</b> <span class="blue">point1, point2</span>;
+            </code></pre>
+            <p class="flush tight purple" style="margin-top: 10px;"><i>⟵ type anonyme</i></p>
+          </div>
+          <p><span class="mono blue">point1 </span>et <span class="mono blue">point2</span> sont <span class="red">des variables</span> de type structure</p>
+          <aside class="notes">On parle alors d'un type anonyme (utilisable une seule fois)<br>Note: il est permis d'initialiser point à sa déclaration</aside>
+        </section>
+
+        <section>
+          <span class="rappel">Rappel</span>
+          <h2 class="long-title">12.1 Structures : imbrications (déclaration)</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 60px;">
+            <pre style="width: 860px; margin: 0; flex: none;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              <span class="blue">struct <span class="dark-yellow">date_Struct</span></span>
+              <b>{</b>
+                <b>short</b> day, month, year;
+              <b>}</b>;
+
+              <span class="blue">struct</span> <span class="purple">PatientFileB_Struct</span>
+              {
+                char   name[32];
+                <span class="blue">struct <span class="dark-yellow">date_Struct</span></span> birthDate;
+                float  height;
+              <b>}</b>;
+            </code></pre>
+            <div>
+              <p class="flush tight mono">struct Date</p>
+              <div class="bytes" style="--b: 14px; height: 60px;"><span class="c date"><span></span><span></span><span></span></span></div>
+              <p class="flush tight mono" style="margin-top: 50px;">struct FicheB</p>
+              <div class="bytes frame" style="--b: 14px; height: 60px;"><span class="c r" style="width: calc(32 * var(--b));"></span><span class="c date"><span></span><span></span><span></span></span><span class="c fl"></span></div>
+              <p class="flush tight mono" style="font-weight: normal;">misterDurand</p>
+            </div>
+          </div>
+          <pre style="width: 1800px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.4em;">
+
+            <span class="blue">struct</span> <span class="purple">PatientFileB _Struct</span> misterDurand ={"Durand", <span class="dark-yellow">{13,2,1976}</span>, 190.0};
+          </code></pre>
+        </section>
+
+        <section>
+          <span class="rappel">Rappel</span>
+          <h2>12.1 Structures : accès aux membres (1)</h2>
+          <p><b>Variable de type structure, accès par </b><highlight>l'opérateur point  </highlight><span class="mono">‘<span class="blue">.</span>’</span></p>
+          <div style="display: flex; align-items: center; gap: 60px; padding-left: 200px;">
+            <p class="flush tight" style="width: 220px;"><b>Syntaxe </b></p>
+            <pre style="width: 600px; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em; font-weight: bold;">
+
+              <span class="blue">&lt;variable&gt;</span><span class="red">.</span><span class="blue">&lt;membre&gt;</span>
+            </code></pre>
+          </div>
+          <div style="display: flex; align-items: center; gap: 60px; padding-left: 200px; margin-top: 20px;">
+            <p class="flush tight" style="width: 220px;"><b>Exemples </b></p>
+            <pre style="width: 900px; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em; font-weight: bold;">
+
+              <span class="blue">struct PatientFile myPatient;</span>
+              <span class="blue">myPatient<span class="red">.</span>height = 190.0;</span>
+              <span class="blue">strcpy(myPatient<span class="red">.</span>name, "Edgar");</span>
+            </code></pre>
+          </div>
+          <div style="display: table; margin: 30px auto 0 auto;">
+            <p class="flush tight">myPatient</p>
+            <div class="bytes"><span class="c">E</span><span class="c">d</span><span class="c">g</span><span class="c">a</span><span class="c">r</span><span class="c" style="font-size: 16px;">\0</span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c"></span><span class="c sh"></span><span class="c fl" style="font-size: 20px;">190.0</span><span class="c fl2"></span></div>
+            <div class="labels" style="font-weight: normal;"><span style="width: 590px;">name</span><span style="width: 66px;">age</span><span style="width: 120px;">height</span><span>weight</span></div>
+          </div>
+        </section>
+
+        <section>
+          <h2>12.1 Structures : accès aux membres (2)</h2>
+          <p class="tight">Avec un <highlight>pointeur</highlight> sur une structure,</p>
+          <p class="tight">accès avec l'opérateur d'indirection :    <error>‑&gt;</error></p>
+          <div style="display: flex; align-items: center; gap: 60px; padding-left: 300px;">
+            <p class="flush tight" style="width: 220px;"><b>Syntaxe</b></p>
+            <pre style="width: 1000px; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.5em; font-weight: bold;">
+
+              &lt;pointeur&gt;<span class="red">-&gt;</span>&lt;membre&gt;
+            </code></pre>
+          </div>
+          <div style="display: flex; align-items: center; gap: 60px; padding-left: 300px; margin-top: 20px;">
+            <p class="flush tight" style="width: 220px;"><b>Exemple</b></p>
+            <pre style="width: 1000px; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.5em;">
+
+              <b>struct PatientFileB</b> patientX = {"Jean", …};
+              <b>struct PatientFileB <span class="red">*</span><span class="blue">ptrPatient</span></b> = <span class="red">&amp;</span>patientX;
+              <span class="blue">ptrPatient</span><span class="red">‑&gt;</span><b>height = 190.0;</b>
+              <span class="blue">ptrPatient</span><span class="red">‑&gt;</span><b>birthDate</b><span class="red">.</span><b>yr = 1976;</b>
+            </code></pre>
+          </div>
+          <div style="display: flex; align-items: flex-end; justify-content: center; gap: 40px; margin-top: 20px;">
+            <div style="text-align: center;">
+              <p class="flush tight">ptrPatient</p>
+              <div style="width: 40px; height: 76px; margin: 0 auto; background-color: #4F81BD; border: 2px solid #1F3864; color: #0000FF; line-height: 70px;">●</div>
+            </div>
+            <span style="font-size: 1.4em; padding-bottom: 10px;">⟶</span>
+            <div>
+              <div style="display: flex; justify-content: space-between;"><span>patientX</span><span class="mono" style="font-weight: normal;">birthDate taille</span></div>
+              <div class="bytes frame" style="--b: 22px;"><span class="c r" style="width: calc(25 * var(--b));"></span><span class="c sh" style="width: calc(2 * var(--b));"></span><span class="c date" style="background-color: #33CC33;"><span></span><span></span><span style="writing-mode: vertical-rl; font-size: 22px; line-height: 1;">1976</span></span><span class="c fl2" style="width: calc(5 * var(--b));">190</span></div>
+            </div>
+          </div>
+          <aside class="notes">Note: on  peut aussi d'abord accéder à la variable et utiliser l'opérateur d'accès standard<br><span class="mono">(*ptPatient).height = 190.0;</span><br><i><span class="mono">(*ptrClient).dateNaiss.an = 1976;</span></i></aside>
+        </section>
+
+        <section>
+          <h2>12.1 Structures : affectation</h2>
+          <p>Possible si même type</p>
+          <pre style="width: 1500px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            <b>struct</b> PatientFileB patientX = {"Jean", …};
+            struct PatientFileB patientY;
+            <b>patientY = patientX;</b>	<span class="blue">// Tout le contenu est recopié</span>
+            patientY.height = patientX.height;
+            <span class="red">// Problème avec les chaines de caractères</span>
+            <span class="strike">patientY.name = patientX.name;</span>
+            strcpy(patientY.name,patientX.name); <span class="blue">// solution</span>
+          </code></pre>
+          <p style="text-align: right; padding-right: 200px;"><span class="button">Exemple</span></p>
+        </section>
+
+        <section>
+          <h2>12.1 Structures et fonctions</h2>
+          <pre style="width: 700px; margin-left: 200px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em; font-weight: bold;">
+
+            <span class="purple">struct MyStruct</span>
+            {
+            	...
+            };
+          </code></pre>
+          <p class="tight">Une fonction peut retourner un résultat de type structure, ou un pointeur sur une structure</p>
+          <p class="tight indent-1 mono"><span class="purple">struct MyStruct</span> <span class="red">function1(</span>…<span class="red">)</span>;</p>
+          <p class="tight indent-1 mono"><span class="purple">struct MyStruct</span><span class="red">* function2(</span>…<span class="red">)</span>;</p>
+          <p class="tight">Une structure peut être passée comme paramètre à une fonction</p>
+          <p class="tight indent-1 mono">… <span class="red">function3(</span><span class="purple">struct MyStruct</span><span class="red">  s)</span>;</p>
+          <p class="tight indent-1 mono">… <span class="red">function4(</span><span class="purple">struct MyStruct</span><span class="red">* ptr_s);</span></p>
+          <p style="text-align: right; padding-right: 200px;"><span class="button">Exemple</span></p>
+          <aside class="notes">funct1 retourne une structure<br>funct 2 retourne un pointeur sur une structure<br>funct 3 passage de paramètre par valeur<br>funct4 passage de paramètre par adresse</aside>
+        </section>
+
+      </section>
+
+      <!----------          BIT FIELDS          ---------->
+      <section>
+
+        <section>
+          <h2>12.2 Champs de bits, <i>bit fields</i></h2>
+          <p>C'est un type <span class="mono blue">struct</span> particulier qui permet de</p>
+          <p class="indent-1">Compacter des données</p>
+          <p class="indent-1">Aligner des données</p>
+          <p class="indent-1">Chaque membre est défini comme un <highlight>champ</highlight> en précisant à la fin de sa déclaration le nombre de bits qu'il occupe</p>
+          <aside class="notes">Dans une structure, chaque membre est défini comme un <b>champ </b>en précisant à la fin de sa déclaration le nombre de bits qu'il occupe.</aside>
+        </section>
+
+        <section>
+          <h2>12.2 Champs de bits : déclaration</h2>
+          <p>Syntaxe de la déclaration d'un type champs de bits:</p>
+          <pre class="syntax-box" style="width: 1000px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            <span class="blue">struct</span> <span class="purple">identificateur</span>
+            <b>{</b>
+            	type1 membre1 <span class="red">:</span> <span class="red" style="font-weight: normal;">nbre_bits</span>;
+            	type2 membre2 <span class="red" style="font-weight: normal;">:</span> <span class="red" style="font-weight: normal;">nbre_bits</span>;
+            	…
+            	typeN membreN <span class="red" style="font-weight: normal;">:</span> <span class="red" style="font-weight: normal;">nbre_bits</span>;
+            <b>};</b>
+          </code></pre>
+          <p class="tight indent-1"><b>Le type d'un champ doit être entier</b></p>
+          <table class="plain mono" style="margin-left: 400px; font-weight: normal;">
+            <tr><td style="width: 300px;">int ,</td><td>unsigned int,</td></tr>
+            <tr><td>char,</td><td>unsigned char,</td></tr>
+            <tr><td>long,</td><td>unsigned long,</td></tr>
+            <tr><td>long long,</td><td>unsigned long long</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>12.2 Déclaration type champs de bits</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 40px;">
+            <pre style="width: 1500px; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.5em; font-weight: bold;">
+
+              <span class="blue">struct</span> <span class="purple">myStruct</span>
+              {
+              	unsigned i : 2;
+              	unsigned j : 5;
+              	int        : 4;
+              	char     k : 1;
+              	unsigned m : 4;
+              };
+              struct myStruct mot = {3,<span class="orange">10</span>,<span class="green">1</span>}; <span style="font-weight: normal;">// initialisation des 3 premiers champs</span>
+            </code></pre>
+            <span class="button">Exemple</span>
+          </div>
+          <table class="bits" style="margin-top: 30px;">
+            <tr class="idx"><td class="lbl">bit n°</td><td>15</td><td>14</td><td>13</td><td>12</td><td>11</td><td>10</td><td>9</td><td>8</td><td>7</td><td>6</td><td>5</td><td>4</td><td>3</td><td>2</td><td>1</td><td>0</td></tr>
+            <tr><td class="lbl">mot</td><td class="m"></td><td class="m"></td><td class="m"></td><td class="m"></td><td class="k green">1</td><td class="u unused"></td><td class="u unused"></td><td class="u unused"></td><td class="u unused"></td><td class="j orange">0</td><td class="j orange">1</td><td class="j orange">0</td><td class="j orange">1</td><td class="j orange">0</td><td class="i">1</td><td class="i">1</td></tr>
+            <tr class="idx"><td class="lbl"></td><td colspan="4">⟵ m ⟶</td><td>k</td><td colspan="4">⟵ inutilisé ⟶</td><td colspan="5">⟵ j ⟶</td><td colspan="2">⟵ i ⟶</td></tr>
+          </table>
+          <aside class="notes">Remarques:<br>la valeur de k est de -1 car un signed int de 1 bit vaut 0 -&gt; 0   1 -&gt; -1</aside>
+        </section>
+
+        <section>
+          <h2>12.2 Champs de bits : remarques (1)</h2>
+          <p>Une variable «champs de bits» est utilisée comme une structure. L'accès aux différents champs se fait de la même manière que l'accès aux membres.</p>
+          <p>Le nombre de bits d'un champ doit être une valeur entre 1 et la taille du type du champs. Par ex. entre 1 et 8 pour <span class="mono blue">char</span>, ...,  entre 1 et 64 pour <span class="mono blue">long long</span>.</p>
+          <p>Des champs sans nom sont autorisés, cela dépend de l'environnement</p>
+          <aside class="notes"><b><i>Utilisation de champs de bits</i></b><br>Une variable champs de bits est utilisée comme une structure.<br> L'accès aux différents champs se fait de la même manière que l'accès aux membres, <br><b>pas possible de prendre l'adresse d'un champ.</b><br>Les opérations courantes sur les entiers ne sont pas applicables à une variable champs de bits. Lorsque la valeur que l'on veut stocker dans un champ est trop grande par rapport au nombre de bits réservés, la valeur est tronquée, les bits de poids fort sont perdus.<br><b><i>Remarque :</i></b><br><b>Les applications comportant des champs de bits ne sont pas portables.</b> <br>D'autre part, utiliser des champs <b>n'économise pas forcément de la</b> <b>mémoire</b>. En effet, bien qu'il y ait un gain de place mémoire pour le stockage des données, la taille du code nécessaire à la manipulation des champs va croître.</aside>
+        </section>
+
+        <section>
+          <h2>12.2 Champs de bits : remarques (2)</h2>
+          <p>L'ordre dans lequel les bits d'un champ sont stockés n'est pas garanti ► dépend de la plate-forme ou du compilateur</p>
+          <p><error>⚠ Il n’est pas possible de prendre l'adresse d'un champ</error></p>
+          <p>Les opérations courantes sur les entiers (+, -, *, /, %) ne sont pas applicables à une variable champs de bits</p>
+        </section>
+
+        <section>
+          <h2>12.2 Champs de bits : remarques (3)</h2>
+          <p>Lorsque la valeur que l'on veut stocker dans un champ est trop grande par rapport au nombre de bits réservés, la valeur est tronquée, les bits de poids fort sont perdus</p>
+          <p><error>⚠ Les exécutables avec des champs de bits ne sont pas portables</error></p>
+          <p>L'emploi des champs de bits n'économise pas forcément de la mémoire. Le gain de stockage des données, peut être perdu par la taille du code nécessaire à la manipulation des champs</p>
+        </section>
+
+        <section>
+          <h2>12.2 Champs de bits : exemple (2)</h2>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 40px;">
+            <pre style="width: 1150px; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              <b><span class="blue">struct</span> <span class="purple">Date</span></b>
+              {
+                 <b>unsigned</b> year : 11;
+                 <b>unsigned</b> month: 4;
+                 <b>unsigned</b> day  : 5;
+              };
+
+              <b><span class="blue">struct</span> <span class="purple">Date</span></b> today = {2018, 1, 14};
+
+              printf("Date: %3d/%2d/%4d\n", today.year,
+                      today.month, today.year);
+            </code></pre>
+            <div class="frame-blue">20 bits<br>→(3)4 bytes au lieu de 12</div>
+          </div>
+          <aside class="notes">2^11= 2048<br>2^4=16<br>2^5=32</aside>
+        </section>
+
+        <section>
+          <h2>12.2 Champs de bits : exemple (3)</h2>
+          <br>
+          <p>Souvent, les contrôleurs de périphériques (p.ex. un disque dur) et le système d'exploitation ont besoin de communiquer à bas niveau.</p>
+          <br>
+          <p>Les contrôleurs de ces périphériques contiennent <highlight>plusieurs registres </highlight>qui peuvent être <highlight>compactés dans un seul entier</highlight>.</p>
+        </section>
+
+        <section>
+          <h2>12.2 Champs de bits : exemple (3)</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 40px;">
+            <pre style="width: 860px; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.3em;">
+
+              <span class="blue">struct</span> <span class="purple">DISK_REGISTER</span> <span class="blue">{</span>
+                    unsigned ready:1;
+                    unsigned error_occured:1;
+                    unsigned disk_spinning:1;
+                    unsigned write_protect:1;
+                    unsigned head_loaded:1;
+                    unsigned error_code:8;
+                    unsigned track:9;
+                    unsigned sector:5;
+                    unsigned command:5;
+              <span class="blue">};</span>
+
+              <span class="blue">struct</span> <span class="purple">DISK_REGISTER</span> *<b>prtDisk_reg</b> =
+                (struct DISK_REGISTER *) DISK_REGISTER_MEMORY;
+
+              //Define sector and track to start read
+              <b>prtDisk_reg</b>->sector  = new_sector;
+              <b>prtDisk_reg</b>->track   = new_track;
+              <b>prtDisk_reg</b>->command = READ; 2222
+            </code></pre>
+            <div style="text-align: center;">
+              <img src="./medias/ch12_disk_register.png" alt="Registre du disque" style="width: 720px; border: 2px solid #000000;">
+              <p class="centered tight purple">⟵ 32 bits ⟶</p>
+            </div>
+          </div>
+          <aside class="notes">To access values stored at a particular memory address, DISK_REGISTER_MEMORY we can assign a pointer of the above structure to access the memory via:<br>The disk driver code to access this is now relatively straightforward:</aside>
+        </section>
+
+      </section>
+
+      <!----------          UNION          ---------->
+      <section>
+
+        <section>
+          <h2>12.3 Union</h2>
+          <p>Les unions permettent de stocker des objets de types différents dans un <highlight>même espace mémoire. </highlight></p>
+          <div style="display: flex; align-items: flex-start; gap: 60px; padding-left: 200px;">
+            <p class="flush tight" style="width: 220px;"><b>Syntaxe </b></p>
+            <pre class="syntax-box" style="width: 800px; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              <span class="blue">union</span> <span class="purple">identificateur</span>
+              <b>{</b>
+              	type1 	membre1;
+              	type2	membre2;
+              	…
+              	typeN	membreN;
+              <b>};</b>
+            </code></pre>
+          </div>
+          <p><b>Remarque   </b>la taille d'une variable de type union est fixe; elle correspond à la place nécessaire pour stocker le membre le plus grand.</p>
+        </section>
+
+        <section>
+          <h2>12.3 Union : exemple «float / int»</h2>
+          <pre style="width: 700px; margin-left: 350px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            <b> </b><span class="blue"><b>union</b></span> <span class="purple"><b>myUnion</b></span>
+              {
+                <span class="blue">float</span> f;
+                <span class="blue">int</span>   i;
+                <span class="blue">char</span>  c[4];
+              };
+            <b> </b><span class="blue"><b>union</b></span> <span class="purple">myUnion</span> <b>n</b>;
+          </code></pre>
+          <p class="tight">la variable <span class="mono">n</span> pourra contenir, selon les besoins :</p>
+          <p class="tight indent-1">- <b>soit</b> un <span class="mono blue">float</span></p>
+          <p class="tight indent-1">- <b>soit</b> un <span class="mono blue">int</span></p>
+          <p class="tight indent-1">- <b>soit</b> un tableau de <span class="mono blue">char</span>.</p>
+          <aside class="notes">Une variable de type union n'aura <b>qu'un seul membre</b>, choisi dans la liste figurant dans la déclaration du type.</aside>
+        </section>
+
+        <section>
+          <h2>12.3 Union : exemple «float / int»</h2>
+          <div style="display: flex; align-items: center; gap: 60px; padding-left: 200px;">
+            <pre style="width: 700px; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em; font-weight: bold;">
+
+              union myUnion n;
+              n.f = 1.2f;
+              printf("%f  ", n.f);
+              printf("0x%x", n.i);
+            </code></pre>
+            <span class="button">Exemple</span>
+          </div>
+          <pre class="terminal" style="width: 700px; margin-left: 200px;"><code
+            class="nohighlight"
+            data-trim
+            style="font-size: 1.6em; font-weight: bold;">
+
+            1.200000  0x3f99999a
+          </code></pre>
+          <p class="tight"><a href="https://www.h-schmidt.net/FloatConverter/IEEE754.html">https://www.h-schmidt.net/FloatConverter/IEEE754.html</a></p>
+          <br>
+          <p><b>Remarque : </b>une variable union ne peut être initialisée lors de sa déclaration qu'à travers son premier membre.</p>
+          <aside class="notes">Les union servent typiquement sur des microcontroleurs pour séparer la sortie d’un convertisseur A/D 16 bits<br>En 2 bytes {LSB,MSB} de façon plus rapide et efficace que par des bit shift. CF cours de Microcontroleur CIFOM (Karim Gehrig)</aside>
+        </section>
+
+        <section>
+          <h2>12.3 Union : exemple RGB565</h2>
+          <pre style="width: 1700px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.4em; font-weight: bold;">
+
+            typedef struct  // Structure contenant les 3 couleurs
+            {
+               unsigned blue  : 5; // 5 bits pour blue
+               unsigned green : 6; // 6 bits pour green
+               unsigned red   : 5; // 5 bits pour red
+            } RGB565_bits;
+
+
+            union RGB565      // Union contenant les deux variantes
+            {
+               RGB565_bits RGB565_values;// 3 couleurs => 5,6,5 bits
+               int RGB565_global;        // Valeur sur 16 bits
+            }; // int obligatoire pour gcc => minimum 32 bits
+          </code></pre>
+          <img src="./medias/ch12_rgb565.png" alt="Bits du format RGB565" style="position: absolute; top: 210px; right: 40px; width: 620px; border: 1px solid #CCCCCC;">
+          <aside class="notes">Les union servent typiquement sur des microcontroleurs pour séparer la sortie d’un convertisseur A/D 16 bits<br>En 2 bytes {LSB,MSB} de façon plus rapide et efficace que par des bit shift. CF cours de Microcontroleur CIFOM (Karim Gehrig)</aside>
+        </section>
+
+        <section>
+          <h2>12.3 Union : exemple RGB565</h2>
+          <div style="display: grid; grid-template-columns: 1000px 700px; align-items: center; justify-content: center; row-gap: 20px; column-gap: 40px;">
+            <pre style="width: 100%; margin: 0;"><code class="nohighlight" data-trim style="font-size: 1.5em; font-weight: bold;">
+              union RGB565 pixel;
+            </code></pre>
+            <p class="flush tight">Déclaration d’une variable pixel</p>
+            <pre style="width: 100%; margin: 0;"><code class="nohighlight" data-trim style="font-size: 1.5em; font-weight: bold;">
+              pixel.RGB565_global = 0x8411;
+            </code></pre>
+            <p class="flush tight">Ecriture du pixel «globalement»</p>
+            <pre style="width: 100%; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              style="font-size: 1.5em; font-weight: bold;">
+
+              pixel.RGB565_values.blue  = 0x11;
+              pixel.RGB565_values.green = 0x20;
+              pixel.RGB565_values.red   = 0x10;
+            </code></pre>
+            <p class="flush tight">Ecriture du pixel couleur<br>par couleur</p>
+          </div>
+          <table class="bits" style="margin-top: 40px; font-size: 0.7em;">
+            <tr class="idx"><td class="lbl"></td><td>15</td><td>14</td><td>13</td><td>12</td><td>11</td><td>10</td><td>9</td><td>8</td><td>7</td><td>6</td><td>5</td><td>4</td><td>3</td><td>2</td><td>1</td><td>0</td></tr>
+            <tr><td class="lbl">RGB565_value</td><td class="rd">1</td><td class="rd">0</td><td class="rd">0</td><td class="rd">0</td><td class="rd">0</td><td class="gr">1</td><td class="gr">0</td><td class="gr">0</td><td class="gr">0</td><td class="gr">0</td><td class="gr">0</td><td class="bl">1</td><td class="bl">0</td><td class="bl">0</td><td class="bl">0</td><td class="bl">1</td></tr>
+            <tr><td class="lbl">RGB565_global</td><td class="g1" colspan="4">8</td><td class="g1" colspan="4">4</td><td class="g2" colspan="4">1</td><td class="g2" colspan="4">1</td></tr>
+          </table>
+          <aside class="notes">Les union servent typiquement sur des microcontroleurs pour séparer la sortie d’un convertisseur A/D 16 bits<br>En 2 bytes {LSB,MSB} de façon plus rapide et efficace que par des bit shift. CF cours de Microcontroleur CIFOM (Karim Gehrig)</aside>
+        </section>
+
+      </section>
+
+      <!----------          ENUM          ---------->
+      <section>
+
+        <section>
+          <h2>12.4 Énumération</h2>
+          <p>Permet d'attribuer un <highlight>identificateur</highlight> à un entier grâce au déclarateur d’énumération <highlight>enum</highlight>.</p>
+          <div style="display: flex; align-items: flex-start; gap: 40px; padding-left: 200px;">
+            <p class="flush tight" style="width: 220px;"><b>Syntaxe </b></p>
+            <pre class="syntax-box" style="width: 1000px; margin: 0; flex: none;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              <span class="blue">enum</span> <span class="purple">nomdutype</span>
+              <b>{</b>
+                  identificateur1  <span class="gray">[= valeur1]</span><b>,</b>    <span class="orange" style="font-weight: normal;">0</span>
+                  identificateur2  <span class="gray">[= valeur2]</span><b>,</b>    <span class="orange" style="font-weight: normal;">1</span>
+                  ...                              <span class="orange" style="font-weight: normal;">2</span>
+                  identificateurN  <span class="gray">[= valeurN]</span>      <span class="orange" style="font-weight: normal;">...</span>
+
+              <b>}</b>   <span class="gray">[liste_variables]</span>  <b>;</b>
+            </code></pre>
+          </div>
+          <p class="centered gray">[optionnel]</p>
+          <aside class="notes">Note: comme pour les structures on peut <br>déclarer une énumération anonyme<br>déclarer une ou plusieurs variable de type enum  à la déclaration de l'énumération.</aside>
+        </section>
+
+        <section>
+          <h2>12.4 Énumération : exemples</h2>
+          <pre style="width: 1750px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.4em;">
+
+            <b>{</b>
+            <span class="blue">enum status</span><b>{</b><span class="purple">stopped</span><b>, </b><span class="purple">running</span><b>} motor;</b>
+            <span class="blue">enum colors</span><b>{</b><span class="purple">red</span>, <span class="purple">orange,	 green</span><b>};</b>
+            <span class="blue">enum weekDays</span><b>{</b><span class="purple">monday, tuesday, wednesday, thursday, friday, saturday, sunday</span><b>}</b>;
+            <span class="blue">enum colors</span> <b>trafficLight</b>; 	// déclaration
+            motor = <span class="purple">running</span>;
+            if (trafficLight != <span class="purple">green</span>)
+              motor = <span class="purple">stopped</span>;
+            <span style="color: #FF0000;">int <s>red =</s> 254;  </span>// symbole réservé (dans la portée)
+            <b>}</b>
+          </code></pre>
+          <aside class="notes">Généralement</aside>
+        </section>
+
+        <section>
+          <h2>12.4 Énumération : remarques</h2>
+          <p class="tight">Les énumérations simplifient le code (+ lisible), et sont supportées par beaucoup d'IDE (aide contextuelle).</p>
+          <br>
+          <p class="tight">Les identificateurs d'une énumération sont réservés (limite de la portée).</p>
+          <p class="tight indent-1">→ plus utilisable pour autre déclaration</p>
+          <br>
+          <p class="tight">On peut :</p>
+          <p class="tight indent-1">déclarer une variable de type <highlight>enum</highlight></p>
+          <p class="tight indent-1">utiliser une valeur identifiée par une énumération comme une constante</p>
+          <br>
+          <p class="tight">La valeur d'une variable de type <highlight>enum</highlight> n'est pas limitée aux valeurs énumérées</p>
+          <aside class="notes">On ne peut pas déclarer le même identifiant dans deux déclarations enum<br>*Quel est le type  de la variable enum ? int short long ?</aside>
+        </section>
+
+      </section>
+
+      <!----------          TYPEDEF          ---------->
+      <section>
+
+        <section>
+          <span class="rappel">Rappel</span>
+          <h2>12.5 <span class="mono blue">typedef</span>  (types synonymes)</h2>
+          <p>Le langage C permet de renommer des types en leur donnant un synonyme</p>
+          <p>L'intérêt est de <highlight>simplifier</highlight> l'écriture et la lecture du code</p>
+          <p>La déclaration d'un nouveau type (synonyme) se fait avec le mot-clé <span class="mono blue">typedef</span></p>
+          <p class="tight">Offre un outil <highlight>favorisant la portabilité du code</highlight></p>
+          <pre style="width: 900px; margin-left: 400px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em; font-weight: bold;">
+
+            <span class="blue">typedef</span> unsigned char <span class="blue">Uint8</span>;
+            <span class="blue">typedef</span> double        <span class="blue">Sfp64</span>;
+          </code></pre>
+        </section>
+
+        <section>
+          <span class="rappel">Rappel</span>
+          <h2>12.5 Type synonyme standard</h2>
+          <h3 class="plain">Syntaxe</h3>
+          <p class="centered mono"><span class="blue">typedef</span>  &lt;Type standard&gt; &lt;<span class="purple">Nom de type</span>&gt;;</p>
+          <br>
+          <h3 class="plain">Exemple</h3>
+          <pre style="width: 1250px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            <b><span class="blue">typedef</span>  int  <span class="purple">Entier</span>;</b>
+            <span class="purple">Entier</span><span class="blue"><b>  v1;</b></span> 	// équivalent à <span class="blue" style="font-weight: normal;">int</span> v1
+          </code></pre>
+        </section>
+
+        <section>
+          <span class="rappel">Rappel</span>
+          <h2>12.5 Type synonyme pour tableau</h2>
+          <h3 class="plain">Syntaxe</h3>
+          <p class="centered mono"><span class="blue">typedef</span>  &lt;Type std&gt; &lt;<span class="purple">Nom de type</span>&gt;[&lt;N&gt;];</p>
+          <br>
+          <h3 class="plain">Exemple</h3>
+          <pre style="width: 1250px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            <b><span class="blue">typedef</span> char <span class="purple">CHAINE</span>[80];</b>
+            <b><span class="purple">CHAINE</span> v2;</b> // équivalent à <span class="blue">char</span> v2<b>[80]</b>
+          </code></pre>
+        </section>
+
+        <section>
+          <span class="rappel">Rappel</span>
+          <h2>12.5 Type synonyme pour pointeurs</h2>
+          <h3 class="plain">Syntaxe</h3>
+          <p class="centered mono"><span class="blue">typedef</span> &lt;Type std&gt;* &lt;<span class="purple">Nom de type</span>&gt;;</p>
+          <br>
+          <h3 class="plain">Exemple</h3>
+          <pre style="width: 1250px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            <b><span class="blue">typedef</span> int* <span class="purple">IntPtrTy</span>;</b>
+            <b><span class="purple">IntPtrTy</span></b> v3; 	// équivalent à <span class="blue" style="font-weight: normal;">int* </span>v3
+          </code></pre>
+        </section>
+
+        <section>
+          <span class="rappel">Rappel</span>
+          <h2>12.5 Type synonyme pour <span class="mono blue">struct</span></h2>
+          <h3 class="plain">Syntaxe</h3>
+          <p class="centered mono"><span class="blue">typedef</span> &lt;Déf struct&gt; &lt;<span class="purple">Nom de type</span>&gt;;</p>
+          <div style="display: flex; align-items: flex-start; gap: 60px;">
+            <h3 class="plain">Exemple</h3>
+            <pre style="width: 1150px; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.5em;">
+
+               <b><span class="blue">typedef</span> struct</b>
+              	      {
+                       char nom[20];
+                         int age;
+                      }
+              <b>  	<span class="purple">PersonneTy</span>;</b>
+              <b><span class="purple">PersonneTy</span> v4;</b> // équiv. à <span class="blue" style="font-weight: normal;">struct</span> personne v4
+            </code></pre>
+          </div>
+        </section>
+
+        <section>
+          <span class="rappel">Rappel</span>
+          <h2>12.5 Remarque</h2>
+          <p class="tight">Quelle est la différence entre <span class="mono blue">struct</span> et <span class="mono blue">typedef struct</span> ?</p>
+          <pre style="width: 1100px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em;">
+
+            <b><span class="blue">struct</span> <span class="purple">t1</span> { ... };</b>	//1.
+            <b><span class="blue">typedef struct</span> { ... } <span class="purple">T2</span>;</b> 	//2.
+          </code></pre>
+          <p class="tight"><span class="mono blue">t1</span> est un identificateur de structure. Le type associé est <span class="mono blue">struct t1</span></p>
+          <p class="tight"><span class="mono blue">T2 </span>est un nouveau type. Cette écriture permet plus d'abstraction de type :</p>
+          <pre style="width: 1100px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.5em; font-weight: bold;">
+
+            <span class="blue">struct</span> <span class="purple">t1</span> v1; <span class="red">// struct traine</span>
+            <span class="purple">T2</span> v2;        <span class="green">// Abstraction</span>
+          </code></pre>
+          <aside class="notes">Voir exemple du cours avec tableau de pointeurs sur de structures!!</aside>
+        </section>
+
+        <section>
+          <h2>12.5 Type synonyme pour un enum</h2>
+          <h3 class="plain">Syntaxe</h3>
+          <p class="centered mono"><span class="blue">typedef</span> &lt;Déf énum&gt; &lt;<span class="purple">Nom de type</span>&gt;;</p>
+          <br>
+          <h3 class="plain">Exemple</h3>
+          <pre style="width: 1700px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.4em;">
+
+            <b><span class="blue">typedef enum</span></b>{lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche}<b><span class="purple">JOURSEM</span>;</b>
+            <b><span class="purple">JOURSEM</span> JourCourant, JourFinPeriode;</b>
+            <b>JourCourant = mercredi;</b>
+            <b>JourFinPeriode = JourCourant;</b>
+          </code></pre>
+        </section>
+
+        <section>
+          <h2 class="long-title">12.5 Type synonyme pour un pointeur de fonction</h2>
+          <h3 class="plain">Syntaxe</h3>
+          <p class="centered mono"><span class="blue">typedef</span>  &lt;Type retour&gt; (*&lt;<span class="purple">Nom de type</span>&gt;)(&lt;Type1&gt;,...);</p>
+          <br>
+          <h3 class="plain">Exemple</h3>
+          <pre style="width: 1700px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 1.4em;">
+
+            <span class="blue">int</span> max (<span class="blue">int</span>, <span class="blue">int</span>) {...}
+            <b><span class="blue">typedef</span> int (*<span class="purple">FnctPtr</span>)(int, int);</b>
+            <b><span class="purple">FnctPtr</span></b> f1=&amp;max;   // ou <b><span class="blue">int</span> (*<span class="purple">f1</span>)(<span class="blue">int</span>, <span class="blue">int</span>)</b>=&amp;max;
+            (*f1)(4,5);	    // appellera Max(4,5)
+          </code></pre>
+        </section>
+
+      </section>
+
+      <!----------          EXERCICES          ---------->
+      <section>
+        <h2>📝 Exercices</h2>
+        <p style="text-align: center; padding-left: 0;">
+          <a href="https://he-arc.github.io/1242.1-Langage_C/docs/cours/chapitre12cours/">Exercices du chapitre 12</a>
+        </p>
+      </section>
+
+    </div>
+  </div>
+
+  <!----------          CONTENT          ---------->
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/notes/notes.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      hash: true,
+      width: 1920,
+      height: 1080,
+      transition: "none",
+      center: false,
+      slideNumber: 'c/t',
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+    });
+  </script>
+</body>
+
+</html>
