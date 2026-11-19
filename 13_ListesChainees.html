@@ -1,0 +1,1062 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>HE-Arc - 1242.1 Langage C - Chapitre 13 - Listes chaînées</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/hearc.css" id="theme">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="https://www.he-arc.ch/wp-content/uploads/2021/12/cropped-hearc-icon-192x192.png"
+    type="image/vnd.microsoft.icon" />
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/vs.css" id="highlight-theme">
+
+  <style>
+    .reveal .indent-1 { padding-left: 300px; }
+    .reveal .centered { text-align: center; padding-left: 0; }
+    .reveal p.tight { margin: 8px 0; }
+    .reveal p.flush { padding-left: 0; }
+    .reveal h2 .mono { text-transform: none; }
+    .reveal h2.long-title { font-size: 1.25em; padding-left: 120px; padding-right: 120px; }
+    .reveal .tightlist p { margin: 0; line-height: 1.25; }
+
+    .reveal .mono { font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+    .reveal .red { color: #FF0000; }
+    .reveal .blue { color: #0000FF; }
+    .reveal .green { color: #00B050; }
+    .reveal code .red, .reveal code .blue, .reveal code .purple { font-weight: bold; }
+    .reveal code .purple { color: #7030A0; }
+    .reveal code .light { color: #808080; font-weight: normal; }
+    .reveal code .small { font-size: 0.8em; }
+    .reveal code .ring { border: 3px solid #FF0000; border-radius: 50%; padding: 0 6px; }
+    .reveal pre code.nohighlight { font-weight: bold; }
+
+    .reveal .framed { border: 2px solid #000000; padding: 10px 30px; margin: 30px 120px 0 120px; }
+    .reveal .framed p { padding-left: 0; }
+
+    /* a stage reproduces the layout of a PPTX slide: absolutely positioned SVG diagram, text and code */
+    .reveal .stage { position: absolute; left: 0; width: 1920px; }
+    .reveal .stage .abs { position: absolute; text-align: left; }
+    .reveal .stage .abs p { padding-left: 0; }
+    .reveal .stage pre.abs code { padding: 8px 14px; }
+
+    .reveal svg.diagram text { font-family: "Roboto", Helvetica, sans-serif; font-size: 24px; fill: #000000; dominant-baseline: middle; }
+    .reveal svg.diagram text.m { font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 26px; }
+    .reveal svg.diagram text.mn { font-family: 'Courier New', Courier, monospace; font-size: 26px; }
+    .reveal svg.diagram text.nm { font-weight: bold; text-anchor: middle; }
+    .reveal svg.diagram text.nm.light { font-weight: normal; }
+    .reveal svg.diagram text.null { font-family: 'Courier New', Courier, monospace; font-size: 22px; fill: #555555; text-anchor: middle; }
+    .reveal svg.diagram text.blue { fill: #0000FF; }
+    .reveal svg.diagram text.purple { fill: #7030A0; }
+    .reveal svg.diagram text.plain { font-size: 24px; }
+    .reveal svg.diagram text.cross { fill: #FF0000; font-size: 40px; font-weight: bold; }
+  </style>
+</head>
+
+<body>
+  <img id="logo-hearc" src="./medias/logo_he-arc.png" alt="Logo HE-ARC">
+  <img id="logo-hesso" src="./medias/logo_hes-so.png" alt="Logo HES-SO">
+  <p id="course-infos">1242.1 Langage C - 2026-2027</p>
+
+  <!----------          CONTENT          ---------->
+  <div class="reveal">
+    <div class="slides">
+
+<svg width="0" height="0" style="position: absolute;">
+  <defs>
+    <marker id="tip-k" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#000000" /></marker>
+    <marker id="tip-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#0000FF" /></marker>
+    <marker id="tip-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#FF0000" /></marker>
+    <marker id="tip-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#808080" /></marker>
+  </defs>
+</svg>
+
+      <!----------          TITLE          ---------->
+      <section>
+        <h1>
+          Chapitre 13
+        </h1>
+        <h2>
+          Structures de données dynamiques : les listes chaînées
+        </h2>
+        <p class="tight">1. Structures dynamiques</p>
+        <p class="tight">2. Opérations de base</p>
+        <p class="tight">3. Programme</p>
+        <p class="tight">Annexe : listes chaînées avec deux pointeurs</p>
+      </section>
+
+      <!----------          STRUCTURES DYNAMIQUES          ---------->
+      <section>
+
+<section>
+<h2>Listes chaînées</h2>
+<p class="tight"><b>Problème</b></p>
+<p class="tight indent-1">Données dont on ne connait <highlight>pas la taille</highlight>.</p>
+<p class="tight indent-1">Données dont la <highlight>quantité et l’organisation varient</highlight> dans le temps.</p>
+<p><b>Solution : <span class="blue">les structures dynamiques.</span></b></p>
+<p class="centered"><img src="./medias/ch13_tableau_vs_liste.jpeg" alt="Tableau standard et liste simplement chaînée" style="width: 1080px;"></p>
+<aside class="notes">L'exemple qui suit montre la création et la gestion d'une liste linéaire composée de noms. Une liste linéaire est une structure de données constituée d'éléments chaînés (on parle aussi de <span class="red">listes chaînées</span>), où chaque élément possède des informations qui lui sont propres ainsi <span class="red">qu'un pointeur sur l'élément suivan</span>t. En général, les éléments sont créés <span class="red">dynamiquement</span>.</aside>
+</section>
+
+<section>
+<h2>Listes chaînées</h2>
+<div class="stage" style="top: 165px; height: 742px;">
+<svg class="diagram" width="1921" height="742" viewBox="0 205 1334 515" style="position: absolute; left: 0px; top: 0;"><rect x="372" y="294" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><rect x="482" y="294" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><line x1="436" y1="310" x2="480" y2="310" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><rect x="592" y="294" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><line x1="546" y1="310" x2="590" y2="310" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><rect x="702" y="294" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><line x1="656" y1="310" x2="700" y2="310" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><rect x="484" y="373" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><rect x="373" y="436" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><rect x="484" y="436" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><rect x="586" y="436" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><rect x="665" y="491" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><line x1="515" y1="405" x2="410" y2="436" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><line x1="515" y1="405" x2="515" y2="434" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><line x1="515" y1="405" x2="612" y2="436" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><line x1="618" y1="466" x2="692" y2="491" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><rect x="551" y="540" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><rect x="385" y="572" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><rect x="684" y="603" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><rect x="417" y="642" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><rect x="574" y="658" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><line x1="582" y1="556" x2="450" y2="588" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><line x1="582" y1="556" x2="712" y2="603" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><line x1="582" y1="572" x2="604" y2="656" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><line x1="684" y1="619" x2="451" y2="588" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><line x1="417" y1="604" x2="447" y2="640" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><line x1="481" y1="658" x2="682" y2="619" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><line x1="481" y1="660" x2="572" y2="674" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><line x1="716" y1="635" x2="638" y2="672" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/></svg>
+<div class="abs" style="left: 130px; top: 24px; font-size: 52px;"><b>Structures dynamiques</b></div>
+<div class="abs" style="left: 274px; top: 115px; font-size: 49px;">Listes</div>
+<div class="abs" style="left: 274px; top: 301px; font-size: 49px;">Arbres</div>
+<div class="abs" style="left: 274px; top: 487px; font-size: 49px;">Graphes</div>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées</h2>
+<div class="stage" style="top: 165px; height: 742px;">
+<svg class="diagram" width="1921" height="742" viewBox="0 205 1334 515" style="position: absolute; left: 0px; top: 0;"><rect x="406" y="229" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><rect x="516" y="229" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><line x1="470" y1="245" x2="514" y2="245" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><rect x="626" y="229" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><line x1="580" y1="245" x2="624" y2="245" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><rect x="736" y="229" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><line x1="690" y1="245" x2="734" y2="245" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><rect x="527" y="300" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><rect x="622" y="363" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><rect x="527" y="418" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><rect x="417" y="363" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><line x1="449" y1="363" x2="525" y2="316" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><line x1="591" y1="316" x2="652" y2="361" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><line x1="652" y1="395" x2="593" y2="432" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><line x1="527" y1="432" x2="451" y2="395" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><rect x="624" y="489" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><rect x="734" y="489" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><line x1="688" y1="505" x2="732" y2="505" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><rect x="844" y="489" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><line x1="798" y1="505" x2="842" y2="505" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><rect x="954" y="489" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><line x1="908" y1="505" x2="952" y2="505" stroke="#000" stroke-width="3" marker-end="url(#tip-k)"/><rect x="622" y="607" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><rect x="732" y="607" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><line x1="688" y1="623" x2="730" y2="623" stroke="#000" stroke-width="3" marker-end="url(#tip-k)" marker-start="url(#tip-k)"/><rect x="842" y="607" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><line x1="798" y1="623" x2="840" y2="623" stroke="#000" stroke-width="3" marker-end="url(#tip-k)" marker-start="url(#tip-k)"/><rect x="952" y="607" width="64" height="32" fill="#4F81BD" stroke="#385D8A" stroke-width="2"/><line x1="908" y1="623" x2="950" y2="623" stroke="#000" stroke-width="3" marker-end="url(#tip-k)" marker-start="url(#tip-k)"/></svg>
+<div class="abs" style="left: 130px; top: 22px; font-size: 49px;">Liste linéaire</div>
+<div class="abs" style="left: 130px; top: 207px; font-size: 49px;">Liste circulaire</div>
+<div class="abs" style="left: 130px; top: 392px; font-size: 49px;">Liste simplement chainée</div>
+<div class="abs" style="left: 130px; top: 575px; font-size: 49px;">Liste doublement chainée</div>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : exemple</h2>
+<div class="stage" style="top: 165px; height: 742px;">
+<svg class="diagram" width="1921" height="742" viewBox="0 205 1334 515" style="position: absolute; left: 0px; top: 0;"><text class="m" x="243" y="295">ptrFirst</text><rect x="264" y="315" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="323.0" cy="335.0" r="9"/><line x1="455" y1="320" x2="455" y2="708" stroke="#000" stroke-width="1.5"/><polyline points="328,335 450,335 450,418 576,418" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="579" y="377" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="579" y="417" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="638.0" y="397.0">Charles</text><circle cx="638.0" cy="437.0" r="9"/><rect x="777" y="377" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="777" y="417" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="836.0" y="397.0">Blaise</text><circle cx="836.0" cy="437.0" r="9"/><rect x="981" y="377" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="981" y="417" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="1040.0" y="397.0">Anne</text><text class="null" x="1040.0" y="437.0">NULL</text><polyline points="638,437 709,437 709,397 775,397" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><polyline points="836,437 902,437 902,418 979,418" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><ellipse cx="845" cy="425" rx="97" ry="90" fill="none" stroke="#385D8A" stroke-width="2.5"/><text class="plain" x="755" y="545">nœud ou maillon</text><text class="plain" x="755" y="575">(<tspan font-style="italic">node</tspan>)</text><path d="M 301 670 L 343 628 L 343 650 L 437 650 L 437 690 L 343 690 L 343 712 Z" fill="#F8F8BE" stroke="#000" stroke-width="2"/><text class="plain" x="350" y="670">Stack</text><path d="M 579 650 L 679 650 L 679 628 L 722 670 L 679 712 L 679 690 L 579 690 Z" fill="#FFF" stroke="#000" stroke-width="2"/><text class="plain" x="612" y="670">Heap</text><text class="plain" x="738" y="670">Allocation dynamique</text></svg>
+<div class="abs" style="left: 130px; top: 22px; font-size: 49px;">Liste simplement chaînée contenant des noms</div>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : exemple</h2>
+<div class="stage" style="top: 165px; height: 742px;">
+<svg class="diagram" width="1921" height="742" viewBox="0 205 1334 515" style="position: absolute; left: 0px; top: 0;"><rect x="820" y="303" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2" stroke-dasharray="8 5"/><rect x="820" y="343" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2" stroke-dasharray="8 5"/><text class="m" x="957" y="324">name</text><text class="m" x="957" y="364">ptrNext</text><rect x="820" y="526" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><text class="null" x="879.0" y="546.0">NULL</text><text class="m" x="960" y="545">ptrFirst</text></svg>
+<div class="abs" style="left: 305px; top: 71px; font-size: 43px;">Déclaration d’une structure <span class="mono" style="font-weight: normal;">node</span></div>
+<pre class="abs" style="left: 302px; top: 134px; width: 778px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+<span class="purple">struct node</span>
+{
+   char          name[20];
+   <span class="purple">struct node</span> *ptrNext;
+};
+</code></pre>
+<div class="abs" style="left: 298px; top: 402px; font-size: 43px;">Déclaration d'un pointeur</div>
+<pre class="abs" style="left: 298px; top: 464px; width: 778px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+<span class="purple">struct node</span> *ptrFirst = NULL;
+</code></pre>
+<div class="abs" style="left: 304px; top: 557px; font-size: 43px;">Alternative avec <span class="mono" style="font-weight: normal;">typedef</span></div>
+<pre class="abs" style="left: 302px; top: 621px; width: 778px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+<span class="blue">typedef</span> struct node <span class="purple">NodeTy</span>;
+<span class="purple">NodeTy</span> *ptrFirst = NULL;
+</code></pre>
+</div>
+</section>
+
+      </section>
+
+      <!----------          OPERATIONS DE BASE          ---------->
+      <section>
+
+<section>
+<h2>Listes chaînées : opérations</h2>
+<div class="framed">
+<p class="flush"><highlight style="font-size: 1.15em;">Opérations de base</highlight></p>
+<p class="tight" style="padding-left: 100px;"><b><span class="blue">Initialisation </span>du pointeur sur le 1<sup>er</sup> nœud</b></p>
+<p class="tight" style="padding-left: 100px;"><b><span class="blue">Ajout</span> d'un nouveau nœud</b></p>
+<p class="tight" style="padding-left: 200px;">- Allocation mémoire d’un nouveau nœud</p>
+<p class="tight" style="padding-left: 200px;">- Initialisation du nouveau nœud</p>
+<p class="tight" style="padding-left: 200px;">- Ajout du nouveau nœud au pointeur de liste</p>
+<p class="tight" style="padding-left: 200px;">- Ajout d’un nouveau nœud en début de chaîne</p>
+<p class="tight" style="padding-left: 100px;"><b><span class="blue">Affichage</span> de la liste</b></p>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : initialisation</h2>
+<div class="stage" style="top: 165px; height: 742px;">
+<svg class="diagram" width="1921" height="742" viewBox="0 205 1334 515" style="position: absolute; left: 0px; top: 0;"><rect x="590" y="311" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="649.0" cy="331.0" r="9"/><polyline points="650,331 760,331 760,366" fill="none" stroke="#000" stroke-width="2"/><line x1="749" y1="378" x2="773" y2="358" stroke="#000" stroke-width="2"/><text class="m" x="570" y="378">ptrFirst</text></svg>
+<div class="abs" style="left: 145px; top: 7px; font-size: 43px;"><highlight>Initialisation </highlight>du pointeur sur le premier noeud</div>
+<pre class="abs" style="left: 739px; top: 409px; width: 418px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+ptrFirst = NULL;
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : ajout</h2>
+<div class="stage" style="top: 165px; height: 742px;">
+<svg class="diagram" width="1921" height="742" viewBox="0 205 1334 515" style="position: absolute; left: 0px; top: 0;"><rect x="410" y="368" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="469.0" cy="388.0" r="9"/><polyline points="469,388 676,388" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="679" y="368" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="679" y="408" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="738.0" y="388.0">?</text><text class="nm blue" x="738.0" y="428.0">?</text><text class="m" x="814" y="388">name</text><text class="m" x="814" y="428">ptrNext</text><text class="m" x="400" y="428">ptrNewNode</text><text class="m purple" x="638" y="468">struct node</text></svg>
+<div class="abs" style="left: 145px; top: 7px; font-size: 43px;"><highlight>Ajout</highlight> d’un nouveau nœud</div>
+<div class="abs" style="left: 228px; top: 96px; font-size: 43px;">1) Allocation en mémoire d’un <b>nouveau</b> nœud</div>
+<pre class="abs" style="left: 297px; top: 498px; width: 1325px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+<span class="purple">struct node</span>* ptrNewNode = <span class="blue">malloc</span>(sizeof(<span class="purple">struct node</span>));
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : ajout</h2>
+<div class="stage" style="top: 165px; height: 742px;">
+<svg class="diagram" width="1921" height="742" viewBox="0 205 1334 515" style="position: absolute; left: 0px; top: 0;"><rect x="410" y="368" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="469.0" cy="388.0" r="9"/><polyline points="469,388 676,388" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="679" y="368" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="679" y="408" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="738.0" y="388.0">Anne</text><text class="null" x="738.0" y="428.0">NULL</text><text class="m" x="814" y="388">name</text><text class="m" x="814" y="428">ptrNext</text><text class="m" x="400" y="428">ptrNewNode</text><text class="m purple" x="638" y="468">struct node</text></svg>
+<div class="abs" style="left: 145px; top: 7px; font-size: 43px;"><highlight>Ajout</highlight> d’un nouveau nœud</div>
+<div class="abs" style="left: 228px; top: 96px; font-size: 43px;">2) Initialisation en mémoire d’un <b>nouveau</b> nœud</div>
+<pre class="abs" style="left: 616px; top: 505px; width: 687px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+gets(ptrNewNode<span class="blue">-&gt;</span>name);
+prtNewNode<span class="blue">-&gt;</span>ptrNext = NULL;
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : ajout</h2>
+<div class="stage" style="top: 165px; height: 742px;">
+<svg class="diagram" width="1921" height="742" viewBox="0 205 1334 515" style="position: absolute; left: 0px; top: 0;"><text class="m" x="201" y="365">ptrNewNode</text><rect x="220" y="388" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="279.0" cy="408.0" r="9"/><polyline points="279,408 348,408 348,438 414,438" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="417" y="418" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="417" y="458" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="476.0" y="438.0">Anne</text><text class="null" x="476.0" y="478.0">NULL</text><text class="m" x="553" y="440">name</text><text class="m" x="553" y="480">ptrNext</text><rect x="218" y="545" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><text class="null" x="277.0" y="565.0">NULL</text><text class="m" x="196" y="605">ptrFirst</text></svg>
+<div class="abs" style="left: 145px; top: 7px; font-size: 43px;"><highlight>Ajout</highlight> d’un nouveau nœud (suite)</div>
+<div class="abs" style="left: 228px; top: 96px; font-size: 43px;">3) Ajout du nouveau nœud au <b>pointeur de liste</b></div>
+<pre class="abs" style="left: 747px; top: 462px; width: 749px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+if (ptrFirst <span class="red">==</span> NULL)
+{
+
+
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : ajout</h2>
+<div class="stage" style="top: 165px; height: 742px;">
+<svg class="diagram" width="1921" height="742" viewBox="0 205 1334 515" style="position: absolute; left: 0px; top: 0;"><text class="m" x="201" y="365">ptrNewNode</text><rect x="220" y="388" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="279.0" cy="408.0" r="9"/><polyline points="279,408 348,408 348,438 414,438" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="417" y="418" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="417" y="458" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="476.0" y="438.0">Anne</text><text class="null" x="476.0" y="478.0">NULL</text><text class="m" x="553" y="440">name</text><text class="m" x="553" y="480">ptrNext</text><rect x="218" y="545" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="277.0" cy="565.0" r="9"/><polyline points="277,565 348,565 348,455 414,455" fill="none" stroke="#0000FF" stroke-width="2" marker-end="url(#tip-b)"/><text class="m" x="196" y="605">ptrFirst</text></svg>
+<div class="abs" style="left: 145px; top: 7px; font-size: 43px;"><highlight>Ajout</highlight> d’un nouveau nœud (suite)</div>
+<div class="abs" style="left: 228px; top: 96px; font-size: 43px;">3) Ajout du nouveau nœud au <b>pointeur de liste</b></div>
+<pre class="abs" style="left: 747px; top: 462px; width: 749px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+if (ptrFirst <span class="red">==</span> NULL)
+{
+  <span class="blue">ptrFirst=ptrNewNode;</span>
+
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : ajout</h2>
+<div class="stage" style="top: 165px; height: 742px;">
+<svg class="diagram" width="1921" height="742" viewBox="0 205 1334 515" style="position: absolute; left: 0px; top: 0;"><text class="m" x="201" y="365">ptrNewNode</text><rect x="417" y="418" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="417" y="458" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="476.0" y="438.0">Anne</text><text class="null" x="476.0" y="478.0">NULL</text><text class="m" x="553" y="440">name</text><text class="m" x="553" y="480">ptrNext</text><rect x="218" y="545" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="277.0" cy="565.0" r="9"/><polyline points="277,565 348,565 348,455 414,455" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="m" x="196" y="605">ptrFirst</text></svg>
+<div class="abs" style="left: 145px; top: 7px; font-size: 43px;"><highlight>Ajout</highlight> d’un nouveau nœud (suite)</div>
+<div class="abs" style="left: 228px; top: 96px; font-size: 43px;">3) Ajout du nouveau nœud au <b>pointeur de liste</b></div>
+<pre class="abs" style="left: 747px; top: 462px; width: 749px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+if (ptrFirst <span class="red">==</span> NULL)
+{
+  ptrFirst=ptrNewNode;
+
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : ajout</h2>
+<div class="stage" style="top: 165px; height: 742px;">
+<svg class="diagram" width="1921" height="742" viewBox="0 205 1334 515" style="position: absolute; left: 0px; top: 0;"><text class="m" x="236" y="328">ptrNewNode</text><rect x="250" y="350" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="309.0" cy="370.0" r="9"/><polyline points="309,370 406,370" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="408" y="350" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="408" y="390" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="467.0" y="370.0">Charles</text><text class="null" x="467.0" y="410.0">NULL</text><rect x="408" y="635" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="408" y="675" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="467.0" y="655.0">Blaise</text><circle cx="467.0" cy="695.0" r="9"/><rect x="613" y="635" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="613" y="675" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="672.0" y="655.0">Anne</text><text class="null" x="672.0" y="695.0">NULL</text><polyline points="467,695 553,695 553,655 611,655" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="m" x="219" y="540">ptrFirst</text><rect x="243" y="572" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="302.0" cy="592.0" r="9"/><polyline points="302,592 353,592 353,655 406,655" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/></svg>
+<div class="abs" style="left: 145px; top: 7px; font-size: 43px;"><highlight>Ajout</highlight> d’un nouveau nœud (suite)</div>
+<div class="abs" style="left: 228px; top: 96px; font-size: 43px;">4) Ajout d’un nœud <b>au début </b>de chaine</div>
+<pre class="abs" style="left: 828px; top: 196px; width: 842px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+if (ptrFirst <span class="red">!=</span> NULL)
+{
+
+
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : ajout</h2>
+<div class="stage" style="top: 165px; height: 742px;">
+<svg class="diagram" width="1921" height="742" viewBox="0 205 1334 515" style="position: absolute; left: 0px; top: 0;"><text class="m" x="236" y="328">ptrNewNode</text><rect x="250" y="350" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="309.0" cy="370.0" r="9"/><polyline points="309,370 406,370" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="408" y="350" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="408" y="390" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="467.0" y="370.0">Charles</text><circle cx="467.0" cy="410.0" r="9" fill="#0000FF"/><polyline points="467,410 467,633" fill="none" stroke="#0000FF" stroke-width="2" marker-end="url(#tip-b)"/><rect x="408" y="635" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="408" y="675" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="467.0" y="655.0">Blaise</text><circle cx="467.0" cy="695.0" r="9"/><rect x="613" y="635" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="613" y="675" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="672.0" y="655.0">Anne</text><text class="null" x="672.0" y="695.0">NULL</text><polyline points="467,695 553,695 553,655 611,655" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="m" x="219" y="540">ptrFirst</text><rect x="243" y="572" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="302.0" cy="592.0" r="9"/><polyline points="302,592 353,592 353,655 406,655" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><path d="M 302 590 C 300 520 330 480 352 460 C 380 430 395 420 405 402" fill="none" stroke="#FF0000" stroke-width="2.5" stroke-dasharray="10 7" marker-end="url(#tip-r)"/></svg>
+<div class="abs" style="left: 145px; top: 7px; font-size: 43px;"><highlight>Ajout</highlight> d’un nouveau nœud (suite)</div>
+<div class="abs" style="left: 228px; top: 96px; font-size: 43px;">4) Ajout d’un nœud <b>au début </b>de chaine</div>
+<pre class="abs" style="left: 852px; top: 382px; width: 780px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+<span class="blue">ptrNewNode-&gt;ptrNext = ptrFirst;</span>
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : ajout</h2>
+<div class="stage" style="top: 165px; height: 742px;">
+<svg class="diagram" width="1921" height="742" viewBox="0 205 1334 515" style="position: absolute; left: 0px; top: 0;"><text class="m" x="236" y="328">ptrNewNode</text><rect x="250" y="350" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="309.0" cy="370.0" r="9"/><polyline points="309,370 406,370" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="408" y="350" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="408" y="390" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="467.0" y="370.0">Charles</text><circle cx="467.0" cy="410.0" r="9"/><polyline points="467,410 467,633" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="408" y="635" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="408" y="675" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="467.0" y="655.0">Blaise</text><circle cx="467.0" cy="695.0" r="9"/><rect x="613" y="635" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="613" y="675" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="672.0" y="655.0">Anne</text><text class="null" x="672.0" y="695.0">NULL</text><polyline points="467,695 553,695 553,655 611,655" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="m" x="219" y="540">ptrFirst</text><rect x="243" y="572" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="302.0" cy="592.0" r="9" fill="#0000FF"/><polyline points="302,592 383,592 383,370 406,370" fill="none" stroke="#0000FF" stroke-width="2" marker-end="url(#tip-b)"/><polyline points="361,600 380,600 380,655 406,655" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="cross" x="342" y="628">✘</text><path d="M 302 370 C 210 420 230 540 293 584" fill="none" stroke="#FF0000" stroke-width="2.5" stroke-dasharray="10 7" marker-end="url(#tip-r)"/></svg>
+<div class="abs" style="left: 145px; top: 7px; font-size: 43px;"><highlight>Ajout</highlight> d’un nouveau nœud (suite)</div>
+<div class="abs" style="left: 228px; top: 96px; font-size: 43px;">4) Ajout d’un nœud <b>au début </b>de chaine</div>
+<pre class="abs" style="left: 805px; top: 317px; width: 850px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+if (ptrFirst <span class="red">!=</span> NULL)
+{
+  ptrNewNode-&gt;ptrNext = ptrFirst;
+  <span class="blue">ptrFirst = ptrNewNode;</span>
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : ajout</h2>
+<div class="stage" style="top: 165px; height: 742px;">
+<svg class="diagram" width="1921" height="742" viewBox="0 205 1334 515" style="position: absolute; left: 0px; top: 0;"><rect x="408" y="350" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="408" y="390" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="467.0" y="370.0">Charles</text><circle cx="467.0" cy="410.0" r="9"/><polyline points="467,410 467,633" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="408" y="635" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="408" y="675" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="467.0" y="655.0">Blaise</text><circle cx="467.0" cy="695.0" r="9"/><rect x="613" y="635" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="613" y="675" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="672.0" y="655.0">Anne</text><text class="null" x="672.0" y="695.0">NULL</text><polyline points="467,695 553,695 553,655 611,655" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="243" y="572" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="302.0" cy="592.0" r="9"/><polyline points="302,592 300,370 406,370" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="m" x="234" y="620">ptrFirst</text></svg>
+<div class="abs" style="left: 145px; top: 7px; font-size: 43px;"><highlight>Ajout</highlight> d’un nouveau nœud (suite)</div>
+<div class="abs" style="left: 228px; top: 96px; font-size: 43px;">4) Ajout d’un nœud <b>au début </b>de chaine</div>
+<pre class="abs" style="left: 805px; top: 317px; width: 850px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+if (ptrFirst <span class="red">!=</span> NULL)
+{
+  ptrNewNode-&gt;ptrNext = ptrFirst;
+  ptrFirst = ptrNewNode;
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : ajout</h2>
+<div class="stage" style="top: 165px; height: 742px;">
+<svg class="diagram" width="1921" height="742" viewBox="0 205 1334 515" style="position: absolute; left: 0px; top: 0;"></svg>
+<div class="abs" style="left: 145px; top: 7px; font-size: 43px;"><highlight>Ajout</highlight> d’un nouveau nœud (suite)</div>
+<div class="abs" style="left: 226px; top: 96px; font-size: 43px;">On peut simplifier :</div>
+<pre class="abs" style="left: 744px; top: 104px; width: 907px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+ptrNewNode-&gt;ptrNext = NULL;
+if (ptrFirst == NULL)
+   ptrFirst = ptrNewNode;
+else
+{
+   ptrNewNode-&gt;ptrnext = ptrFirst;
+   ptrFirst            = ptrNewNode;
+}
+</code></pre>
+<div class="abs" style="left: 219px; top: 533px; font-size: 43px;">Comme ceci :</div>
+<pre class="abs" style="left: 744px; top: 583px; width: 907px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+ptrNewNode-&gt;ptrNext = ptrFirst;
+ptrFirst            = ptrNewNode;
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : affichage</h2>
+<div class="stage" style="top: 165px; height: 778px;">
+<svg class="diagram" width="1921" height="778" viewBox="0 180 1334 540" style="position: absolute; left: 0px; top: 0;"><rect x="312" y="312" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="371.0" cy="332.0" r="9"/><polyline points="371,332 476,332" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="m" x="287" y="378">ptrFirst</text><rect x="478" y="312" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="478" y="352" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm" x="537.0" y="332.0">Blaise</text><circle cx="537.0" cy="372.0" r="9"/><rect x="675" y="312" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="675" y="352" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm" x="734.0" y="332.0">Anne</text><text class="null" x="734.0" y="372.0">NULL</text><polyline points="537,372 609,372 609,332 673,332" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="mn" x="803" y="336">name</text><text class="mn" x="803" y="375">ptrNext</text></svg>
+<div class="abs" style="left: 145px; top: 43px; font-size: 43px;"><highlight>Affichage</highlight></div>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : affichage</h2>
+<div class="stage" style="top: 165px; height: 778px;">
+<svg class="diagram" width="1921" height="778" viewBox="0 180 1334 540" style="position: absolute; left: 0px; top: 0;"><rect x="312" y="312" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="371.0" cy="332.0" r="9"/><polyline points="371,332 476,332" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="m" x="287" y="378">ptrFirst</text><rect x="478" y="312" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="478" y="352" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm" x="537.0" y="332.0">Blaise</text><circle cx="537.0" cy="372.0" r="9"/><rect x="675" y="312" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="675" y="352" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm" x="734.0" y="332.0">Anne</text><text class="null" x="734.0" y="372.0">NULL</text><polyline points="537,372 609,372 609,332 673,332" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="mn" x="803" y="336">name</text><text class="mn" x="803" y="375">ptrNext</text><rect x="312" y="194" width="118" height="40" fill="#F8F8BE" stroke="#0000FF" stroke-width="2"/><circle cx="371.0" cy="214.0" r="9" fill="#0000FF"/><text class="m blue" x="346" y="244">ptr</text><polyline points="371,214 537,214 537,310" fill="none" stroke="#0000FF" stroke-width="3" marker-end="url(#tip-b)"/><path d="M 368 332 C 315 300 320 250 360 222" fill="none" stroke="#FF0000" stroke-width="2.5" stroke-dasharray="10 7" marker-end="url(#tip-r)"/></svg>
+<div class="abs" style="left: 145px; top: 43px; font-size: 43px;"><highlight>Affichage</highlight></div>
+<pre class="abs" style="left: 677px; top: 429px; width: 706px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+<span class="purple">struct node</span><span class="blue">* ptr;</span>
+<span class="blue">ptr = ptrFirst;</span>
+while (ptr != NULL)
+{
+  printf("%s\n", ptr-&gt;name);
+  ptr = ptr-&gt;ptrNext;
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : affichage</h2>
+<div class="stage" style="top: 165px; height: 778px;">
+<svg class="diagram" width="1921" height="778" viewBox="0 180 1334 540" style="position: absolute; left: 0px; top: 0;"><rect x="312" y="312" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="371.0" cy="332.0" r="9"/><polyline points="371,332 476,332" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="m" x="287" y="378">ptrFirst</text><rect x="478" y="312" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="478" y="352" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="537.0" y="332.0">Blaise</text><circle cx="537.0" cy="372.0" r="9"/><rect x="675" y="312" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="675" y="352" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm" x="734.0" y="332.0">Anne</text><text class="null" x="734.0" y="372.0">NULL</text><polyline points="537,372 609,372 609,332 673,332" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="mn" x="803" y="336">name</text><text class="mn" x="803" y="375">ptrNext</text><rect x="312" y="194" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="371.0" cy="214.0" r="9" fill="#0000FF"/><text class="m blue" x="346" y="244">ptr</text><polyline points="371,214 537,214 537,310" fill="none" stroke="#0000FF" stroke-width="3" marker-end="url(#tip-b)"/></svg>
+<div class="abs" style="left: 145px; top: 43px; font-size: 43px;"><highlight>Affichage</highlight></div>
+<pre class="abs" style="left: 677px; top: 429px; width: 749px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+<span class="purple">struct node</span><span class="blue">* ptr;</span>
+ptr = ptrFirst;
+while (<span class="blue">ptr != NULL</span>) //<span class="light">(</span><span class="blue">true</span><span class="light">)</span>
+{
+  printf("%s\n", <span class="blue">ptr-&gt;name</span>);
+  ptr = ptr-&gt;ptrNext;
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : affichage</h2>
+<div class="stage" style="top: 165px; height: 778px;">
+<svg class="diagram" width="1921" height="778" viewBox="0 180 1334 540" style="position: absolute; left: 0px; top: 0;"><rect x="312" y="312" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="371.0" cy="332.0" r="9"/><polyline points="371,332 476,332" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="m" x="287" y="378">ptrFirst</text><rect x="478" y="312" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="478" y="352" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm" x="537.0" y="332.0">Blaise</text><circle cx="537.0" cy="372.0" r="9"/><rect x="675" y="312" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="675" y="352" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm" x="734.0" y="332.0">Anne</text><text class="null" x="734.0" y="372.0">NULL</text><polyline points="537,372 609,372 609,332 673,332" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="mn" x="803" y="336">name</text><text class="mn" x="803" y="375">ptrNext</text><rect x="312" y="194" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="371.0" cy="214.0" r="9" fill="#0000FF"/><text class="m blue" x="346" y="244">ptr</text><polyline points="371,214 734,214 734,310" fill="none" stroke="#0000FF" stroke-width="3" marker-end="url(#tip-b)"/><path d="M 536 372 C 470 340 440 280 395 233" fill="none" stroke="#FF0000" stroke-width="2.5" stroke-dasharray="10 7" marker-end="url(#tip-r)"/></svg>
+<div class="abs" style="left: 145px; top: 43px; font-size: 43px;"><highlight>Affichage</highlight></div>
+<pre class="abs" style="left: 677px; top: 429px; width: 706px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+<span class="purple">struct node</span><span class="blue">* ptr;</span>
+ptr = ptrFirst;
+while (ptr != NULL)
+{
+  printf("%s\n", ptr-&gt;name);
+  <span class="blue">ptr = ptr-&gt;ptrNext;</span>
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : affichage</h2>
+<div class="stage" style="top: 165px; height: 778px;">
+<svg class="diagram" width="1921" height="778" viewBox="0 180 1334 540" style="position: absolute; left: 0px; top: 0;"><rect x="312" y="312" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="371.0" cy="332.0" r="9"/><polyline points="371,332 476,332" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="m" x="287" y="378">ptrFirst</text><rect x="478" y="312" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="478" y="352" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm" x="537.0" y="332.0">Blaise</text><circle cx="537.0" cy="372.0" r="9"/><rect x="675" y="312" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="675" y="352" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="734.0" y="332.0">Anne</text><text class="null" x="734.0" y="372.0">NULL</text><polyline points="537,372 609,372 609,332 673,332" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="mn" x="803" y="336">name</text><text class="mn" x="803" y="375">ptrNext</text><rect x="312" y="194" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="371.0" cy="214.0" r="9" fill="#0000FF"/><text class="m" x="346" y="244">ptr</text><polyline points="371,214 734,214 734,310" fill="none" stroke="#0000FF" stroke-width="3" marker-end="url(#tip-b)"/></svg>
+<div class="abs" style="left: 145px; top: 43px; font-size: 43px;"><highlight>Affichage</highlight></div>
+<pre class="abs" style="left: 677px; top: 429px; width: 749px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+<span class="purple">struct node</span><span class="blue">* ptr;</span>
+ptr = ptrFirst;
+while (<span class="blue">ptr != NULL</span>) //<span class="light">(</span><span class="blue">true</span><span class="light">)</span>
+{
+  printf("%s\n", <span class="blue">ptr-&gt;name</span>);
+  ptr = ptr-&gt;ptrNext;
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : affichage</h2>
+<div class="stage" style="top: 165px; height: 778px;">
+<svg class="diagram" width="1921" height="778" viewBox="0 180 1334 540" style="position: absolute; left: 0px; top: 0;"><rect x="312" y="312" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="371.0" cy="332.0" r="9"/><polyline points="371,332 476,332" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="m" x="287" y="378">ptrFirst</text><rect x="478" y="312" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="478" y="352" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm" x="537.0" y="332.0">Blaise</text><circle cx="537.0" cy="372.0" r="9"/><rect x="675" y="312" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="675" y="352" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm" x="734.0" y="332.0">Anne</text><text class="null" x="734.0" y="372.0">NULL</text><polyline points="537,372 609,372 609,332 673,332" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="mn" x="803" y="336">name</text><text class="mn" x="803" y="375">ptrNext</text><rect x="312" y="194" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><text class="nm blue" x="371.0" y="214.0">NULL</text><text class="m" x="346" y="244">ptr</text><path d="M 690 375 C 600 330 610 230 425 218" fill="none" stroke="#FF0000" stroke-width="2.5" stroke-dasharray="10 7" marker-end="url(#tip-r)"/></svg>
+<div class="abs" style="left: 145px; top: 43px; font-size: 43px;"><highlight>Affichage</highlight></div>
+<pre class="abs" style="left: 677px; top: 429px; width: 706px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+<span class="purple">struct node</span><span class="blue">* ptr;</span>
+ptr = ptrFirst;
+while (ptr != NULL)
+{
+  printf("%s\n", ptr-&gt;name);
+  <span class="blue">ptr = ptr-&gt;ptrNext;</span>
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Listes chaînées : affichage</h2>
+<div class="stage" style="top: 165px; height: 778px;">
+<svg class="diagram" width="1921" height="778" viewBox="0 180 1334 540" style="position: absolute; left: 0px; top: 0;"><rect x="312" y="312" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="371.0" cy="332.0" r="9"/><polyline points="371,332 476,332" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="m" x="287" y="378">ptrFirst</text><rect x="478" y="312" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="478" y="352" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm" x="537.0" y="332.0">Blaise</text><circle cx="537.0" cy="372.0" r="9"/><rect x="675" y="312" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="675" y="352" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm" x="734.0" y="332.0">Anne</text><text class="null" x="734.0" y="372.0">NULL</text><polyline points="537,372 609,372 609,332 673,332" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="mn" x="803" y="336">name</text><text class="mn" x="803" y="375">ptrNext</text><rect x="312" y="194" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><text class="nm blue" x="371.0" y="214.0">NULL</text><text class="m" x="346" y="244">ptr</text></svg>
+<div class="abs" style="left: 145px; top: 43px; font-size: 43px;"><highlight>Affichage</highlight></div>
+<pre class="abs" style="left: 677px; top: 429px; width: 749px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+<span class="purple">struct node</span><span class="blue">* ptr;</span>
+ptr = ptrFirst;
+while <span class="ring">(ptr != NULL)</span>  <span class="red">⟶ false</span>
+{
+  printf("%s\n", ptr-&gt;name);
+  ptr = ptr-&gt;ptrNext;
+}
+</code></pre>
+</div>
+</section>
+
+      </section>
+
+      <!----------          PROGRAMME          ---------->
+      <section>
+
+<section>
+<h2>Listes chaînées : programme (1)</h2>
+<pre style="width: 1300px;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.6em;">
+#include &lt;stdio.h&gt;
+
+<span class="purple">struct node</span>
+{
+  char name[20];
+  <span class="purple">struct node</span>* ptrNext;
+};
+
+<span class="purple">struct node</span> *ptrFirst=NULL;
+
+void addNode(void);
+void displayList (void);
+</code></pre>
+</section>
+
+<section>
+<h2>Listes chaînées : programme (2)</h2>
+<pre style="width: 1300px;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.4em;">
+<span class="blue">int main(void)</span>
+{
+  char choice;
+  printf("Insert a new name (Y/N)? ");
+  scanf(" %c", &amp;choice);
+  while (toupper(choice) != 'N')
+  {
+      <span class="blue">addNode();</span>
+      printf("Insert a new name (Y/N)? ");
+      scanf(" %c", &amp;choice);
+  }
+  <span class="blue">displayList();</span>
+  return 0;
+}
+</code></pre>
+</section>
+
+<section>
+<h2>Listes chaînées : programme (3)</h2>
+<pre style="width: 1300px;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.5em;">
+<span class="blue">void addNode(</span><span class="purple">struct node</span> *ptrFirst<span class="blue">)</span>
+{
+  <span class="purple">struct node</span>* ptrNewNode;
+  ptrNewNode = malloc(sizeof(<span class="purple">struct node</span>));
+
+  printf("Enter a name: ");
+  fflush(stdin);
+  gets(ptrNewNode-&gt;name);
+
+  ptrNewNode-&gt;ptrNext = ptrFirst;
+  ptrFirst            = ptrNewNode<span class="blue">;</span>
+}
+</code></pre>
+</section>
+
+<section>
+<h2>Listes chaînées : programme (4)</h2>
+<pre style="width: 1300px;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.3em;">
+<span class="blue">void displayList(</span><span class="purple">struct node</span> *ptrFirst<span class="blue">)</span>
+{
+   <span class="purple">struct node</span> * ptr;
+   ptr = ptrFirst;
+   if (ptr == NULL)
+       printf("La liste est vide\n");
+  else
+  {
+       printf("\nContenu de la liste: \n");
+       while (ptr != NULL)
+       {
+             printf("%s\n", ptr-&gt;name);
+             ptr = ptr-&gt;ptrNext;
+       }
+   }
+}
+</code></pre>
+</section>
+
+<section>
+<h2>Listes chaînées : programme (5)</h2>
+<pre style="width: 1300px;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.3em;">
+<span class="blue">void emptyList (</span><span class="purple">struct node</span> *ptrFirst<span class="blue">)</span>
+{
+  <span class="purple">struct node</span> *ptr, *nextPtr;
+  ptr = ptrFirst;
+  while (ptr != NULL) {
+      nextPtr = ptr-&gt;ptrNext;          // (1)
+      free(ptr);                      // (2)
+      ptr = nextPtr;                  // (3)
+  }
+}
+
+<span class="small">// Remarque : le pointeur sur le nœud suivant</span>
+<span class="small">// est pris <u>avant</u> (1) l’appel de la fonction</span>
+<span class="small">// free(). Il est possible que l’espace libéré</span>
+<span class="small">// puisse être réutilisé avant l’exécution de</span>
+<span class="small">// la ligne suivante (3) et que ptrSuivant soit invalide</span>
+</code></pre>
+</section>
+
+      </section>
+
+      <!----------          EXERCICES          ---------->
+      <section>
+        <h2>📝 Exercices</h2>
+        <p style="text-align: center; padding-left: 0;">
+          <a href="https://he-arc.github.io/1242.1-Langage_C/docs/cours/chapitre13cours/">Exercices du chapitre 13</a>
+        </p>
+      </section>
+
+      <!----------          ANNEXE          ---------->
+      <section>
+
+<section>
+<h2>ANNEXE</h2>
+<br>
+<p class="tight"><highlight>Liste chainées avec deux pointeurs </highlight></p>
+<p class="tight">ptrFirst : pointe sur le premier nœud</p>
+<p class="tight">ptrLast&nbsp; : pointe sur le dernier nœud</p>
+</section>
+
+<section>
+<h2 class="long-title">Exemple Liste simplement chaînée contenant des noms</h2>
+<div class="stage" style="top: 230px; height: 490px;">
+<svg class="diagram" width="1921" height="490" viewBox="0 280 1334 340" style="position: absolute; left: 0px; top: 0;"><text class="mn" x="317" y="318">ptrFirst</text><rect x="312" y="336" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="371.0" cy="356.0" r="9"/><text class="mn" x="314" y="460">ptrLast</text><rect x="312" y="478" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="371.0" cy="498.0" r="9"/><rect x="478" y="400" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="478" y="440" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="537.0" y="420.0">Charles</text><circle cx="537.0" cy="460.0" r="9"/><rect x="675" y="400" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="675" y="440" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="734.0" y="420.0">Blaise</text><circle cx="734.0" cy="460.0" r="9"/><rect x="879" y="400" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="879" y="440" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="938.0" y="420.0">Anne</text><text class="null" x="938.0" y="460.0">NULL</text><polyline points="371,356 423,356 423,418 476,418" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><polyline points="537,460 609,460 609,418 673,418" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><polyline points="734,460 820,460 820,418 877,418" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><polyline points="371,498 834,498 834,458 877,458" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><circle cx="747" cy="445" r="104" fill="none" stroke="#385D8A" stroke-width="2.5"/><text class="plain" x="659" y="588">nœud ou maillon</text></svg>
+
+</div>
+</section>
+
+<section>
+<h2>Annexe</h2>
+<div class="stage" style="top: 150px; height: 856px;">
+<svg class="diagram" width="1841" height="856" viewBox="0 100 1334 620" style="position: absolute; left: 40px; top: 0;"><rect x="887" y="186" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="887" y="226" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="946.0" y="206.0">?</text><text class="nm blue" x="946.0" y="246.0">?</text><text class="m" x="1022" y="206">name</text><text class="m" x="1022" y="246">ptrNext</text><rect x="886" y="463" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><text class="null" x="945.0" y="483.0">NULL</text><text class="m" x="1013" y="483">ptrFirst</text><rect x="886" y="512" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><text class="null" x="945.0" y="532.0">NULL</text><text class="m" x="1013" y="532">ptrLast</text></svg>
+<div class="abs" style="left: 344px; top: 90px; font-size: 41px;">Déclaration du type noeud:</div>
+<pre class="abs" style="left: 330px; top: 156px; width: 793px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+<span class="purple">struct node</span>
+{
+   char         name[20];
+   <span class="purple">struct node</span> *ptrNext;
+};
+</code></pre>
+<div class="abs" style="left: 333px; top: 425px; font-size: 41px;">Déclaration des deux pointeurs :</div>
+<pre class="abs" style="left: 328px; top: 501px; width: 795px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+<span class="purple">struct node</span> *ptrFirst = NULL,
+            *ptrLast = NULL;
+</code></pre>
+<div class="abs" style="left: 344px; top: 635px; font-size: 41px;">Alternative avec <span class="mono" style="font-weight: normal;">typedef</span></div>
+<pre class="abs" style="left: 330px; top: 712px; width: 793px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+<span class="blue">typedef</span> struct node <span class="purple">NodeTy</span>;
+<span class="purple">NodeTy</span> *ptrFirst, *ptrLast;
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Annexe</h2>
+<div class="stage" style="top: 150px; height: 856px;">
+<svg class="diagram" width="1841" height="856" viewBox="0 100 1334 620" style="position: absolute; left: 40px; top: 0;"><rect x="640" y="540" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="699.0" cy="560.0" r="9"/><polyline points="700,560 810,560 810,595" fill="none" stroke="#000" stroke-width="2"/><line x1="799" y1="607" x2="823" y2="587" stroke="#000" stroke-width="2"/><text class="m" x="636" y="602">ptrFirst</text><rect x="640" y="643" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="699.0" cy="663.0" r="9"/><polyline points="700,663 810,663 810,698" fill="none" stroke="#000" stroke-width="2"/><line x1="799" y1="710" x2="823" y2="690" stroke="#000" stroke-width="2"/><text class="m" x="636" y="705">ptrLast</text></svg>
+<div class="abs" style="left: 328px; top: 10px; font-size: 41px;"><div class="framed tightlist" style="width: 1230px; margin: 0; padding: 4px 16px; font-size: 0.85em;">
+<p class="flush tight"><b>Opérations de base:</b></p>
+<p class="flush tight">a)&nbsp; Initialisation des pointeurs</p>
+<p class="flush tight">b)&nbsp; Ajouter un nœud</p>
+<p class="flush tight" style="padding-left: 70px;">1) Allocation mémoire d’un nouveau nœud</p>
+<p class="flush tight" style="padding-left: 70px;">2) Initialisation du nœud</p>
+<p class="flush tight" style="padding-left: 70px;">3) Ajout du nœud à la liste</p>
+<p class="flush tight" style="padding-left: 140px;">Au début de la liste</p>
+<p class="flush tight" style="padding-left: 140px;">A la fin de la liste</p>
+<p class="flush tight">c)&nbsp; Afficher la liste</p>
+</div></div>
+<div class="abs" style="left: 342px; top: 545px; font-size: 50px;">a) Initialisation des pointeurs</div>
+<pre class="abs" style="left: 458px; top: 647px; width: 400px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+ptrFirst = NULL;
+ptrLast  = NULL;
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Annexe</h2>
+<div class="stage" style="top: 150px; height: 856px;">
+<svg class="diagram" width="1841" height="856" viewBox="0 100 1334 620" style="position: absolute; left: 40px; top: 0;"><rect x="312" y="233" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="371.0" cy="253.0" r="9"/><polyline points="371,253 467,253" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="470" y="233" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="470" y="273" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="529.0" y="253.0">?</text><text class="nm blue" x="529.0" y="293.0">?</text><text class="m" x="322" y="294">elem</text><text class="m" x="606" y="254">name</text><text class="m" x="606" y="294">ptrNext</text><text class="m purple" x="428" y="333">struct node</text><rect x="323" y="575" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="382.0" cy="595.0" r="9"/><polyline points="382,595 479,595" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="481" y="575" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="481" y="615" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="540.0" y="595.0">Anne</text><text class="null" x="540.0" y="635.0">NULL</text><text class="m" x="334" y="636">elem</text><text class="m" x="617" y="597">name</text><text class="m" x="617" y="637">ptrNext</text><text class="m purple" x="441" y="676">struct node</text></svg>
+<div class="abs" style="left: 342px; top: 17px; font-size: 50px;">b) Ajouter un nœud</div>
+<div class="abs" style="left: 421px; top: 103px; font-size: 41px;">1) Allocation en mémoire d’un nouveau nœud</div>
+<pre class="abs" style="left: 704px; top: 377px; width: 891px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+<span class="purple">struct node</span>* elem;
+elem = <span class="blue">malloc</span>(sizeof(<span class="purple">struct node</span>));
+</code></pre>
+<div class="abs" style="left: 421px; top: 571px; font-size: 41px;">2) Initialisation d’un nœud</div>
+<pre class="abs" style="left: 1074px; top: 675px; width: 522px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+gets(elem<span class="blue">-&gt;</span>name);
+elem<span class="blue">-&gt;</span>ptrNext = NULL;
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Annexe</h2>
+<div class="stage" style="top: 150px; height: 856px;">
+<svg class="diagram" width="1841" height="856" viewBox="0 100 1334 620" style="position: absolute; left: 40px; top: 0;"><rect x="312" y="260" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="371.0" cy="280.0" r="9"/><polyline points="371,280 467,280" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="m" x="322" y="322">elem</text><rect x="470" y="260" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="470" y="300" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="529.0" y="280.0">Anne</text><text class="null" x="529.0" y="320.0">NULL</text><text class="m" x="606" y="282">name</text><text class="m" x="606" y="322">ptrNext</text><rect x="310" y="418" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><text class="null" x="369.0" y="438.0">NULL</text><text class="m" x="319" y="480">ptrFirst</text><rect x="310" y="520" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><text class="null" x="369.0" y="540.0">NULL</text><text class="m" x="319" y="582">ptrLast</text></svg>
+<div class="abs" style="left: 342px; top: 17px; font-size: 50px;">b) Ajouter un nœud</div>
+<div class="abs" style="left: 421px; top: 103px; font-size: 41px;">3) Ajout d’un nœud à une liste vide</div>
+<pre class="abs" style="left: 915px; top: 414px; width: 662px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+if (ptrLast == NULL)
+{
+
+
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Annexe</h2>
+<div class="stage" style="top: 150px; height: 856px;">
+<svg class="diagram" width="1841" height="856" viewBox="0 100 1334 620" style="position: absolute; left: 40px; top: 0;"><rect x="312" y="260" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="371.0" cy="280.0" r="9"/><polyline points="371,280 467,280" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="m" x="322" y="322">elem</text><rect x="470" y="260" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="470" y="300" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="529.0" y="280.0">Anne</text><text class="null" x="529.0" y="320.0">NULL</text><text class="m" x="606" y="282">name</text><text class="m" x="606" y="322">ptrNext</text><rect x="310" y="418" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="369.0" cy="438.0" r="9"/><text class="m" x="319" y="480">ptrFirst</text><rect x="310" y="520" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><text class="null" x="369.0" y="540.0">NULL</text><text class="m" x="319" y="582">ptrLast</text><polyline points="369,438 409,438 409,320 467,320" fill="none" stroke="#0000FF" stroke-width="2" marker-end="url(#tip-b)"/></svg>
+<div class="abs" style="left: 342px; top: 17px; font-size: 50px;">b) Ajouter un nœud</div>
+<div class="abs" style="left: 421px; top: 103px; font-size: 41px;">3) Ajout d’un nœud à une liste vide</div>
+<pre class="abs" style="left: 915px; top: 414px; width: 662px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+if (ptrLast == NULL)
+{
+  <span class="blue">ptrFirst = elem;</span>
+
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Annexe</h2>
+<div class="stage" style="top: 150px; height: 856px;">
+<svg class="diagram" width="1841" height="856" viewBox="0 100 1334 620" style="position: absolute; left: 40px; top: 0;"><rect x="312" y="260" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="371.0" cy="280.0" r="9"/><polyline points="371,280 467,280" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="m" x="322" y="322">elem</text><rect x="470" y="260" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="470" y="300" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="529.0" y="280.0">Anne</text><text class="null" x="529.0" y="320.0">NULL</text><text class="m" x="606" y="282">name</text><text class="m" x="606" y="322">ptrNext</text><rect x="310" y="418" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="369.0" cy="438.0" r="9"/><text class="m" x="319" y="480">ptrFirst</text><rect x="310" y="520" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="369.0" cy="540.0" r="9"/><text class="m" x="319" y="582">ptrLast</text><polyline points="369,438 409,438 409,320 467,320" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><polyline points="369,540 526,540 526,343" fill="none" stroke="#0000FF" stroke-width="2" marker-end="url(#tip-b)"/></svg>
+<div class="abs" style="left: 342px; top: 17px; font-size: 50px;">b) Ajouter un nœud</div>
+<div class="abs" style="left: 421px; top: 103px; font-size: 41px;">3) Ajout d’un nœud à une liste vide</div>
+<pre class="abs" style="left: 915px; top: 414px; width: 662px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+if (ptrLast == NULL)
+{
+  ptrFirst = elem;
+  <span class="blue">ptrLast = elem;</span>
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Annexe</h2>
+<div class="stage" style="top: 150px; height: 856px;">
+<svg class="diagram" width="1841" height="856" viewBox="0 100 1334 620" style="position: absolute; left: 40px; top: 0;"><rect x="470" y="260" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="470" y="300" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="529.0" y="280.0">Anne</text><text class="null" x="529.0" y="320.0">NULL</text><text class="m" x="606" y="282">name</text><text class="m" x="606" y="322">ptrNext</text><rect x="310" y="418" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="369.0" cy="438.0" r="9"/><text class="m" x="319" y="480">ptrFirst</text><rect x="310" y="520" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="369.0" cy="540.0" r="9"/><text class="m" x="319" y="582">ptrLast</text><polyline points="369,438 409,438 409,320 467,320" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><polyline points="369,540 526,540 526,343" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/></svg>
+<div class="abs" style="left: 342px; top: 17px; font-size: 50px;">b) Ajouter un nœud</div>
+<div class="abs" style="left: 421px; top: 103px; font-size: 41px;">3) Ajout d’un nœud à une liste vide</div>
+<pre class="abs" style="left: 915px; top: 414px; width: 662px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+if (ptrLast == NULL)
+{
+  ptrFirst = elem;
+  ptrLast = elem;
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Annexe</h2>
+<div class="stage" style="top: 150px; height: 856px;">
+<svg class="diagram" width="1841" height="856" viewBox="0 100 1334 620" style="position: absolute; left: 40px; top: 0;"><text class="mn" x="308" y="330">elem</text><rect x="296" y="267" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="355.0" cy="287.0" r="9"/><polyline points="355,287 450,287" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="453" y="267" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="453" y="307" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="512.0" y="287.0">Charles</text><text class="null" x="512.0" y="327.0">NULL</text><text class="mn" x="290" y="470">ptrFirst</text><rect x="289" y="489" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="348.0" cy="509.0" r="9"/><polyline points="348,509 400,509 400,572 451,572" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="454" y="552" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="454" y="592" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="513.0" y="572.0">Blaise</text><circle cx="513.0" cy="612.0" r="9"/><rect x="659" y="552" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="659" y="592" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="718.0" y="572.0">Anne</text><text class="null" x="718.0" y="612.0">NULL</text><polyline points="513,612 599,612 599,572 657,572" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="mn" x="290" y="612">ptrLast</text><rect x="289" y="632" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="348.0" cy="652.0" r="9"/><polyline points="348,652 639,652 639,612 657,612" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/></svg>
+<div class="abs" style="left: 342px; top: 17px; font-size: 50px;">b) Ajouter un nœud</div>
+<div class="abs" style="left: 421px; top: 103px; font-size: 41px;">3) Ajout d’un nœud <b>au début </b>de liste</div>
+<pre class="abs" style="left: 911px; top: 222px; width: 672px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+if (ptrLast != NULL)
+{
+
+
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Annexe</h2>
+<div class="stage" style="top: 150px; height: 856px;">
+<svg class="diagram" width="1841" height="856" viewBox="0 100 1334 620" style="position: absolute; left: 40px; top: 0;"><text class="mn" x="308" y="330">elem</text><rect x="296" y="267" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="355.0" cy="287.0" r="9"/><polyline points="355,287 450,287" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="453" y="267" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="453" y="307" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="512.0" y="287.0">Charles</text><circle cx="512.0" cy="327.0" r="9" fill="#0000FF"/><polyline points="512,328 512,550" fill="none" stroke="#0000FF" stroke-width="2" marker-end="url(#tip-b)"/><text class="mn" x="290" y="470">ptrFirst</text><rect x="289" y="489" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="348.0" cy="509.0" r="9"/><polyline points="348,509 400,509 400,572 451,572" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="454" y="552" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="454" y="592" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="513.0" y="572.0">Blaise</text><circle cx="513.0" cy="612.0" r="9"/><rect x="659" y="552" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="659" y="592" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="718.0" y="572.0">Anne</text><text class="null" x="718.0" y="612.0">NULL</text><polyline points="513,612 599,612 599,572 657,572" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="mn" x="290" y="612">ptrLast</text><rect x="289" y="632" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="348.0" cy="652.0" r="9"/><polyline points="348,652 639,652 639,612 657,612" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/></svg>
+<div class="abs" style="left: 342px; top: 17px; font-size: 50px;">b) Ajouter un nœud</div>
+<div class="abs" style="left: 421px; top: 103px; font-size: 41px;">3) Ajout d’un nœud <b>au début </b>de liste</div>
+<pre class="abs" style="left: 911px; top: 222px; width: 672px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+if (ptrLast != NULL)
+{
+  <span class="blue">elem-&gt;ptrNext = ptrFirst;</span>
+
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Annexe</h2>
+<div class="stage" style="top: 150px; height: 856px;">
+<svg class="diagram" width="1841" height="856" viewBox="0 100 1334 620" style="position: absolute; left: 40px; top: 0;"><text class="mn" x="308" y="247">elem</text><rect x="296" y="267" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="355.0" cy="287.0" r="9"/><polyline points="355,287 450,287" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="453" y="267" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="453" y="307" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="512.0" y="287.0">Charles</text><circle cx="512.0" cy="327.0" r="9"/><polyline points="512,328 512,550" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="mn" x="290" y="470">ptrFirst</text><rect x="289" y="489" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="348.0" cy="509.0" r="9" fill="#0000FF"/><polyline points="348,509 345,326 450,326" fill="none" stroke="#0000FF" stroke-width="2" marker-end="url(#tip-b)"/><rect x="454" y="552" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="454" y="592" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="513.0" y="572.0">Blaise</text><circle cx="513.0" cy="612.0" r="9"/><rect x="659" y="552" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="659" y="592" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="718.0" y="572.0">Anne</text><text class="null" x="718.0" y="612.0">NULL</text><polyline points="513,612 599,612 599,572 657,572" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="mn" x="290" y="612">ptrLast</text><rect x="289" y="632" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="348.0" cy="652.0" r="9"/><polyline points="348,652 639,652 639,612 657,612" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/></svg>
+<div class="abs" style="left: 342px; top: 17px; font-size: 50px;">b) Ajouter un nœud</div>
+<div class="abs" style="left: 421px; top: 103px; font-size: 41px;">3) Ajout d’un nœud <b>au début </b>de liste</div>
+<pre class="abs" style="left: 911px; top: 222px; width: 672px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+if (ptrLast != NULL)
+{
+  elem-&gt;ptrNext = ptrFirst;
+  <span class="blue">ptrFirst = elem;</span>
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Annexe</h2>
+<div class="stage" style="top: 150px; height: 856px;">
+<svg class="diagram" width="1841" height="856" viewBox="0 100 1334 620" style="position: absolute; left: 40px; top: 0;"><rect x="453" y="267" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="453" y="307" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="512.0" y="287.0">Charles</text><circle cx="512.0" cy="327.0" r="9"/><polyline points="512,328 512,550" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="mn" x="290" y="470">ptrFirst</text><rect x="289" y="489" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="348.0" cy="509.0" r="9"/><polyline points="348,509 345,326 450,326" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="454" y="552" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="454" y="592" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="513.0" y="572.0">Blaise</text><circle cx="513.0" cy="612.0" r="9"/><rect x="659" y="552" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="659" y="592" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="718.0" y="572.0">Anne</text><text class="null" x="718.0" y="612.0">NULL</text><polyline points="513,612 599,612 599,572 657,572" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="mn" x="290" y="612">ptrLast</text><rect x="289" y="632" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="348.0" cy="652.0" r="9"/><polyline points="348,652 639,652 639,612 657,612" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/></svg>
+<div class="abs" style="left: 342px; top: 17px; font-size: 50px;">b) Ajouter un nœud</div>
+<div class="abs" style="left: 421px; top: 103px; font-size: 41px;">3) Ajout d’un nœud <b>au début </b>de liste</div>
+<pre class="abs" style="left: 911px; top: 222px; width: 672px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+if (ptrLast != NULL)
+{
+  elem-&gt;ptrNext = ptrFirst;
+  ptrFirst = elem;
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Annexe</h2>
+<div class="stage" style="top: 150px; height: 856px;">
+<svg class="diagram" width="1841" height="856" viewBox="0 100 1334 620" style="position: absolute; left: 40px; top: 0;"><text class="mn" x="308" y="247">elem</text><rect x="296" y="267" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="355.0" cy="287.0" r="9"/><polyline points="355,287 450,287" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="453" y="267" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="453" y="307" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="512.0" y="287.0">Charles</text><text class="null" x="512.0" y="327.0">NULL</text><text class="mn" x="290" y="470">ptrFirst</text><rect x="289" y="489" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="348.0" cy="509.0" r="9"/><polyline points="348,509 400,509 400,572 451,572" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="454" y="552" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="454" y="592" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="513.0" y="572.0">Anne</text><circle cx="513.0" cy="612.0" r="9"/><rect x="659" y="552" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="659" y="592" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="718.0" y="572.0">Blaise</text><text class="null" x="718.0" y="612.0">NULL</text><polyline points="513,612 599,612 599,572 657,572" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="mn" x="290" y="612">ptrLast</text><rect x="289" y="632" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="348.0" cy="652.0" r="9"/><polyline points="348,652 639,652 639,612 657,612" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/></svg>
+<div class="abs" style="left: 342px; top: 17px; font-size: 50px;">b) Ajouter un nœud</div>
+<div class="abs" style="left: 421px; top: 103px; font-size: 41px;">3) Ajout d’un nœud <b>à la fin </b>de liste</div>
+<pre class="abs" style="left: 949px; top: 222px; width: 662px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+if (ptrLast != NULL)
+{
+
+
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Annexe</h2>
+<div class="stage" style="top: 150px; height: 856px;">
+<svg class="diagram" width="1841" height="856" viewBox="0 100 1334 620" style="position: absolute; left: 40px; top: 0;"><text class="mn" x="308" y="247">elem</text><rect x="296" y="267" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="355.0" cy="287.0" r="9"/><polyline points="355,287 450,287" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="453" y="267" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="453" y="307" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="512.0" y="287.0">Charles</text><text class="null" x="512.0" y="327.0">NULL</text><text class="mn" x="290" y="470">ptrFirst</text><rect x="289" y="489" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="348.0" cy="509.0" r="9"/><polyline points="348,509 400,509 400,572 451,572" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="454" y="552" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="454" y="592" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="513.0" y="572.0">Anne</text><circle cx="513.0" cy="612.0" r="9"/><rect x="659" y="552" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="659" y="592" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="718.0" y="572.0">Blaise</text><circle cx="718.0" cy="612.0" r="9"/><polyline points="513,612 599,612 599,572 657,572" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="mn" x="290" y="612">ptrLast</text><rect x="289" y="632" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="348.0" cy="652.0" r="9" fill="#FF0000"/><polyline points="348,652 639,652 639,612 657,612" fill="none" stroke="#808080" stroke-width="1" marker-end="url(#tip-g)"/><polyline points="289,652 272,652 272,326 450,326" fill="none" stroke="#FF0000" stroke-width="3" marker-end="url(#tip-r)"/><circle cx="718" cy="612" r="9" fill="#0000FF"/><polyline points="718,612 798,612 798,474 513,474 513,350" fill="none" stroke="#0000FF" stroke-width="3" marker-end="url(#tip-b)"/></svg>
+<div class="abs" style="left: 342px; top: 17px; font-size: 50px;">b) Ajouter un nœud</div>
+<div class="abs" style="left: 421px; top: 103px; font-size: 41px;">3) Ajout d’un nœud <b>à la fin </b>de liste</div>
+<pre class="abs" style="left: 949px; top: 222px; width: 662px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+if (ptrLast != NULL)
+{
+  <span class="blue">ptrLast-&gt;ptrNext = elem;</span>
+  <span class="red">ptrLast = elem;</span>
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Annexe</h2>
+<div class="stage" style="top: 150px; height: 856px;">
+<svg class="diagram" width="1841" height="856" viewBox="0 100 1334 620" style="position: absolute; left: 40px; top: 0;"><rect x="453" y="267" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="453" y="307" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm blue" x="512.0" y="287.0">Charles</text><text class="null" x="512.0" y="327.0">NULL</text><text class="mn" x="290" y="470">ptrFirst</text><rect x="289" y="489" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="348.0" cy="509.0" r="9"/><polyline points="348,509 400,509 400,572 451,572" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="454" y="552" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="454" y="592" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="513.0" y="572.0">Anne</text><circle cx="513.0" cy="612.0" r="9"/><rect x="659" y="552" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><rect x="659" y="592" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><text class="nm light" x="718.0" y="572.0">Blaise</text><circle cx="718.0" cy="612.0" r="9"/><polyline points="513,612 599,612 599,572 657,572" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="mn" x="290" y="612">ptrLast</text><rect x="289" y="632" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="348.0" cy="652.0" r="9"/><polyline points="289,652 272,652 272,326 450,326" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><polyline points="718,612 798,612 798,474 513,474 513,350" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/></svg>
+<div class="abs" style="left: 342px; top: 17px; font-size: 50px;">b) Ajouter un nœud</div>
+<div class="abs" style="left: 421px; top: 103px; font-size: 41px;">3) Ajout d’un nœud <b>à la fin </b>de liste</div>
+<pre class="abs" style="left: 949px; top: 222px; width: 662px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+if (ptrLast != NULL)
+{
+  ptrLast-&gt;ptrNext = elem;
+  ptrLast = elem;
+}
+</code></pre>
+</div>
+</section>
+
+<section>
+<h2>Annexe</h2>
+<div class="stage" style="top: 150px; height: 856px;">
+<svg class="diagram" width="1841" height="856" viewBox="0 100 1334 620" style="position: absolute; left: 40px; top: 0;"><text class="m" x="240" y="213">myList</text><rect x="234" y="243" width="118" height="40" fill="#F8F8BE" stroke="#000" stroke-width="2"/><circle cx="293.0" cy="263.0" r="9"/><polyline points="293,263 293,346" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><rect x="218" y="348" width="145" height="190" fill="#FFF" stroke="#000" stroke-width="3"/><text class="mn" x="228" y="383">ptrFirst</text><rect x="234" y="400" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><circle cx="293.0" cy="420.0" r="9"/><polyline points="293,420 390,420" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/><text class="mn" x="236" y="465">ptrLast</text><rect x="234" y="482" width="118" height="40" fill="#FFF" stroke="#000" stroke-width="2"/><circle cx="293.0" cy="502.0" r="9"/><polyline points="293,502 390,502" fill="none" stroke="#000" stroke-width="2" marker-end="url(#tip-k)"/></svg>
+<div class="abs" style="left: 344px; top: 39px; font-size: 47px;"><b class="green">Bon usage : </b>définir une structure pour la liste !</div>
+<pre class="abs" style="left: 607px; top: 124px; width: 952px; margin: 0;"><code
+  class="nohighlight"
+  data-trim
+  data-noescape
+  style="font-size: 1.44em;">
+struct list
+{
+  <span class="purple">struct node</span> *ptrFirst;
+  <span class="purple">struct node</span> *ptrLast;
+};
+
+
+struct list <span class="red">*</span>myList;
+myList = malloc(sizeof(struct list));
+
+<span class="blue">AddNode(myList);</span>
+
+<span class="light">//plutôt que <b>AddNode(&amp;ptrFirst,&amp;ptrLast);</b></span>
+</code></pre>
+</div>
+</section>
+
+      </section>
+
+    </div>
+  </div>
+
+  <!----------          CONTENT          ---------->
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/notes/notes.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      hash: true,
+      width: 1920,
+      height: 1080,
+      transition: "none",
+      center: false,
+      slideNumber: 'c/t',
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+    });
+  </script>
+</body>
+
+</html>
