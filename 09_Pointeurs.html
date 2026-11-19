@@ -1,0 +1,1504 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>HE-Arc - 1242.1 Langage C - Chapitre 9 - Pointeurs</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/hearc.css" id="theme">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="https://www.he-arc.ch/wp-content/uploads/2021/12/cropped-hearc-icon-192x192.png"
+    type="image/vnd.microsoft.icon" />
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/vs.css" id="highlight-theme">
+
+  <style>
+    .reveal .container p,
+    .reveal .container h3,
+    .reveal .container h4 { padding-left: 0; }
+    .reveal .container .col-left { text-align: left; }
+
+    .reveal .indent-1 { padding-left: 300px; }
+    .reveal .indent-2 { padding-left: 400px; }
+    .reveal .centered { text-align: center; padding-left: 0; }
+    .reveal p.tight { margin: 8px 0; }
+    .reveal p.flush { padding-left: 0; }
+    .reveal i { font-style: italic; }
+    .reveal h3.plain { text-transform: none; }
+    .reveal h2 .mono { text-transform: none; }
+    .reveal h2.long-title { font-size: 1.4em; }
+
+    .reveal pre.terminal code.hljs,
+    .reveal pre.terminal code {
+      background-color: #000000;
+      color: #FFFFFF;
+    }
+    .reveal pre.terminal code .hl-yellow { color: #FFFF00; font-weight: bold; }
+
+    .reveal .mono { font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+    .reveal code .red { color: #FF0000; font-weight: bold; }
+    .reveal code .blue { color: #0000FF; font-weight: bold; }
+    .reveal code .green { color: #00B050; font-weight: bold; }
+    .reveal code .note { font-family: "Roboto", Helvetica, sans-serif; font-weight: normal; }
+    .reveal code .red *, .reveal code .blue *, .reveal code .green * { color: inherit; }
+
+    .reveal .red { color: #FF0000; }
+    .reveal .blue { color: #0000FF; }
+    .reveal .green { color: #00B050; }
+    .reveal .lightblue { color: #548DD4; }
+
+    .reveal .syntax {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      background-color: #ffff99;
+      border: 2px solid #000;
+      padding: 0.1em 0.5em;
+    }
+    .reveal .frame-blue {
+      border: 4px solid #0000FF;
+      padding: 10px 30px;
+      display: table;
+      margin: 0 auto;
+    }
+    .reveal .frame-blue p { padding-left: 0; }
+    .reveal .frame-black {
+      border: 2px solid #000000;
+      padding: 6px 20px;
+    }
+    .reveal .frame-black p { padding-left: 0; margin: 0; }
+
+    /* memory cells: one flex row per memory strip, same cell width in the value, label and address rows */
+    .reveal .memblock { display: table; margin: 0 auto; --cw: 200px; --ch: 76px; }
+    .reveal .mem {
+      display: flex;
+      justify-content: flex-start;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      font-size: 34px;
+    }
+    .reveal .mem .cell {
+      box-sizing: border-box;
+      flex: none;
+      width: var(--cw);
+      height: var(--ch);
+      line-height: calc(var(--ch) - 4px);
+      margin-left: -2px;
+      border: 2px solid #000000;
+      background-color: #4F81BD;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .reveal .mem .cell.var { background-color: #376092; color: #FFFFFF; }
+    .reveal .mem .cell.arr { background-color: #00B0F0; }
+    .reveal .mem .cell.w2 { width: calc(2 * var(--cw)); }
+    .reveal .mem .cell.w4 { width: calc(4 * var(--cw)); }
+    .reveal .mem .cell.half { width: calc(var(--cw) / 2); }
+    .reveal .mem .cell.brk { background: linear-gradient(90deg, #4F81BD 0 25%, #FFFFFF 25% 75%, #4F81BD 75%); }
+    .reveal .mem .cell.gap { border-color: transparent; background: none; }
+    .reveal .mem .cell.mark { position: relative; outline: 5px solid #FF0000; outline-offset: -4px; }
+    .reveal .mem.index .cell,
+    .reveal .mem.addr .cell {
+      height: 50px;
+      line-height: 50px;
+      border-color: transparent;
+      background: none;
+      overflow: visible;
+    }
+    .reveal .mem.addr .cell { height: 42px; line-height: 42px; font-size: 28px; text-align: left; }
+    .reveal .mem .rowlabel {
+      flex: none;
+      box-sizing: border-box;
+      padding-right: 30px;
+      text-align: right;
+      align-self: center;
+    }
+    .reveal .mem .rowlabel.text { font-family: "Roboto", Helvetica, sans-serif; }
+    .reveal .mem .over { flex: none; text-align: center; margin-left: -2px; }
+    .reveal .mem .over .bracket {
+      height: 14px;
+      margin: 0 6px;
+      border: 3px solid #000000;
+      border-bottom: none;
+      border-radius: 12px 12px 0 0;
+    }
+    .reveal .brace-under {
+      height: 16px;
+      border: 3px solid #000000;
+      border-top: none;
+      border-radius: 0 0 14px 14px;
+    }
+
+    .reveal svg.diagram text { font-family: "Roboto", Helvetica, sans-serif; font-size: 34px; fill: #000000; }
+    .reveal svg.diagram text.mono { font-family: 'Courier New', Courier, monospace; }
+    .reveal svg.diagram text.b { font-weight: bold; }
+    .reveal svg.diagram text.blue { fill: #0000FF; }
+    .reveal svg.diagram text.red { fill: #FF0000; }
+    .reveal svg.diagram text.white { fill: #FFFFFF; }
+    .reveal svg.diagram .box { fill: #FFFFFF; stroke: #000000; stroke-width: 3; }
+    .reveal svg.diagram .main { fill: #02D038; stroke: #000000; stroke-width: 2; }
+    .reveal svg.diagram .callee { fill: #FFFF00; stroke: #000000; stroke-width: 2; }
+    .reveal svg.diagram .memcell { fill: #4F81BD; stroke: #385D8A; stroke-width: 3; }
+    .reveal svg.diagram .rule { stroke: #4F81BD; stroke-width: 2; }
+    .reveal svg.diagram .arrow { fill: none; stroke: #000000; stroke-width: 3; }
+    .reveal svg.diagram .arrow.red { stroke: #FF0000; stroke-width: 5; }
+    .reveal svg.diagram .step { fill: #0070C0; }
+
+    /* call-by-value walkthrough: one gutter character per code line, coloured by the function it belongs to */
+    .reveal code .bar { display: inline-block; width: 1ch; }
+    .reveal code .bar.callee { background-color: #FFFF00; }
+    .reveal code .bar.main { background-color: #00B050; }
+    .reveal code .step { display: inline-block; width: 2ch; text-align: center; color: #0070C0; font-weight: bold; font-size: 1.25em; line-height: 0.8; }
+    .reveal .verdict {
+      border: 2px solid currentColor;
+      padding: 10px 24px;
+      font-weight: bold;
+      text-align: center;
+    }
+    .reveal .verdict p { padding-left: 0; margin: 0; }
+
+    .reveal code .ring { border: 4px solid currentColor; border-radius: 50%; padding: 0 6px; }
+    .reveal code .ring * { color: #000000; }
+
+    .reveal table.plain { margin: 0 0 0 300px; font-size: 1em; }
+    .reveal table.plain td { border: none; padding: 0.1em 0.8em 0.1em 0; vertical-align: middle; }
+
+    .reveal table.equiv { margin: 0 auto; font-size: 1em; }
+    .reveal table.equiv td {
+      border: 2px solid #000000;
+      padding: 0.15em 0.6em;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+    }
+    .reveal table.equiv tr:last-child td { border-bottom: 2px solid #000000; }
+    .reveal table.equiv td.eq { text-align: center; width: 90px; font-weight: normal; }
+
+    .reveal table.priority { font-size: 0.75em; width: 1700px; margin: 0 auto; white-space: nowrap; }
+    .reveal table.priority th,
+    .reveal table.priority td { border: 2px solid #222; padding: 0.1em 0.8em; height: 1.4em; text-align: center; }
+    .reveal table.priority th { background-color: #dddddd; text-align: center; }
+    .reveal table.priority tr:last-child td { border-bottom: 2px solid #222; }
+    .reveal table.priority td.op { font-family: 'Courier New', Courier, monospace; text-align: center; }
+    .reveal table.priority td.op i { font-weight: normal; }
+    .reveal table.priority td.op .blue { font-weight: bold; }
+    .reveal table.priority td.dir { text-align: center; }
+    .reveal table.priority td.dir.rtl { color: #FF0000; }
+    .reveal table.priority td.level { text-align: left; }
+  </style>
+</head>
+
+<body>
+  <img id="logo-hearc" src="./medias/logo_he-arc.png" alt="Logo HE-ARC">
+  <img id="logo-hesso" src="./medias/logo_hes-so.png" alt="Logo HES-SO">
+  <p id="course-infos">1242.1 Langage C - 2026-2027</p>
+
+  <!----------          CONTENT          ---------->
+  <div class="reveal">
+    <div class="slides">
+
+      <!----------          TITLE          ---------->
+      <section>
+        <h1>
+          Chapitre 9
+        </h1>
+        <h2>
+          Pointeurs
+        </h2>
+        <p class="tight">1. Accès mémoire direct et indirect</p>
+        <p class="tight">2. Pointeurs</p>
+        <p class="tight indent-1">1. Adresse d’une variable</p>
+        <p class="tight indent-1">2. Déclaration de pointeur</p>
+        <p class="tight indent-1">3. Opérateur de déréférencement</p>
+        <p class="tight">3. Paramètres formels d’une fonction</p>
+        <p class="tight">4. Tableaux et pointeurs</p>
+        <aside class="notes">Référence:<br>http://fr.wikibooks.org/wiki/Programmation_C/Tableaux<br>intéressant  . P.ex. la possibilité d'écrire   T[i]    ou i[T]   (à éviter!!)</aside>
+      </section>
+
+      <!----------          INTRODUCTION          ---------->
+      <section>
+
+        <section>
+          <h2>Les pointeurs</h2>
+          <br>
+          <p><highlight>Concept</highlight></p>
+          <p>Un pointeur <b>est une variable</b> qui <b>contient une adresse mémoire</b></p>
+          <p class="indent-1">Permet de <b>manipuler directement la mémoire</b></p>
+          <p class="indent-1"><b>Utile</b> dans de nombreux scénarios</p>
+          <p class="indent-1">Un des plus <b>importants concepts du langage C</b></p>
+        </section>
+
+        <section>
+          <h2>Les pointeurs</h2>
+          <p><highlight>Utilité</highlight></p>
+          <p class="tight indent-1"><b>Passage des paramètres d’une fonction par adresse</b></p>
+          <p class="tight indent-1"><b>Gestion de certains types</b> (p. ex. tableaux, chaînes de caractères, pointeurs sur fonctions)</p>
+          <p class="tight indent-1"><b>Structures dynamiques</b></p>
+          <p class="tight indent-1"><b>Performance</b> ► éviter les copies de données</p>
+          <br>
+          <p><highlight>Désavantage</highlight></p>
+          <p class="tight indent-1"><error>⚠ </error><b>La mémoire doit toujours être utilisée avec grande attention</b></p>
+        </section>
+
+      </section>
+
+      <!----------          ACCES MEMOIRE DIRECT ET INDIRECT          ---------->
+      <section>
+
+        <section>
+          <h2 class="long-title">9.1 Accès à la mémoire – 2 modes d’adressage</h2>
+          <p class="tight"><span class="green"><b>Adressage direct</b></span></p>
+          <p class="tight indent-1">Accès au contenu d'une variable par le nom de la variable</p>
+          <p class="tight"><highlight>Adressage indirect</highlight></p>
+          <p class="tight indent-1">Accès au contenu d'une variable, par <highlight>l’adresse de la variable</highlight> ou <highlight>par un pointeur</highlight> (variable qui contient l'adresse)</p>
+          <br>
+          <div class="memblock" style="--cw: 150px;">
+            <div class="mem" style="align-items: flex-end;">
+              <span class="rowlabel green" style="width: 440px;">Nom de variable</span>
+              <span class="over green" style="width: calc(4 * var(--cw));">variable1<div class="bracket"></div></span>
+              <span class="over" style="width: var(--cw);"></span>
+              <span class="over green" style="width: calc(2 * var(--cw));">variable2<div class="bracket"></div></span>
+            </div>
+            <div class="mem">
+              <span class="rowlabel" style="width: 440px;">Contenu</span>
+              <span class="cell var"></span><span class="cell var"></span><span class="cell var"></span><span class="cell var"></span><span class="cell brk"></span><span class="cell var"></span><span class="cell var"></span><span class="cell"></span><span class="cell"></span>
+            </div>
+            <div class="mem addr" style="font-size: 24px;">
+              <span class="rowlabel" style="width: 440px;"></span>
+              <span class="cell blue" style="font-size: 24px;">0x...3F06</span><span class="cell lightblue" style="font-size: 24px;">0x...3F07</span><span class="cell lightblue" style="font-size: 24px;">0x...3F08</span><span class="cell lightblue" style="font-size: 24px;">0x...3F09</span><span class="cell"></span><span class="cell blue" style="font-size: 24px;">0x...5C26</span><span class="cell lightblue" style="font-size: 24px;">0x...5C27</span>
+            </div>
+          </div>
+          <aside class="notes">Note importante : dans ce cours on considère les adresses sur 64 bits (donc 8 octets, "<i>bytes</i>" en anglais).<br>Cela devrait par exemple être <b>0x00FAE20102235C26</b>. Comme c'est un peu long, on préfère juste écrire "0x...5C26" ou même "...5C26".</aside>
+        </section>
+
+        <section>
+          <h2 class="long-title">9.1 Accès à la mémoire – 2 modes d’adressage</h2>
+          <p class="tight"><span class="green"><b>Adressage direct par le nom de la variable</b></span></p>
+          <pre style="width: 800px; margin-left: 400px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            <span class="green">x</span> = 40;
+            printf("%d",<span class="green">x</span>);
+          </code></pre>
+          <p class="tight"><highlight>Adressage indirect par *</highlight>, opérateur d’indirection ou de déréférencement (<i>contenu de</i>)</p>
+          <div style="display: flex; align-items: center; gap: 50px; padding-left: 400px;">
+            <pre style="width: 800px; margin: 20px 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              <span class="blue">*address64</span> = 40;
+              printf("%d",<span class="blue">*address64</span>);
+            </code></pre>
+            <p class="flush">Avec <span class="mono blue">address64</span>, un pointeur (voir 9.2) qui contient l’adresse <span class="mono blue">0x...3F06</span></p>
+          </div>
+          <div class="memblock" style="--cw: 150px; --ch: 70px;">
+            <div class="mem index">
+              <span class="rowlabel text green" style="width: 440px;">Nom de variable</span>
+              <span class="cell w4 green">x</span>
+            </div>
+            <div class="mem">
+              <span class="rowlabel text" style="width: 440px;">Contenu</span>
+              <span class="cell w4 var"><span class="red">40</span></span><span class="cell"></span><span class="cell brk"></span><span class="cell"></span>
+            </div>
+            <div class="mem addr">
+              <span class="rowlabel" style="width: 440px;"></span>
+              <span class="cell w4 blue">0x...3F06</span>
+            </div>
+          </div>
+          <aside class="notes">Adressage indirect : on accède à x par son adresse, contenue dans le pointeur address64 (voir 9.2), et non par son nom.</aside>
+        </section>
+
+      </section>
+
+      <!----------          POINTEURS          ---------->
+      <section>
+
+        <section>
+          <h2>9.2 Les pointeurs</h2>
+          <p class="tight"><b>Définition simple</b></p>
+          <p class="tight indent-1">Les pointeurs sont des variables qui mémorisent les adresses de la mémoire.</p>
+          <p class="tight indent-1">Ils donnent accès à un emplacement de la mémoire interne de l’ordinateur</p>
+          <p class="tight indent-2">Une <highlight>variable</highlight> permet d'accéder à un emplacement mémoire</p>
+          <svg class="diagram" width="1300" height="110" viewBox="0 0 1300 110" style="display: block; margin: 0 auto;">
+            <line class="rule" x1="0" y1="40" x2="1300" y2="40" /><line class="rule" x1="0" y1="100" x2="1300" y2="100" />
+            <rect class="memcell" x="190" y="40" width="150" height="60" /><rect class="memcell" x="340" y="40" width="150" height="60" /><rect class="memcell" x="490" y="40" width="150" height="60" />
+            <rect class="memcell" x="830" y="40" width="150" height="60" /><rect class="memcell" x="980" y="40" width="150" height="60" />
+            <text class="mono" x="905" y="28" text-anchor="middle">variable=5</text>
+            <text x="905" y="82" text-anchor="middle">5</text>
+          </svg>
+          <p class="tight indent-2">Un <highlight>pointeur</highlight> permet d’accéder à n’importe quel emplacement mémoire</p>
+          <svg class="diagram" width="1300" height="150" viewBox="0 0 1300 150" style="display: block; margin: 0 auto;">
+            <defs>
+              <marker id="tip-black" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" /></marker>
+            </defs>
+            <line class="rule" x1="0" y1="40" x2="1300" y2="40" /><line class="rule" x1="0" y1="100" x2="1300" y2="100" />
+            <rect class="memcell" x="190" y="40" width="150" height="60" /><rect class="memcell" x="340" y="40" width="150" height="60" /><rect class="memcell" x="490" y="40" width="150" height="60" />
+            <rect class="memcell" x="830" y="40" width="150" height="60" /><rect class="memcell" x="980" y="40" width="150" height="60" />
+            <text class="mono" x="415" y="28" text-anchor="middle">pointeur</text>
+            <text class="mono" x="905" y="28" text-anchor="middle">*pointeur=5</text>
+            <text x="905" y="82" text-anchor="middle">5</text>
+            <circle cx="415" cy="70" r="13" />
+            <path class="arrow" d="M 415 70 V 138 H 905 V 104" marker-end="url(#tip-black)" />
+          </svg>
+        </section>
+
+        <section>
+          <h2>9.2 Les pointeurs</h2>
+          <p><b>Définition</b></p>
+          <br>
+          <p class="tight">a)&nbsp; Un pointeur est une <highlight>variable</highlight></p>
+          <p class="tight">b)&nbsp; Un pointeur est une <highlight>variable qui contient une adresse</highlight></p>
+          <p class="tight">c)&nbsp; Un pointeur<highlight> peut contenir l’adresse d’une autre variable</highlight></p>
+          <br>
+          <p>Si un pointeur P contient l'adresse d'une variable A, on dit que <highlight>«P pointe sur A»</highlight></p>
+        </section>
+
+        <section>
+          <h2>9.2 Adresse d’une variable</h2>
+          <div style="display: flex; align-items: center; gap: 60px; padding-left: 200px;">
+            <p class="flush tight"><b>Déclaration de variable</b></p>
+            <pre style="width: 500px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              short x;
+            </code></pre>
+          </div>
+          <div class="memblock" style="--cw: 230px;">
+            <div class="mem index"><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell red">x</span></div>
+            <div class="mem"><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell brk"></span><span class="cell var mark"><span class="red">?</span></span><span class="cell"></span></div>
+            <div class="mem addr"><span class="cell">...3F04</span><span class="cell">...3F06</span><span class="cell">...3F08</span><span class="cell"></span><span class="cell">...5C26</span><span class="cell">...5C28</span></div>
+            <div style="width: 760px; margin-left: 655px; text-align: center; line-height: 1.2;"><span class="red">⬆</span><br><span class="mono">short</span> sur 2 octets soit 16 bits</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 60px; padding-left: 200px;">
+            <p class="flush tight"><b>Initialisation</b></p>
+            <pre style="width: 500px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              short x = 15;
+            </code></pre>
+          </div>
+          <div class="memblock" style="--cw: 230px;">
+            <div class="mem index"><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell red">x</span></div>
+            <div class="mem"><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell brk"></span><span class="cell var mark"><span class="red">15</span></span><span class="cell"></span></div>
+            <div class="mem addr"><span class="cell">...3F04</span><span class="cell">...3F06</span><span class="cell">...3F08</span><span class="cell"></span><span class="cell">...5C26</span><span class="cell">...5C28</span></div>
+          </div>
+        </section>
+
+        <section>
+          <h2>9.2 Adresse d’une variable</h2>
+          <div class="frame-blue">
+            <p class="tight">L’adresse de la variable x est obtenue par l’opérateur <highlight>&amp;</highlight></p>
+            <p class="tight"><inline-code>&nbsp;<span class="blue">&amp;</span>x&nbsp;</inline-code> &nbsp;<b>→ <highlight>adresse de la variable x</highlight></b></p>
+          </div>
+          <br>
+          <p><b>Exemple</b></p>
+          <p class="tight indent-1"><inline-code>printf("%p", (void *)<span class="blue">&amp;</span>x);</inline-code> → <span class="red mono">00FAE2010223<b style="font-size: 1.3em;">5C26</b></span></p>
+          <p class="tight indent-1">⚠ dépend du compilateur et de la plateforme (avec ou sans <span class="mono">0x</span>)</p>
+          <p class="tight indent-1">Le cast <inline-code>(void *)</inline-code> est nécessaire avec <span class="mono">%p</span> (chapitre 4)</p>
+          <div class="memblock" style="--cw: 230px;">
+            <div class="mem index"><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell">x</span></div>
+            <div class="mem"><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell brk"></span><span class="cell var mark">15</span><span class="cell"></span></div>
+            <div class="mem addr"><span class="cell">0x...3F04</span><span class="cell">0x...3F06</span><span class="cell">0x...3F08</span><span class="cell"></span><span class="cell"><span class="red">0x</span>...<span class="red">5C26</span></span><span class="cell">0x...5C28</span></div>
+          </div>
+        </section>
+
+        <section>
+          <h2>9.2 Syntaxe de déclaration d’un pointeur</h2>
+          <p class="centered"><span class="syntax"><span class="blue">&lt;type&gt; *</span>&lt;variable1&gt;, <span class="blue">*</span>&lt;variable2&gt;, … ;</span></p>
+          <p>Le type correspond au type de la case mémoire pointée.</p>
+          <p>Pour différencier un pointeur d'une variable ordinaire, <highlight>on fait précéder son nom du signe '*' lors de sa déclaration </highlight></p>
+          <br>
+          <div style="display: flex; align-items: center; gap: 60px; padding-left: 200px;">
+            <p class="flush"><b>Exemple</b></p>
+            <pre style="width: 800px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              double<span class="blue"> *</span>ptrD1,<span class="blue"> *</span>ptrD2;
+            </code></pre>
+          </div>
+          <br>
+          <p>➔ on déclare 2 variables <span class="mono">ptrD1 </span>et <span class="mono">ptrD2</span>, dont le contenu est une adresse (<highlight>*</highlight>) pointant sur un <span class="mono">double</span></p>
+        </section>
+
+        <section>
+          <h2>9.2 Déclaration d’un pointeur</h2>
+          <div style="display: flex; align-items: center; gap: 40px; padding-left: 160px;">
+            <pre style="width: 460px; margin: 0; flex: none;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              <span class="blue">short *</span>ptrX;
+            </code></pre>
+            <p class="flush tight">Réserve un emplacement pour stocker une adresse mémoire, pointant sur un entier de type <span class="mono blue">short</span></p>
+          </div>
+          <div class="memblock" style="--ch: 70px;">
+            <div class="mem index"><span class="cell"></span><span class="cell" style="text-align: left;">ptrX</span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell">x</span></div>
+            <div class="mem"><span class="cell"></span><span class="cell w4 mark"><span class="red">?</span></span><span class="cell brk"></span><span class="cell var">15</span><span class="cell"></span></div>
+            <div class="mem addr"><span class="cell">...3F04</span><span class="cell">...3F06</span><span class="cell">...3F08</span><span class="cell">...3F0A</span><span class="cell">...3F0C</span><span class="cell"></span><span class="cell">...5C26</span><span class="cell">...5C28</span></div>
+          </div>
+          <p class="centered tight"><span class="red">⬆</span> Adresse sur 8 octets, pas encore initialisée : valeur indéterminée</p>
+          <div style="display: flex; align-items: center; gap: 40px; padding-left: 160px;">
+            <pre style="width: 460px; margin: 0; flex: none;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              ptrX = <span class="blue">&amp;</span>x;
+            </code></pre>
+            <div>
+              <p class="flush tight">Écrit <highlight>l'adresse de <span class="mono">x</span> </highlight>dans la variable <span class="mono">ptrX</span></p>
+              <p class="flush tight">On dit alors que <highlight><span class="mono">ptrX</span> pointe sur <span class="mono">x</span></highlight></p>
+            </div>
+          </div>
+          <div class="memblock" style="--ch: 70px;">
+            <div class="mem index"><span class="cell"></span><span class="cell" style="text-align: left;">ptrX</span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell">x</span></div>
+            <div class="mem"><span class="cell"></span><span class="cell w4 mark"><span class="red">0x00FAE20102235C26</span></span><span class="cell brk"></span><span class="cell var">15</span><span class="cell"></span></div>
+            <div class="mem addr"><span class="cell">...3F04</span><span class="cell">...3F06</span><span class="cell">...3F08</span><span class="cell">...3F0A</span><span class="cell">...3F0C</span><span class="cell"></span><span class="cell">...<span class="red" style="font-size: 1.3em;">5C26</span></span><span class="cell">...5C28</span></div>
+          </div>
+        </section>
+
+        <section>
+          <h2>9.2 Opérateur de déréférencement <span class="blue">*</span></h2>
+          <p><highlight>Affiche</highlight> la valeur de <span class="mono">x</span> par pointeur déréférencé</p>
+          <p class="indent-1"><inline-code>printf("%d", <span class="blue">*</span><span class="red">ptrX</span>);</inline-code> → <b>15</b></p>
+          <br>
+          <div class="memblock">
+            <svg class="diagram" width="1600" height="190" viewBox="0 0 1600 190" style="display: block;">
+              <defs>
+                <marker id="tip-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#FF0000" /></marker>
+              </defs>
+              <path class="arrow red" d="M 600 186 C 600 40, 1215 40, 1215 180" marker-end="url(#tip-red)" />
+              <text class="mono b red" x="905" y="40" text-anchor="middle">*ptrX</text>
+              <text class="mono b" x="210" y="170">ptrX</text>
+              <text class="mono b" x="1250" y="170">x</text>
+            </svg>
+            <div class="mem"><span class="cell"></span><span class="cell w4 mark"><span class="red">0x00FAE20102235C26</span></span><span class="cell brk"></span><span class="cell var">15</span><span class="cell"></span></div>
+            <div class="mem addr"><span class="cell">...3F04</span><span class="cell">...3F06</span><span class="cell">...3F08</span><span class="cell">...3F0A</span><span class="cell">...3F0C</span><span class="cell"></span><span class="cell">...5C26</span><span class="cell">...5C28</span></div>
+          </div>
+          <aside class="notes">Dans l'exemple précédent vous avez dû remarquer que nous avons donné un type au pointeur (short *) : même <b>si dans un système donné un pointeur a toujours la même taille (8 octets avec l'adressage sur 64 bits du cours</b>), le langage impose de lui donner un type. Si vous ne savez pas à l'avance sur quel type de données il va pointer vous pouvez lui donner le type <b>void *</b> (voir la slide « Pointeurs particuliers »).<br><br>Dans ce cours, le nom des pointeurs est préfixé par "ptr" (ex. ptrX), pour une meilleure lisibilité du code.</aside>
+        </section>
+
+        <section>
+          <h2>9.2 Opérateur de déréférencement <span class="blue">*</span></h2>
+          <p><highlight>Affecte</highlight> une valeur à <span class="mono">x</span> par pointeur déréférencé</p>
+          <p class="indent-1"><inline-code>*ptrX = <span class="blue">20</span>;</inline-code></p>
+          <br>
+          <div class="memblock">
+            <svg class="diagram" width="1600" height="190" viewBox="0 0 1600 190" style="display: block;">
+              <path class="arrow red" d="M 600 186 C 600 40, 1215 40, 1215 180" marker-end="url(#tip-red)" />
+              <text class="mono b red" x="905" y="40" text-anchor="middle">*ptrX</text>
+              <text class="mono b" x="210" y="170">ptrX</text>
+              <text class="mono b" x="1250" y="170">x</text>
+            </svg>
+            <div class="mem"><span class="cell"></span><span class="cell w4 mark"><span class="red">0x00FAE20102235C26</span></span><span class="cell brk"></span><span class="cell var"><span class="red">20</span></span><span class="cell"></span></div>
+            <div class="mem addr"><span class="cell">...3F04</span><span class="cell">...3F06</span><span class="cell">...3F08</span><span class="cell">...3F0A</span><span class="cell">...3F0C</span><span class="cell"></span><span class="cell">...5C26</span><span class="cell">...5C28</span></div>
+          </div>
+          <aside class="notes">On se rend vite compte qu'un pointeur doit être <b>initialisé avec une adresse valide</b>, c'est à dire qui a été réservée en mémoire (allouée) par le programme pour être utilisée.<br><br>Imaginez-vous cette instruction, si nous n'avions pas initialisé le pointeur avec l'adresse de x : <b>l'écriture se ferait en un lieu indéterminé</b> de la mémoire.</aside>
+        </section>
+
+        <section>
+          <h2>9.2 Remarques</h2>
+          <p class="tight">Les pointeurs et les noms de variables donnent accès à un emplacement de la mémoire. <b>Mais :</b></p>
+          <p class="tight indent-1">un pointeur est une variable qui peut 'pointer' sur <highlight>différentes</highlight> <highlight>adresses</highlight></p>
+          <p class="tight indent-1">le nom d'une variable reste toujours lié à <highlight>la même adresse</highlight></p>
+          <p class="centered"><error>⚠ Ne pas confondre l’opérateur <span class="mono">*</span> de déréférencement avec la syntaxe déclarative</error></p>
+          <div style="display: grid; grid-template-columns: 560px 60px 980px; align-items: center; justify-content: center; row-gap: 20px; column-gap: 10px;">
+            <pre style="width: 100%; margin: 0; grid-row: 1 / 3; align-self: stretch;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em; height: 100%; box-sizing: border-box;">
+
+              char c;
+              <span class="blue">char *</span>ptrP;
+              ptrP = &amp;c;
+              <span class="red">*</span>ptrP = 'f';
+            </code></pre>
+            <p class="flush tight" style="grid-column: 2; grid-row: 1;">←</p>
+            <div class="frame-black" style="grid-column: 3; grid-row: 1;">
+              <p>Déclaration de pointeur <span class="mono blue">* </span>: la variable <span class="mono">ptrP</span> contient l’adresse d’un <span class="mono blue">char</span></p>
+            </div>
+            <p class="flush tight" style="grid-column: 2; grid-row: 2;">←</p>
+            <div class="frame-black" style="grid-column: 3; grid-row: 2;">
+              <p>Opérateur de déréférencement <span class="mono red">* </span>: accès au contenu de la mémoire pointée par <span class="mono">ptrP</span></p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="long-title">9.2 Résumé : les opérations sur les pointeurs</h2>
+          <p class="centered">L’utilisation de pointeurs nécessite :</p>
+          <div style="display: grid; grid-template-columns: 520px 1150px; align-items: center; justify-content: center; row-gap: 45px; column-gap: 40px;">
+            <div style="text-align: right;">
+              <pre style="width: 440px; margin: 0 0 0 auto;"><code
+                class="nohighlight"
+                data-trim
+                data-noescape
+                style="font-size: 1.6em;">
+
+                <span class="blue">&lt;type&gt;</span>
+                <span class="blue">*</span>ptrX<b>, </b><span class="blue">*</span>ptrY<b>;</b>
+              </code></pre>
+            </div>
+            <p class="flush tight">une <highlight>syntaxe de déclaration </highlight>pour pouvoir <b>déclarer</b> un pointeur</p>
+
+            <div style="text-align: right;">
+              <pre style="width: 130px; margin: 0 0 0 auto;"><code
+                class="nohighlight"
+                data-trim
+                data-noescape
+                style="font-size: 1.6em;">
+
+                <span class="blue">&amp;</span>x
+              </code></pre>
+            </div>
+            <p class="flush tight">un opérateur unaire pour obtenir <b>l'adresse d'une variable.</b> L’<highlight>opérateur «adresse de»</highlight> <highlight>&amp;</highlight></p>
+
+            <div style="text-align: right;">
+              <pre style="width: 200px; margin: 0 0 0 auto;"><code
+                class="nohighlight"
+                data-trim
+                data-noescape
+                style="font-size: 1.6em;">
+
+                <span class="blue">*</span>ptrX
+              </code></pre>
+            </div>
+            <p class="flush tight">un opérateur unaire pour <b>accéder au contenu </b>de la mémoire, par son adresse. L'<highlight>opérateur de déréférencement * </highlight>(«<i>contenu de</i>»)</p>
+          </div>
+        </section>
+
+        <section>
+          <h2>9.2 Priorité des opérateurs</h2>
+          <table class="priority">
+            <tr><th>Opérateur</th><th>Associativité</th><th>Priorité</th></tr>
+            <tr><td class="op">++ -- <i>(postfixé)</i> () []</td><td class="dir">→</td><td class="level">haute</td></tr>
+            <tr><td class="op"><span class="blue">&amp; <i>(adresse)</i> * <i>(déref.)</i></span> + -<i>(unaire)</i> ++ -- <i>(préfixé)</i> (&lt;Type&gt;) ! ~</td><td class="dir rtl">←</td><td></td></tr>
+            <tr><td class="op">* / %</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">+ -</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">&lt;&lt; &gt;&gt;</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">&lt; &gt; &lt;= &gt;=</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">== !=</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">&amp;</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">^</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">|</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">&amp;&amp;</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">||</td><td class="dir">→</td><td></td></tr>
+            <tr><td class="op">?:</td><td class="dir rtl">←</td><td></td></tr>
+            <tr><td class="op">= += -= *= /= %= &gt;&gt;= <i>etc</i></td><td class="dir rtl">←</td><td></td></tr>
+            <tr><td class="op">,</td><td class="dir">→</td><td class="level">basse</td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>9.2 Exemples</h2>
+          <div style="display: flex; align-items: flex-start; gap: 40px; padding-left: 100px;">
+            <pre style="width: 360px; margin: 10px 0 0 0; flex: none;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              ptrX = &amp;x;
+            </code></pre>
+            <div>
+              <p class="flush tight">Si un pointeur <span class="mono">ptrX</span> pointe sur une variable <span class="mono">x</span> alors <span class="mono blue">*ptrX</span> peut être utilisé partout où on peut écrire <span class="mono">x</span></p>
+              <p class="flush">Les expressions suivantes sont donc équivalentes</p>
+            </div>
+          </div>
+          <table class="equiv">
+            <tr><td>y = <span class="blue">*ptrX</span>+1</td><td class="eq">≡</td><td>y = <span class="blue">x</span>+1</td></tr>
+            <tr><td><span class="blue">*ptrX</span> = <span class="blue">*ptrX</span>+10</td><td class="eq">≡</td><td><span class="blue">x</span> = <span class="blue">x</span>+10</td></tr>
+            <tr><td><span class="blue">*ptrX</span> += 2</td><td class="eq">≡</td><td><span class="blue">x</span> += 2</td></tr>
+            <tr><td>++<span class="blue">*ptrX</span></td><td class="eq">≡</td><td>++<span class="blue">x</span></td></tr>
+            <tr><td>(<span class="blue">*ptrX</span>)++</td><td class="eq">≡</td><td><span class="blue">x</span>++</td></tr>
+          </table>
+          <p class="tight centered">⚠ Sans les parenthèses : <span class="mono red">*ptrX++</span> ≡ <span class="mono">*(ptrX++)</span>, c'est le <b>pointeur</b> qui est incrémenté, pas <span class="mono">x</span></p>
+          <p class="tight centered">➔ <span class="mono">ptrX</span> ne pointe plus sur <span class="mono">x</span> : lire <span class="mono">*ptrX</span> ensuite est un <error>comportement indéfini</error></p>
+          <aside class="notes">Dans le dernier cas, les parenthèses sont nécessaires :<br>Le <b>++</b> postfixé est prioritaire sur l'opérateur <b>*</b> (voir le tableau de la slide précédente) : sans les parenthèses, c'est le <i>pointeur</i> ptrX qui serait incrémenté, <i>et non pas l'objet</i> sur lequel ptrX pointe.</aside>
+        </section>
+
+        <section>
+          <h2>9.2 Pointeurs particuliers</h2>
+          <pre style="width: 640px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            int *ptrP = NULL;
+          </code></pre>
+          <p><b>La constante </b><span class="mono blue">NULL </span>est utilisée pour indiquer que <span class="mono">ptrP</span> <b>ne contient pas encore d'adresse valide</b>.</p>
+          <p class="tight indent-1">Déréférencer <span class="mono">NULL</span> : <error>comportement indéfini</error>, en pratique un plantage immédiat → l'erreur se voit tout de suite</p>
+          <p class="centered"><b style="color: #00CC00;">Bonne pratique : initialiser tous les pointeurs à <span class="mono">NULL</span></b></p>
+          <p class="tight indent-1">C23 : <span class="mono blue">nullptr</span> joue le même rôle ; le cours garde <span class="mono">NULL</span>, présent dans tout le code existant et les bibliothèques</p>
+          <br>
+          <p><b>Le type </b><span class="mono blue">void* </span>est utilisé quand on ne sait pas encore le type sur lequel va pointer le pointeur → type retourné par <span class="mono">malloc</span> (chapitre 10)</p>
+          <p class="indent-1 mono">void *ptrP;</p>
+          <aside class="notes">Déréférencer NULL est un comportement indéfini ; sur un PC, le système arrête le programme (segmentation fault). C'est la raison de la bonne pratique : un pointeur non initialisé écrit à un endroit quelconque, parfois sans rien de visible, alors qu'avec NULL l'erreur se voit à coup sûr et tout de suite. On peut aussi tester un pointeur avant de s'en servir : if (ptrP != NULL).<br><br>C23 ajoute le mot-clé nullptr (int *ptrP = nullptr; compile avec la commande du cours). Le cours garde NULL : c'est ce qu'on trouve dans le code existant, les bibliothèques et la documentation.<br><br>Attention, un pointeur <span class="mono">void *</span> ne peut pas être déréférencé sans un casting sur le type souhaité !<br>void *ptr;<br>int a = *ptr;	     // Erreur de compilation<br>int a = *(int*)ptr;  // Est possible</aside>
+        </section>
+
+        <section>
+          <h2>9.2 Vue d’ensemble</h2>
+          <div style="display: grid; grid-template-columns: 560px 1150px; align-items: center; justify-content: center; row-gap: 40px; column-gap: 40px;">
+            <pre style="width: 380px; margin: 0 0 0 auto;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              int a = 6;
+            </code></pre>
+            <div>
+              <p class="flush tight"><b>Constante</b></p>
+              <p class="flush tight" style="padding-left: 60px;">6 est une <b>constante</b> qui est déterminée lors de la <b>compilation </b>; elle n’est <b>pas modifiable</b> par le programme</p>
+            </div>
+
+            <pre style="width: 260px; margin: 0 0 0 auto;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              int a;
+              a = 6;
+            </code></pre>
+            <div>
+              <p class="flush tight"><b>Variable</b></p>
+              <p class="flush tight" style="padding-left: 60px;">L’adresse de <span class="mono">a</span> <b>ne change pas</b> pendant sa durée de vie. Le contenu de <span class="mono">a</span>, sa valeur, est <b>modifiable</b> par le programme</p>
+            </div>
+
+            <pre style="width: 540px; margin: 0 0 0 auto;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              int *ptr = NULL;
+              ptr = &amp;a;
+            </code></pre>
+            <div>
+              <p class="flush tight"><b>Pointeur</b></p>
+              <p class="flush tight" style="padding-left: 60px;">L’adresse de <span class="mono">ptr</span> <b>ne change pas</b> pendant sa durée de vie ; le contenu de <span class="mono">ptr</span>, l’adresse de la variable <span class="mono">a</span>, est <b>modifiable</b> par le programme</p>
+            </div>
+          </div>
+        </section>
+
+      </section>
+
+      <!----------          PARAMETRES FORMELS D'UNE FONCTION          ---------->
+      <section>
+
+        <section>
+          <h2>9.3 Passage de paramètres</h2>
+          <p>En programmation, il existe 2 modes de passage de paramètres</p>
+          <p class="tight"><b>Passage par </b><highlight>valeur</highlight></p>
+          <p class="tight indent-1">en entrée : le compilateur passe la valeur à la fonction</p>
+          <p class="tight"><b>Passage par </b><highlight>adresse</highlight></p>
+          <p class="tight indent-1">en entrée/sortie : le compilateur passe l’adresse de la variable</p>
+          <p class="tight indent-1">→ la fonction peut lire et modifier la valeur de la variable</p>
+          <br>
+          <p><highlight>En C, le passage de paramètres ne se fait que par valeur !</highlight></p>
+          <aside class="notes">la fonction appelante fait une copie des valeurs passées en paramètre dans la pile d'exécution et la fonction appelée utilisera ces copies pour ses paramètres. Ces copies disparaîtront lors du retour à la fonction appelante. Donc toute modification de ces copies dans la fonction appelée n'a aucun effet sur les valeurs des variables de la fonction appelante.</aside>
+        </section>
+
+        <section>
+          <h2>9.3 Passage de paramètres</h2>
+          <br>
+          <p><b>Principe</b></p>
+          <br>
+          <p class="indent-1">1.&nbsp; La fonction appelante fait une <highlight>copie des valeurs passées en paramètre</highlight> dans la pile («<i>stack»</i>)</p>
+          <p class="indent-1">2.&nbsp; La fonction appelée utilisera ces copies comme paramètres</p>
+          <p class="indent-1">3.&nbsp; Ces copies disparaîtront lors du retour à la fonction appelante</p>
+          <aside class="notes">la fonction appelante fait une copie des valeurs passées en paramètre dans la pile d'exécution et la fonction appelée utilisera ces copies pour ses paramètres. Ces copies disparaîtront lors du retour à la fonction appelante. Donc toute modification de ces copies dans la fonction appelée n'a aucun effet sur les valeurs des variables de la fonction appelante.</aside>
+        </section>
+
+        <section>
+          <h2>9.3 Passage par valeur</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 40px;">
+            <pre style="width: 830px; margin: 0; flex: none;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.5em;">
+
+              <span class="bar callee"> </span><span class="step"> </span><b>void exchange(int a, int b)</b>
+              <span class="bar callee"> </span><span class="step"> </span><b>{</b>
+              <span class="bar callee"> </span><span class="step"> </span><b>  int tmp = a;</b>
+              <span class="bar callee"> </span><span class="step">❶</span><b>  a = b;</b>
+              <span class="bar callee"> </span><span class="step"> </span><b>  b = tmp;</b>
+              <span class="bar callee"> </span><span class="step">❷</span><b>}</b>
+              <span class="bar"> </span><span class="step"> </span>                  <span class="red">↑     ↑</span>
+              <span class="bar"> </span><span class="step"> </span>                  <span class="red">20    40</span>
+              <span class="bar main"> </span><span class="step"> </span>int main(void)
+              <span class="bar main"> </span><span class="step"> </span>{
+              <span class="bar main"> </span><span class="step"> </span>  int u = 20, v = 40;
+              <span class="bar main"> </span><span class="step"> </span>  printf("u = %d v = %d\n", u, v);
+              <span class="bar main"> </span><span class="step"> </span><b>  exchange(u, v);</b>
+              <span class="bar main"> </span><span class="step">❸</span>  printf("u = %d v = %d\n", u, v);
+              <span class="bar main"> </span><span class="step"> </span>  return 0;
+              <span class="bar main"> </span><span class="step"> </span>}
+            </code></pre>
+            <div>
+              <svg class="diagram" width="900" height="470" viewBox="0 0 900 470" style="display: block;">
+                <rect x="2" y="2" width="896" height="466" fill="none" stroke="#376092" stroke-width="3" />
+                <circle class="step" cx="470" cy="38" r="26" /><text class="white b" x="470" y="50" text-anchor="middle">1</text>
+                <circle class="step" cx="650" cy="38" r="26" /><text class="white b" x="650" y="50" text-anchor="middle">2</text>
+                <circle class="step" cx="820" cy="38" r="26" /><text class="white b" x="820" y="50" text-anchor="middle">3</text>
+                <line class="rule" x1="2" y1="74" x2="898" y2="74" /><line class="rule" x1="2" y1="190" x2="898" y2="190" /><line class="rule" x1="2" y1="362" x2="898" y2="362" />
+                <text x="20" y="118">Contexte de</text><text class="mono b" x="20" y="162">main</text>
+                <text x="20" y="250">Contexte de</text><text class="mono b" x="20" y="294">exchange</text>
+                <text class="mono" x="372" y="116" text-anchor="end">u</text><text class="mono" x="372" y="172" text-anchor="end">v</text>
+                <text class="mono" x="372" y="232" text-anchor="end">a</text><text class="mono" x="372" y="288" text-anchor="end">b</text><text class="mono" x="372" y="344" text-anchor="end">tmp</text>
+
+                <rect class="box" x="395" y="78" width="150" height="370" />
+                <rect class="main" x="395" y="78" width="150" height="56" /><text class="blue" x="470" y="118" text-anchor="middle">20</text>
+                <rect class="main" x="395" y="134" width="150" height="56" /><text class="blue" x="470" y="174" text-anchor="middle">40</text>
+                <rect class="callee" x="395" y="194" width="150" height="56" /><text class="blue b" x="470" y="234" text-anchor="middle">20</text>
+                <rect class="callee" x="395" y="250" width="150" height="56" /><text class="blue b" x="470" y="290" text-anchor="middle">40</text>
+                <rect class="callee" x="395" y="306" width="150" height="56" /><text class="blue b" x="470" y="346" text-anchor="middle">20</text>
+
+                <rect class="box" x="575" y="78" width="150" height="370" />
+                <rect class="main" x="575" y="78" width="150" height="56" /><text class="blue" x="650" y="118" text-anchor="middle">20</text>
+                <rect class="main" x="575" y="134" width="150" height="56" /><text class="blue" x="650" y="174" text-anchor="middle">40</text>
+                <rect class="callee" x="575" y="194" width="150" height="56" /><text class="blue b" x="650" y="234" text-anchor="middle">40</text>
+                <rect class="callee" x="575" y="250" width="150" height="56" /><text class="blue" x="650" y="290" text-anchor="middle">20</text>
+                <rect class="callee" x="575" y="306" width="150" height="56" /><text class="blue" x="650" y="346" text-anchor="middle">20</text>
+
+                <rect class="box" x="745" y="78" width="150" height="370" />
+                <rect class="main" x="745" y="78" width="150" height="56" /><text class="blue" x="820" y="118" text-anchor="middle">20</text>
+                <rect class="main" x="745" y="134" width="150" height="56" /><text class="blue" x="820" y="174" text-anchor="middle">40</text>
+              </svg>
+              <div style="display: flex; align-items: center; gap: 50px; margin-top: 30px;">
+                <pre class="terminal" style="width: 330px; margin: 0; flex: none;"><code
+                  class="nohighlight"
+                  data-trim
+                  style="font-size: 1.6em; font-weight: bold;">
+
+                  u = 20 v = 40
+                  u = 20 v = 40
+                </code></pre>
+                <div class="verdict red">
+                  <p>Les valeurs u et v ne sont</p>
+                  <p>PAS échangées !</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>9.3 Passage de paramètres</h2>
+          <br>
+          <br>
+          <p><b>Comment échanger, avec une fonction en langage C, les valeurs de 2 variables ?</b></p>
+          <br>
+          <p class="indent-2" style="padding-right: 150px;">Puisque le seul mode de passage des paramètres (en C) se fait par copie, pour modifier <span class="mono">u</span> et <span class="mono">v</span> depuis la fonction <span class="mono blue">exchange</span>, on doit accéder à leur valeur de manière indirecte, avec un pointeur !</p>
+        </section>
+
+        <section>
+          <h2>9.3 Passage par valeur… d’une adresse</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 30px;">
+            <pre style="width: 850px; margin: 0; flex: none;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.5em;">
+
+              <span class="bar callee"> </span><span class="step"> </span><b>void exchange(int <span class="red">*</span>ptrA, int <span class="red">*</span>ptrB)</b>
+              <span class="bar callee"> </span><span class="step"> </span><b>{</b>
+              <span class="bar callee"> </span><span class="step"> </span><b>  int tmpValue = <span class="red">*</span>ptrA;</b>
+              <span class="bar callee"> </span><span class="step">❶</span><b>  <span class="red">*</span>ptrA = <span class="red">*</span>ptrB;</b>
+              <span class="bar callee"> </span><span class="step"> </span><b>  <span class="red">*</span>ptrB = tmpValue;</b>
+              <span class="bar callee"> </span><span class="step">❷</span><b>}</b>
+              <span class="bar"> </span><span class="step"> </span>                    <span class="red">↑          ↑</span>
+              <span class="bar"> </span><span class="step"> </span>                <span class="red">0x...FF32  0x...FF36</span>
+              <span class="bar main"> </span><span class="step"> </span>int main(void)
+              <span class="bar main"> </span><span class="step"> </span>{
+              <span class="bar main"> </span><span class="step"> </span>  int u = 20, v = 40;
+              <span class="bar main"> </span><span class="step"> </span>  printf("u = %d v = %d\n", u, v);
+              <span class="bar main"> </span><span class="step"> </span><b>  exchange(<span class="red">&amp;</span>u, <span class="red">&amp;</span>v);</b>
+              <span class="bar main"> </span><span class="step">❸</span>  printf("u = %d v = %d\n", u, v);
+              <span class="bar main"> </span><span class="step"> </span>  return 0;
+              <span class="bar main"> </span><span class="step"> </span>}
+            </code></pre>
+            <div>
+              <svg class="diagram" width="900" height="470" viewBox="0 0 900 470" style="display: block;">
+                <defs>
+                  <marker id="tip-thin" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10" fill="none" stroke="#000000" stroke-width="1.5" /></marker>
+                </defs>
+                <rect x="2" y="2" width="896" height="466" fill="none" stroke="#376092" stroke-width="3" />
+                <circle class="step" cx="395" cy="38" r="26" /><text class="white b" x="395" y="50" text-anchor="middle">1</text>
+                <circle class="step" cx="635" cy="38" r="26" /><text class="white b" x="635" y="50" text-anchor="middle">2</text>
+                <circle class="step" cx="815" cy="38" r="26" /><text class="white b" x="815" y="50" text-anchor="middle">3</text>
+                <line class="rule" x1="2" y1="190" x2="898" y2="190" /><line class="rule" x1="2" y1="362" x2="898" y2="362" />
+                <text class="blue" x="20" y="118">0x...FF32</text><text class="blue" x="20" y="174">0x...FF36</text>
+                <text class="mono" x="300" y="116" text-anchor="end">u</text><text class="mono" x="300" y="172" text-anchor="end">v</text>
+                <text class="mono" x="300" y="232" text-anchor="end">ptrA</text><text class="mono" x="300" y="288" text-anchor="end">ptrB</text><text class="mono" x="300" y="344" text-anchor="end">tmpValue</text>
+
+                <rect class="box" x="320" y="78" width="150" height="370" />
+                <rect class="main" x="320" y="78" width="150" height="56" /><text class="blue" x="395" y="118" text-anchor="middle">20</text>
+                <rect class="main" x="320" y="134" width="150" height="56" /><text class="blue" x="395" y="174" text-anchor="middle">40</text>
+                <rect class="callee" x="320" y="194" width="150" height="56" /><text class="blue" x="386" y="231" text-anchor="middle" style="font-size: 24px;">0x...FF32</text>
+                <rect class="callee" x="320" y="250" width="150" height="56" /><text class="blue" x="386" y="287" text-anchor="middle" style="font-size: 24px;">0x...FF36</text>
+                <rect class="callee" x="320" y="306" width="150" height="56" /><text class="blue" x="395" y="346" text-anchor="middle">20</text>
+                <circle cx="458" cy="222" r="9" /><circle cx="458" cy="278" r="9" />
+                <path class="arrow" style="stroke-width: 2;" d="M 458 222 H 505 V 106 H 474" marker-end="url(#tip-thin)" />
+                <path class="arrow" style="stroke-width: 2;" d="M 458 278 H 530 V 162 H 474" marker-end="url(#tip-thin)" />
+
+                <rect class="box" x="560" y="78" width="150" height="370" />
+                <rect class="main" x="560" y="78" width="150" height="56" /><text class="blue b" x="635" y="118" text-anchor="middle">40</text>
+                <rect class="main" x="560" y="134" width="150" height="56" /><text class="blue b" x="635" y="174" text-anchor="middle">20</text>
+                <rect class="callee" x="560" y="194" width="150" height="56" /><text class="blue" x="635" y="231" text-anchor="middle" style="font-size: 24px;">0x...FF32</text>
+                <rect class="callee" x="560" y="250" width="150" height="56" /><text class="blue" x="635" y="287" text-anchor="middle" style="font-size: 24px;">0x...FF36</text>
+                <rect class="callee" x="560" y="306" width="150" height="56" /><text class="blue" x="635" y="346" text-anchor="middle">20</text>
+
+                <rect class="box" x="740" y="78" width="150" height="370" />
+                <rect class="main" x="740" y="78" width="150" height="56" /><text class="blue" x="815" y="118" text-anchor="middle">40</text>
+                <rect class="main" x="740" y="134" width="150" height="56" /><text class="blue" x="815" y="174" text-anchor="middle">20</text>
+              </svg>
+              <div style="display: flex; align-items: center; gap: 50px; margin-top: 30px;">
+                <pre class="terminal" style="width: 330px; margin: 0; flex: none;"><code
+                  class="nohighlight"
+                  data-trim
+                  style="font-size: 1.6em; font-weight: bold;">
+
+                  u = 20 v = 40
+                  u = 40 v = 20
+                </code></pre>
+                <div class="verdict green">
+                  <p>Les valeurs u et v sont</p>
+                  <p>maintenant échangées !</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="tight centered">Comme <span class="mono">scanf("%d", <span class="red">&amp;</span>x);</span> (chapitre 4) : <span class="mono red">&amp;</span> donne l’adresse de <span class="mono">x</span>, pour que <span class="mono">scanf</span> puisse y écrire</p>
+          <p class="tight centered"><span class="mono">scanf("%79s", word);</span> : pas de <span class="mono red">&amp;</span>, le nom d’un tableau est déjà une adresse (voir 9.4)</p>
+        </section>
+
+        <section>
+          <h2>⚠ 9.3 Pièges des pointeurs</h2>
+          <div style="display: grid; grid-template-columns: 540px 1200px; align-items: center; justify-content: center; row-gap: 30px; column-gap: 50px;">
+            <pre style="width: 100%; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              int<span class="red">*</span> a, b;
+            </code></pre>
+            <div>
+              <p class="flush tight"><b>Déclaration multiple</b> : seul <span class="mono">a</span> est un pointeur, <span class="mono">b</span> est un <span class="mono">int</span></p>
+              <p class="flush tight">➔ une <span class="mono blue">*</span> par pointeur : <span class="mono">int <span class="blue">*</span>a, <span class="blue">*</span>b;</span></p>
+            </div>
+
+            <pre style="width: 100%; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              int *p;
+              <span class="red">*p</span> = 20;
+            </code></pre>
+            <div>
+              <p class="flush tight"><b>Pointeur non initialisé</b> : adresse indéterminée</p>
+              <p class="flush tight">➔ <error>comportement indéfini</error> (gcc : <span class="mono red">-Wuninitialized</span>)</p>
+              <p class="flush tight">➔ toujours initialiser : <span class="mono">int *p = <span class="blue">&amp;x</span>;</span> ou <span class="mono blue">NULL</span></p>
+            </div>
+
+            <pre style="width: 100%; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              int *f(void)
+              {
+                int x = 1;
+                return <span class="red">&amp;x</span>;
+              }
+            </code></pre>
+            <div>
+              <p class="flush tight"><b>Pointeur pendant</b> : <span class="mono">x</span> disparaît de la <highlight>pile</highlight> au retour de <span class="mono">f</span></p>
+              <p class="flush tight">➔ l’adresse renvoyée ne désigne plus rien</p>
+              <p class="flush tight">➔ <error>comportement indéfini</error> (gcc : <span class="mono red" style="white-space: nowrap;">-Wreturn-local-addr</span>)</p>
+            </div>
+          </div>
+          <aside class="notes">Déclaration multiple : l'étoile appartient au nom, pas au type. D'où l'écriture « int *a » du cours plutôt que « int* a ». gcc ne dit rien.<br><br>Pointeur non initialisé : comme toute variable locale, p contient ce qui traînait en mémoire. L'écriture se fait à un endroit quelconque : plantage, ou pire, rien de visible. Avec NULL, le déréférencement plante aussi, mais à coup sûr et tout de suite.<br><br>Pointeur pendant : même mécanisme que les copies de 9.3, les variables locales disparaissent au retour de la fonction. Avec gcc 15.2, f() renvoie même un pointeur nul. Le chapitre 11 (11.4, types de retour) y revient avec une chaîne.<br><br>Avec -Werror, les deux derniers pièges ne compilent pas (vérifié avec gcc 15.2).</aside>
+        </section>
+
+      </section>
+
+      <!----------          TABLEAUX ET POINTEURS          ---------->
+      <section>
+
+        <section>
+          <h2>9.4 Rappel : variable et pointeur</h2>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 120px; margin: 20px 0 30px 0;">
+            <pre style="width: 480px; margin: 0; flex: none;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              int x=20;
+              int *ptrX;
+              ptrX = &amp;x;
+            </code></pre>
+            <div class="memblock" style="margin: 0; --cw: 260px; --ch: 80px;">
+              <div class="mem index"><span class="cell half"></span><span class="cell red">ptrX</span><span class="cell half"></span><span class="cell" style="text-align: left;"><span class="blue">x</span> <span class="red">*ptrX</span></span></div>
+              <div class="mem" style="border-top: 3px solid #000; border-bottom: 3px solid #000;"><span class="cell half gap"></span><span class="cell" style="font-size: 30px;"><span class="red">0x...5C26</span></span><span class="cell half gap"></span><span class="cell var"><span class="blue" style="color: #0000FF; font-size: 44px;">20</span></span><span class="cell half gap"></span></div>
+              <div class="mem addr"><span class="cell half"></span><span class="cell"></span><span class="cell half"></span><span class="cell red" style="text-align: center;">0x...5C26</span></div>
+              <div class="mem"><span class="cell half gap" style="height: 16px;"></span><span class="cell gap" style="height: 16px;"></span><span class="cell half gap" style="height: 16px;"></span><span style="width: var(--cw); flex: none;"><div class="brace-under" style="margin: 0 30px;"></div></span></div>
+              <div class="mem index"><span class="cell half"></span><span class="cell"></span><span class="cell half"></span><span class="cell red">&amp;x</span></div>
+            </div>
+          </div>
+          <table class="plain">
+            <tr><td style="width: 200px;"><span class="mono">x</span></td><td>désigne le <span class="blue">contenu </span>de <span class="mono">x</span></td><td></td></tr>
+            <tr><td><span class="mono"><span class="blue">&amp;</span>x</span></td><td>désigne <span class="blue">l’adresse</span> de <span class="mono">x</span></td><td></td></tr>
+            <tr><td><span class="mono">ptrX</span></td><td>contient <span class="blue">l’adresse</span> de <span class="mono">x</span></td><td style="padding-left: 80px;">→ <span class="mono">ptrX</span> pointe sur <span class="mono">x</span></td></tr>
+            <tr><td><span class="mono"><span class="blue">*</span>ptrX</span></td><td>désigne le <span class="blue">contenu</span> de <span class="mono">x</span></td><td></td></tr>
+          </table>
+          <aside class="notes">ptrX pointe sur x : il contient son adresse, &amp;x.<br>*ptrX : opérateur de déréférencement, désigne le contenu de x.</aside>
+        </section>
+
+        <section>
+          <h2>9.4 Lien entre pointeur et tableau</h2>
+          <div class="frame-blue" style="margin: 0 0 0 100px;">
+            <p class="tight"><highlight>Le nom d’un tableau, ici <i>t</i>, représente en réalité son adresse !</highlight></p>
+          </div>
+          <div style="display: flex; align-items: flex-end; gap: 20px; padding-left: 400px; margin-top: 15px;">
+            <pre style="width: 610px; margin: 0; flex: none;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              int t[4] = {10, 11, 12, 13};
+              <span class="blue">printf("%p", (void *)t);</span>
+            </code></pre>
+            <p class="flush tight" style="margin-bottom: 14px;"><b>⟶</b></p>
+            <pre class="terminal" style="width: 520px; margin: 0; flex: none;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              000000000000<b>5CF<span class="hl-yellow">0</span></b>
+            </code></pre>
+          </div>
+          <p class="tight" style="padding-left: 400px;"><span class="mono">%p → </span>format pour afficher une adresse en hexadécimal</p>
+          <p class="tight" style="padding-left: 520px;">⚠ dépend du compilateur et de la plateforme (avec ou sans <span class="mono">0x</span>)</p>
+          <div class="memblock" style="--cw: 250px; --ch: 76px; margin-top: 10px;">
+            <div class="mem index"><span class="cell"><span style="float: left; font-family: 'Roboto', Helvetica, sans-serif;">t ↓</span>t[0]</span><span class="cell">t[1]</span><span class="cell">t[2]</span><span class="cell">t[3]</span></div>
+            <div class="mem"><span class="cell arr">10</span><span class="cell arr">11</span><span class="cell arr">12</span><span class="cell arr">13</span></div>
+            <div class="mem addr"><span class="cell red">...5CF0</span><span class="cell"><span class="red">...</span>5CF4</span><span class="cell"><span class="red">...</span>5CF8</span><span class="cell"><span class="red">...</span>5CFC</span></div>
+            <div class="brace-under"></div>
+          </div>
+          <p class="centered tight"><error><span class="mono">t</span> vaut <i class="mono">0x...5CF0</i></error></p>
+        </section>
+
+        <section>
+          <h2>9.4 Lien entre pointeur et tableau</h2>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+            <pre style="width: 700px; margin: 0; flex: none;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              int t[4] = {10, 11, 12, 13};
+              printf("%p\n", (void *)t);
+              printf("%p\n", (void *)(t+1));
+              printf("%p\n", (void *)(t+2));
+              printf("%p\n", (void *)(t+3));
+            </code></pre>
+            <p class="flush tight"><b>⟶</b></p>
+            <pre class="terminal" style="width: 520px; margin: 38px 0 0 0; flex: none;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              000000000000<b>5CF<span class="hl-yellow">0</span></b>
+              000000000000<b>5CF<span class="hl-yellow">4</span></b>
+              000000000000<b>5CF<span class="hl-yellow">8</span></b>
+              000000000000<b>5CF<span class="hl-yellow">C</span></b>
+            </code></pre>
+          </div>
+          <p class="centered tight"><span class="mono blue">t+1</span> : élément suivant → l’adresse avance de 4 octets (taille d’un <span class="mono">int</span>)</p>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 80px;">
+            <div class="memblock" style="margin: 0; --cw: 240px; --ch: 70px;">
+              <div class="mem index"><span class="cell blue">t[0]</span><span class="cell blue">t[1]</span><span class="cell blue">t[2]</span><span class="cell blue">t[3]</span></div>
+              <div class="mem"><span class="cell arr">10</span><span class="cell arr">11</span><span class="cell arr">12</span><span class="cell arr">13</span></div>
+              <div class="mem addr"><span class="cell">⬆<span class="red">...</span>5CF0</span><span class="cell">⬆<span class="red">...</span>5CF4</span><span class="cell">⬆<span class="red">...</span>5CF8</span><span class="cell">⬆<span class="red">...</span>5CFC</span></div>
+              <div class="mem addr"><span class="cell blue">t</span><span class="cell blue">t+1</span><span class="cell blue">t+2</span><span class="cell blue">t+3</span></div>
+            </div>
+            <div>
+              <p class="flush tight"><span class="mono blue">t[0]</span> est équivalent à <span class="mono blue">*t</span></p>
+              <p class="flush tight"><span class="mono blue">t[1]</span> est équivalent à <span class="mono blue">*(t+1)</span></p>
+              <p class="flush tight"><span class="mono blue">t[2]</span> est équivalent à <span class="mono blue">*(t+2)</span></p>
+              <p class="flush tight"><span class="mono blue">t[3]</span> est équivalent à <span class="mono blue">*(t+3)</span></p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>9.4 Lien entre pointeur et tableau</h2>
+          <p class="centered tight"><highlight>Formalisme tableau vs formalisme pointeur</highlight></p>
+          <div class="frame-blue" style="padding: 4px 120px;">
+            <p class="tight"><span class="mono blue">t[i] </span>est équivalent <span class="mono blue">*(t+i)</span></p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 60px; padding-left: 200px; margin-top: 15px;">
+            <p class="flush tight"><b>Exemple</b> </p>
+            <pre style="width: 640px; margin: 0; flex: none;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              int t[4]; t[<span class="blue">2</span>] = <span class="red">66</span>;
+            </code></pre>
+          </div>
+          <div class="memblock" style="--cw: 250px; --ch: 76px; margin-top: 10px;">
+            <div class="mem index"><span class="cell"><span style="float: left; font-family: 'Roboto', Helvetica, sans-serif;">t</span>0</span><span class="cell">1</span><span class="cell blue">2</span><span class="cell">3</span></div>
+            <div class="mem"><span class="cell arr"></span><span class="cell arr"></span><span class="cell arr"><span class="red">66</span></span><span class="cell arr"></span></div>
+            <div class="mem addr"><span class="cell red">...5CF0</span><span class="cell"><span class="red">...</span>5CF4</span><span class="cell"><span class="red">...</span>5CF8</span><span class="cell"><span class="red">...</span>5CFC</span></div>
+            <div class="brace-under" style="width: calc(3 * var(--cw));"></div>
+          </div>
+          <br>
+          <table class="plain mono" style="margin: 0 auto; font-size: 1em;">
+            <tr><td style="text-align: right;">t+<span class="blue">2</span></td><td>→ 5CF0 + <span class="blue">2</span>*sizeof(int) = 5CF8</td></tr>
+            <tr><td style="text-align: right;">*(t+2)</td><td>→ *(5CF8)→ <span class="red">66</span></td></tr>
+          </table>
+        </section>
+
+        <section>
+          <h2>⚠ 9.4 Différence entre tableau et pointeur</h2>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 60px;">
+            <pre style="width: 900px; margin: 0; flex: none;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em; font-weight: bold;">
+
+              int <span class="ring red"><span>t</span></span>[10];      <span class="red note">⟵ tableau : non affectable</span>
+
+              int *<span class="ring blue"><span>ptr</span></span>;      <span class="blue note">⟵ variable</span>
+              ....
+              ptr = t;
+            </code></pre>
+          </div>
+          <br>
+          <p class="tight">Un pointeur est une <highlight>variable</highlight>, donc des opérations comme</p>
+          <p class="tight"><span class="mono">ptr=t;</span> ou <span class="mono">ptr++ </span>sont <highlight>permises</highlight>.</p>
+          <p class="tight">Un tableau n'est <error>pas une variable</error> que l'on peut affecter : son nom est converti en l'adresse de son premier élément,</p>
+          <p class="tight">donc des opérations comme <span class="mono">t=ptr </span>ou <span class="mono">t++ </span>sont <error>impossibles</error>.</p>
+        </section>
+
+        <section>
+          <h2>9.4 Différence entre tableau et pointeur</h2>
+          <p class="mono" style="font-size: 1.3em;">int t[10];&nbsp;&nbsp; // sizeof(t) → 40</p>
+          <p class="tight">Un tableau <highlight>est</highlight> une <highlight>zone mémoire</highlight> (ici 10 <span class="mono">int</span> de 4 octets).</p>
+          <p class="tight">Aucun pointeur n'est stocké : son nom est converti en l'adresse du premier élément.</p>
+          <br>
+          <p class="mono" style="font-size: 1.3em;">int *ptr = t;&nbsp;&nbsp; // sizeof(ptr) → 8</p>
+          <p class="tight">Un <highlight>pointeur</highlight> est une variable qui contient une <highlight>adresse</highlight> (8 octets).</p>
+          <br>
+          <p class="tight"><warning>⚠</warning> Un tableau passé en paramètre à une fonction est <error>converti en pointeur</error><br>(chapitre 8 : «&nbsp;dégénéré en pointeur&nbsp;»)&nbsp;:</p>
+          <p class="mono" style="font-size: 1.3em;">void f(int tab[])&nbsp;&nbsp; // sizeof(tab) → 8</p>
+          <aside class="notes">sizeof(ptr) vaut 8 sur une machine 64 bits (hypothèse du cours), 4 sur une machine 32 bits.<br>Dans f, tab est un int * : sizeof(tab) ne donne plus la taille du tableau, il faut passer la taille en paramètre.</aside>
+        </section>
+
+        <section>
+          <h2 class="long-title">9.4 Formalisme tableau et formalisme pointeur</h2>
+          <div style="display: flex; align-items: flex-start; justify-content: center; gap: 60px;">
+            <pre style="width: 840px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              int main(void)
+              {
+                int t[10] = {-3, 4, 0, -7 /* ... */};
+                int pos[10];
+                int j = 0;
+
+                for (int i = 0; i &lt; 10; i++)
+                {
+                  if (<span class="blue">t[i]</span> &gt; 0)
+                  {
+                    <span class="blue">pos[j]</span><b> = </b><span class="blue">t[i]</span><b>;</b>
+                    j++;
+                  }
+                }
+                return 0;
+              }
+            </code></pre>
+            <pre style="width: 840px; margin: 0;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              int main(void)
+              {
+                int t[10] = {-3, 4, 0, -7 /* ... */};
+                int pos[10];
+                int j = 0;
+
+                for (int i = 0; i &lt; 10; i++)
+                {
+                  if (<span class="blue">*(t + i)</span> &gt; 0)
+                  {
+                    <span class="blue">*(pos + j)</span><b> = </b><span class="blue">*(t + i)</span><b>;</b>
+                    j++;
+                  }
+                }
+                return 0;
+              }
+            </code></pre>
+          </div>
+        </section>
+
+        <section>
+          <h2>9.4 Pointeur et <span class="mono blue">const</span></h2>
+          <div style="display: grid; grid-template-columns: 700px 1100px; align-items: center; justify-content: center; row-gap: 40px; column-gap: 40px;">
+            <pre style="width: 100%; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.5em; font-weight: bold;">
+
+              <span class="blue">const</span> char *p = "abc";
+              <span class="red">*p = 'X';</span>
+              p++;
+            </code></pre>
+            <div>
+              <p class="flush tight">Pointeur sur des <span class="mono">char</span> <highlight>non modifiables</highlight></p>
+              <p class="flush tight">➔ modifier <span class="mono red">*p</span> : <error>erreur de compilation</error></p>
+              <p class="flush tight">➔ modifier <span class="mono">p</span> : permis, <span class="mono">p</span> reste une variable</p>
+              <p class="flush tight">Chaîne littérale (chapitre 8) : à ne pas modifier ➔ <span class="mono blue">const</span></p>
+            </div>
+
+            <pre style="width: 100%; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.5em; font-weight: bold;">
+
+              void mystrcpy(char *ptrCh1,
+                            <span class="blue">const</span> char *ptrCh2)
+            </code></pre>
+            <div>
+              <p class="flush tight"><b>Contrat</b> : la fonction <highlight>ne modifie pas</highlight> la chaîne source</p>
+              <p class="flush tight">➔ vérifié par le compilateur</p>
+              <p class="flush tight">➔ accepte une chaîne littérale : <span class="mono">mystrcpy(s, "abc");</span></p>
+            </div>
+
+            <pre style="width: 100%; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.5em; font-weight: bold;">
+
+              char *<span class="blue">const</span> q = t;
+            </code></pre>
+            <div>
+              <p class="flush tight">🌶️ <span class="mono blue">const</span> après l’<span class="mono">*</span> : c’est <span class="mono">q</span> qui n’est pas modifiable</p>
+              <p class="flush tight">➔ <span class="mono">*q = 'X';</span> permis, <span class="mono red">q++</span> interdit</p>
+            </div>
+          </div>
+          <aside class="notes">Lecture de droite à gauche : « p est un pointeur sur des char const ». Le const protège ce qui est pointé, pas le pointeur.<br>gcc 15.2 : error: assignment of read-only location '*p'.<br><br>Chapitre 8 : char greeting[6] = "salut"; copie la chaîne dans un tableau, modifiable. Avec un pointeur, on pointe sur la chaîne littérale elle-même : la modifier est un comportement indéfini, d'où const char *. Même mot-clé que le tableau de valeurs constantes de 8.1.<br><br>Contrat : l'appelant sait que sa chaîne ne sera pas touchée ; la destination, elle, n'est pas const puisqu'on y écrit. C'est le prototype du vrai strcpy().<br><br>🌶️ char *const q : gcc 15.2 : error: increment of read-only variable 'q'. Les deux se combinent : const char *const.</aside>
+        </section>
+
+        <section>
+          <h2>9.4 Exemple d’implémentation de <span class="mono">strcpy()</span></h2>
+          <pre style="width: 1500px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 2em;">
+
+            void mystrcpy(char *ptrCh1,
+                          const char *ptrCh2)
+            {
+             int i = 0;
+             while <span class="blue">(</span><span class="red">(</span>ptrCh1[i] = ptrCh2[i]<span class="red">)</span> != '\0'<span class="blue">)</span>
+                    i++;
+            }
+          </code></pre>
+          <pre style="width: 1500px; margin-top: 10px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 2em;">
+
+            char dest[16];
+            mystrcpy(dest, "abc");
+          </code></pre>
+          <p class="tight centered"><warning>⚠</warning> <span class="mono">dest</span> doit pouvoir contenir la chaîne <b>et</b> son <span class="mono">'\0'</span>, sinon : <error>comportement indéfini</error> (chapitre 8)</p>
+        </section>
+
+        <section>
+          <h2>9.4 Exemple d’implémentation de <span class="mono">strcpy()</span></h2>
+          <pre style="width: 1500px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 2em;">
+
+            void mystrcpy(char *ptrCh1,
+                          const char *ptrCh2)
+            {
+             int i = 0;
+             while<span class="red">( </span>(*(ptrCh1+i) = *(ptrCh2+i) ) != '\0'<span class="red">)</span>
+                  i++;
+            }
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>9.4 Exemple d’implémentation de <span class="mono">strcpy()</span></h2>
+          <pre style="width: 1500px;"><code
+            class="nohighlight"
+            data-trim
+            data-noescape
+            style="font-size: 2em; font-weight: bold;">
+
+            void mystrcpy(char *ptrCh1,
+                          const char *ptrCh2)
+            {
+              while ( (*ptrCh1 = *ptrCh2) != '\0' )
+              {
+                ptrCh1++;
+                ptrCh2++;
+              }
+            }
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>9.4 Exemple d’implémentation de <span class="mono">strcpy()</span></h2>
+          <pre style="width: 1500px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 2em;">
+
+            void mystrcpy(char *ptrCh1,
+                          const char *ptrCh2)
+            {
+                while ((*ptrCh1++ = *ptrCh2++) != '\0')
+                    ;
+            }
+          </code></pre>
+          <p class="tight centered">Forme courte <span class="mono red"><s>while (*ptrCh1++ = *ptrCh2++);</s></span> : avertissement de gcc (<span class="mono red">-Wparentheses</span>)</p>
+          <p class="tight centered">➔ un <span class="mono">=</span> dans une condition ressemble à une faute de frappe pour <span class="mono">==</span></p>
+          <aside class="notes">Ordre : copie du caractère, avance des deux pointeurs (post-incrément), puis comparaison du caractère copié à '\0' : le '\0' final est copié avant l'arrêt. Le corps de la boucle est vide (le ; seul).<br>gcc 15.2, forme courte : warning: suggest parentheses around assignment used as truth value [-Wparentheses], en erreur avec -Werror (commande de la page).<br>Les doubles parenthèses while ((*ptrCh1++ = *ptrCh2++)); font aussi taire gcc, mais la comparaison explicite se lit mieux. Même forme que l'exemple 09.05.</aside>
+        </section>
+
+        <section>
+          <h2 class="long-title">9.4 Parcourir un tableau avec un pointeur</h2>
+          <p class="tight">Comme dans <span class="mono">mystrcpy()</span> : <span class="mono blue">p++</span> avance d’un <highlight>élément</highlight></p>
+          <pre style="width: 1100px; margin-top: 10px;"><code
+            class="c"
+            data-trim
+            data-noescape
+            style="font-size: 1.6em;">
+
+            int t[SIZE] = {10, 11, 12, 13};
+
+            for (int *p = t; <span class="blue">p &lt; t + SIZE</span>; <span class="blue">p++</span>)
+              printf("%d ", *p);
+          </code></pre>
+          <div class="memblock" style="--cw: 240px; --ch: 70px; margin-top: 10px;">
+            <div class="mem index"><span class="cell blue">t[0]</span><span class="cell blue">t[1]</span><span class="cell blue">t[2]</span><span class="cell blue">t[3]</span><span class="cell"></span></div>
+            <div class="mem"><span class="cell arr">10</span><span class="cell arr">11</span><span class="cell arr">12</span><span class="cell arr">13</span><span class="cell gap" style="border: 2px dashed #FF0000;"></span></div>
+            <div class="mem addr"><span class="cell">⬆<span class="red">...</span>5CF0</span><span class="cell">⬆<span class="red">...</span>5CF4</span><span class="cell">⬆<span class="red">...</span>5CF8</span><span class="cell">⬆<span class="red">...</span>5CFC</span><span class="cell">⬆<span class="red">...</span>5D00</span></div>
+            <div class="mem addr"><span class="cell blue">t</span><span class="cell blue">t+1</span><span class="cell blue">t+2</span><span class="cell blue">t+3</span><span class="cell red">t+SIZE</span></div>
+          </div>
+          <table class="plain" style="margin-top: 10px;">
+            <tr><td style="width: 420px;"><span class="mono blue">p &lt; t + SIZE</span></td><td>comparaison de deux <highlight>adresses</highlight> du même tableau</td></tr>
+            <tr><td><span class="mono red">t + SIZE</span></td><td>un élément après la fin : à comparer, <error>jamais à déréférencer</error></td></tr>
+          </table>
+          <aside class="notes">Les opérateurs &lt;, &lt;=, &gt;, &gt;=, == et != fonctionnent sur deux pointeurs du même tableau.<br>p++, p--, p += n, p -= n : toujours en nombre d'éléments, le compilateur multiplie par sizeof(int).</aside>
+        </section>
+
+        <section>
+          <h2>9.4 Différence de deux pointeurs</h2>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+            <pre style="width: 900px; margin: 0; flex: none;"><code
+              class="c"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              int t[4] = {10, 11, 12, 13};
+              int *p = t;
+              printf("<span class="blue">%td</span>", <span class="blue">&amp;t[3] - p</span>);
+            </code></pre>
+            <p class="flush tight"><b>⟶</b></p>
+            <pre class="terminal" style="width: 160px; margin: 0; flex: none;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em; font-weight: bold;">
+
+              3
+            </code></pre>
+          </div>
+          <div class="frame-blue" style="margin-top: 20px;">
+            <p class="tight">Un nombre <highlight>d’éléments</highlight>, pas d’octets</p>
+          </div>
+          <table class="plain mono" style="margin: 15px auto 0 auto; font-size: 1em;">
+            <tr><td style="text-align: right;">&amp;t[3] - p</td><td>→ (5CFC - 5CF0) / sizeof(int) = <span class="red">3</span></td></tr>
+          </table>
+          <p class="tight"><span class="mono">%td → </span>format pour afficher une différence de pointeurs</p>
+          <br>
+          <p class="tight">⚠ Un pointeur doit rester dans <highlight>son tableau</highlight>, ou juste après le dernier élément (<span class="mono">t + 4</span>)</p>
+          <p class="tight indent-1">au-delà : <error>comportement indéfini</error></p>
+          <p>📚 Référence : <a href="https://en.cppreference.com/w/c/language/operator_arithmetic#Pointer_arithmetic">cppreference → arithmétique des pointeurs</a></p>
+          <aside class="notes">Le résultat peut être négatif (p - &amp;t[3] vaut -3).<br>Soustraire deux pointeurs qui ne pointent pas dans le même tableau : comportement indéfini.<br>Le chapitre 11 (11.1) revient sur l'arithmétique des pointeurs.</aside>
+        </section>
+
+      </section>
+
+      <!----------          RESUME          ---------->
+      <section>
+
+        <section>
+          <h2>Programmer avec des pointeurs : <span class="blue">résumé</span></h2>
+          <div style="display: grid; grid-template-columns: 560px 400px 480px; justify-content: center; column-gap: 60px; row-gap: 10px;">
+            <p class="flush tight centered"><b>Déclaration</b></p>
+            <p class="flush tight centered"><b>Initialisation</b></p>
+            <p class="flush tight centered"><b>Utilisation</b></p>
+            <pre style="width: 100%; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              int  var, tab[5];
+              <span class="blue">int *</span>ptrT = NULL;
+              <span class="blue">int *</span>ptrV = NULL;
+            </code></pre>
+            <pre style="width: 100%; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              ptrV = <span class="blue">&amp;</span>var;
+              ptrT = tab;
+            </code></pre>
+            <pre style="width: 100%; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              <span class="blue">*</span>ptrV = 6;
+              <span class="blue">*</span>(ptrT + 1) = 4;
+              <span class="blue">*</span>ptrT = <span class="blue">*</span>ptrV;
+            </code></pre>
+          </div>
+          <br>
+          <p class="centered"><b>Fonction avec un argument de type pointeur</b></p>
+          <div style="display: grid; grid-template-columns: 300px 640px; justify-content: center; align-items: center; column-gap: 40px; row-gap: 30px;">
+            <p class="flush tight" style="text-align: right;">Déclaration</p>
+            <pre style="width: 100%; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              void foo(<span class="blue">int *</span>ptr);
+            </code></pre>
+            <p class="flush tight" style="text-align: right;">appel</p>
+            <pre style="width: 100%; margin: 0;"><code
+              class="nohighlight"
+              data-trim
+              data-noescape
+              style="font-size: 1.6em;">
+
+              foo(ptr);
+              foo(<span class="blue">&amp;</span>var);
+            </code></pre>
+          </div>
+          <aside class="notes">Note : on peut aussi écrire foo(int ptr[]), qui montre qu'on attend un tableau. Pour un paramètre, int [] est exactement int * : le tableau passé en paramètre est converti en pointeur (voir la slide « 9.4 Différence entre tableau et pointeur », sizeof(tab) → 8).</aside>
+        </section>
+
+        <section>
+          <h2>Résumé : le pointeur</h2>
+          <br>
+          <br>
+          <div style="display: table; margin: 0 auto; border: 3px solid #000000; padding: 30px 120px 30px 60px;">
+            <p class="flush"><b>Un pointeur</b></p>
+            <p class="flush" style="padding-left: 100px;"><highlight>est</highlight> une <highlight>variable</highlight></p>
+            <p class="flush" style="padding-left: 100px;"><highlight>contient</highlight> une <highlight>adresse mémoire</highlight></p>
+            <p class="flush" style="padding-left: 100px;"><highlight>est associé </highlight>à une <highlight>arithmétique</highlight></p>
+          </div>
+        </section>
+
+      </section>
+
+      <!----------          EXERCICES          ---------->
+      <section>
+        <h2>📝 Exercices</h2>
+        <p style="text-align: center; padding-left: 0;">
+          <a href="https://he-arc.github.io/1242.1-Langage_C/docs/cours/chapitre09cours/">Exercices du chapitre 09</a>
+        </p>
+      </section>
+
+    </div>
+  </div>
+
+  <!----------          CONTENT          ---------->
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/notes/notes.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      hash: true,
+      width: 1920,
+      height: 1080,
+      transition: "none",
+      center: false,
+      slideNumber: 'c/t',
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+    });
+  </script>
+</body>
+
+</html>
